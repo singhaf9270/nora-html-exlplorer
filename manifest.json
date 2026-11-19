@@ -1,9 +1,9 @@
 {
   "id": "nora-html-exporter",
   "name": "Nora HTML Exporter",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "minAppVersion": "1.4.0",
-  "description": "Bilingual (FA/EN) Obsidian plugin to export notes or entire folders as standalone Nora HTML Reader files, including a single merged HTML book with embedded Vault attachments.",
+  "description": "Bilingual (FA/EN) plugin to export notes or entire folders as standalone Nora HTML Reader files, including a single merged HTML book with embedded Vault attachments.",
   "author": "Saeed",
   "authorUrl": "",
   "isDesktopOnly": false
