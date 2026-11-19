@@ -6,8 +6,7 @@ Create beautiful, standalone HTML reading experiences from your Obsidian notes. 
 
 - **Single-note export:** Export the current Markdown note with a customizable cover and reader appearance.
 - **Quick export:** Generate HTML using your saved defaults.
-- **Batch folder export:** Export every Markdown note in a selected folder as a separate HTML file.
-- **Merged folder export:** Combine every Markdown note in a selected folder into **one complete HTML document**. Each note becomes a section in a shared table of contents.
+- **Folder export:** Combine every Markdown note in a selected folder into **one complete HTML document**. Each note becomes a section in a shared table of contents. Folder export creates one HTML file, not one file per note.
 - **Nested folders:** Include subfolders when exporting a folder.
 - **Attachment embedding:** Embed local Vault images and supported attachments as Base64 data so exported documents can work offline.
 - **Live preview:** Preview a note in an Obsidian side panel.
@@ -32,20 +31,14 @@ Once published, install **Nora HTML Exporter** from Obsidian's Community plugins
 ### Export one note
 Open a Markdown note and use the Nora ribbon button, the command palette, or the note context menu. Choose the full export dialog to customize the cover and reader, or use **Quick export** to apply your defaults.
 
-### Export a folder as separate HTML files
-1. Run **Batch export a folder to HTML** from the command palette, or right-click a folder.
-2. Select a folder and decide whether to include subfolders.
-3. Optionally preserve the subfolder structure in the output.
-4. Click **Start Batch Export**.
-
-### Export a folder as one merged HTML file
+### Export a folder as one HTML file
 1. Run **Batch export a folder to HTML** from the command palette, or right-click a folder.
 2. Select the source folder.
-3. Enable **Include subfolders** if the nested notes should also be included.
+3. Enable **Include subfolders** if nested notes should also be included.
 4. Click **Export Entire Folder as One HTML**.
-5. Nora creates one standalone HTML reader containing all selected notes, separated into sections and listed in a shared table of contents.
+5. Nora combines all selected Markdown notes into one standalone HTML reader. Each note becomes a separate section in the same document, with a shared table of contents.
 
-The merged document is saved under the configured export directory, inside a folder named after the source folder. The output is a single HTML file; it does not create a separate HTML file for each note.
+The result is exactly one `.html` file for the selected folder, regardless of how many Markdown notes it contains. It is saved under the configured export directory, inside a folder named after the source folder.
 
 ## Settings
 
