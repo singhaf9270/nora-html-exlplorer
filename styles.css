@@ -1,0 +1,396 @@
+/* ===== Nora HTML Exporter v1.3.0 - Bilingual (FA / EN) Plugin Styles ===== */
+
+.nora-modal {
+  font-family: 'Vazirmatn', 'IRANSans', var(--font-interface), system-ui, -apple-system, sans-serif;
+}
+
+.nora-modal.nora-rtl,
+.nora-preview-root.nora-rtl,
+.nora-settings.nora-rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.nora-modal.nora-ltr,
+.nora-preview-root.nora-ltr,
+.nora-settings.nora-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.nora-modal .modal-content {
+  padding-top: 8px;
+}
+
+.nora-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.nora-modal-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6759d6, #19a7a0);
+  color: #fff;
+  font-weight: 900;
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  box-shadow: 0 6px 16px rgba(103, 89, 214, 0.28);
+}
+
+.nora-modal-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.nora-modal-title-wrap h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-normal);
+}
+
+.nora-modal-title-wrap p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nora-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nora-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.nora-lang-switch:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+}
+
+.nora-section-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--interactive-accent);
+  margin: 16px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nora-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px 14px;
+}
+
+.nora-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.nora-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.nora-field.wide {
+  grid-column: 1 / -1;
+}
+
+.nora-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.nora-field input[type="text"],
+.nora-field select,
+.nora-field textarea {
+  width: 100%;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border-radius: 9px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.nora-field textarea {
+  resize: vertical;
+  min-height: 68px;
+  line-height: 1.7;
+}
+
+.nora-field input:focus,
+.nora-field select:focus,
+.nora-field textarea:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(103, 89, 214, 0.16);
+  outline: none;
+}
+
+.nora-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  font-size: 12.5px;
+}
+
+.nora-toggle-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.nora-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--background-secondary-alt);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.nora-stat-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.nora-progress-box {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  display: none;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nora-progress-box.active {
+  display: flex;
+}
+
+.nora-progress-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nora-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--background-modifier-border);
+  overflow: hidden;
+}
+
+.nora-progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6759d6, #19a7a0);
+  transition: width 0.18s ease;
+}
+
+.nora-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.nora-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nora-btn {
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.14s, border-color 0.14s, opacity 0.14s;
+}
+
+.nora-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--interactive-accent);
+}
+
+.nora-btn:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.nora-btn.primary {
+  background: linear-gradient(135deg, #6759d6, #19a7a0);
+  border: 0;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(103, 89, 214, 0.3);
+}
+
+.nora-btn.primary:hover:not(:disabled) {
+  opacity: 0.94;
+}
+
+/* ===== Live Preview Side View ===== */
+.nora-preview-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: 'Vazirmatn', 'IRANSans', var(--font-interface), system-ui, -apple-system, sans-serif;
+  background: var(--background-secondary);
+}
+
+.nora-preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 9px 12px;
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.nora-preview-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text-normal);
+}
+
+.nora-preview-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #6759d6, #19a7a0);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.nora-preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nora-preview-controls select,
+.nora-preview-controls button {
+  font-family: inherit;
+  font-size: 11.5px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.nora-preview-controls button.nora-export-mini {
+  background: linear-gradient(135deg, #6759d6, #19a7a0);
+  color: #fff;
+  border: 0;
+  font-weight: 700;
+  padding: 5px 10px;
+}
+
+.nora-preview-iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.nora-preview-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+  gap: 10px;
+}
+
+.nora-preview-empty .big {
+  font-size: 40px;
+}
+
+@media (max-width: 640px) {
+  .nora-grid,
+  .nora-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
