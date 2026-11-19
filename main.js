@@ -26,7 +26,8 @@ const DEFAULT_SETTINGS = {
   docType: '',
   exportFolder: 'Nora Exports',
   embedAttachments: true,
-  openAfterExport: true
+  openAfterExport: true,
+  chapterHeadingLevel: '1'
 };
 
 /* =========================================================
@@ -174,6 +175,14 @@ const I18N = {
     setEmbedDesc: 'تصاویر، صوت، ویدیو و PDFهای داخل Vault به صورت خودکار داخل فایل HTML قرار می‌گیرند تا فایل کاملاً مستقل و آفلاین باشد.',
     setOpenName: 'باز کردن خودکار در مرورگر پس از ذخیره',
     setOpenDesc: 'در نسخه دسکتاپ، بلافاصله بعد از ساخت HTML آن را در مرورگر پیش‌فرض سیستم باز می‌کند.',
+    setChapterHeadingName: 'سطح هدینگ شروع فصل در خروجی یکپارچه',
+    setChapterHeadingDesc: 'عنوان هر فایل به‌عنوان شروع یک فصل درج می‌شود. سطح هدینگ را برای فصل‌ها انتخاب کنید (H1 تا H6).',
+    supportHeading: 'همراه ما باشید',
+    supportIntro: 'آموزش‌ها، تازه‌ها و نکته‌های کاربردی ابسیدین را در کانال‌های ما دنبال کنید.',
+    supportJoin: 'عضویت در کانال',
+    supportDonationTitle: 'با همراهی شما، ادامه می‌دهیم',
+    supportDonationDesc: 'اگر این افزونه برایتان مفید بوده، می‌توانید از ادامهٔ توسعهٔ آن حمایت کنید.',
+    supportDonate: 'حمایت مالی',
 
     // Exported Reader UI
     reader: {
@@ -421,6 +430,14 @@ const I18N = {
     setEmbedDesc: 'Embed images, audio, video, and PDFs directly inside the HTML file so it works completely offline.',
     setOpenName: 'Open in Browser After Saving',
     setOpenDesc: 'On desktop, automatically opens the generated HTML file in your default web browser.',
+    setChapterHeadingName: 'Chapter heading level for merged export',
+    setChapterHeadingDesc: 'Each file title starts a new chapter. Choose the heading level (H1–H6).',
+    supportHeading: 'Stay Connected',
+    supportIntro: 'Follow our channels for Obsidian tutorials, updates, and practical tips.',
+    supportJoin: 'Join channel',
+    supportDonationTitle: 'Your support keeps us going',
+    supportDonationDesc: 'If this plugin is useful, you can support its continued development.',
+    supportDonate: 'Support us',
 
     // Exported Reader UI
     reader: {
@@ -1365,6 +1382,9 @@ function buildStandaloneHtml(mdText, options, attachmentsMap) {
   const dir = options.direction === 'auto' ? t.dir : (options.direction || t.dir);
   const size = parseInt(options.fontSize, 10) || 16;
   const initWidth = options.width || '850';
+  const splitHeadingTag = options.chapterHeadingLevel
+    ? `H${Math.min(6, Math.max(1, parseInt(options.chapterHeadingLevel, 10) || 1))}`
+    : null;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
   const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang });
@@ -2150,6 +2170,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   const sourceEl=document.querySelector('#chapters');
   const coverEl=document.querySelector('#coverSection');
   const raw=${JSON.stringify(content)};
+  const splitHeadingTag=${JSON.stringify(splitHeadingTag)};
   const nf=n=>Number(n||0).toLocaleString(S.locale);
   const isRtl=getComputedStyle(document.documentElement).direction!=='ltr';
   const prev=document.querySelector('#prev'), next=document.querySelector('#next');
@@ -2177,7 +2198,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   }
   let pages=[],chunk=null;
   for(const node of [...temp.childNodes]){
-    if(node.nodeType===1&&/^H[12]$/.test(node.tagName)){
+    if(node.nodeType===1&&(splitHeadingTag ? node.tagName===splitHeadingTag : /^H[12]$/.test(node.tagName))){
       if(chunk&&chunk.childNodes.length) pages.push(chunk);
       chunk=document.createElement('div');
       chunk.className='article';
@@ -3324,6 +3345,58 @@ class NoraSettingTab extends PluginSettingTab {
           this.plugin.settings.openAfterExport = val;
           await this.plugin.saveSettings();
         }));
+
+    new Setting(containerEl)
+      .setName(t.setChapterHeadingName)
+      .setDesc(t.setChapterHeadingDesc)
+      .addDropdown(dd => {
+        for (let level = 1; level <= 6; level++) {
+          dd.addOption(String(level), `H${level}`);
+        }
+        return dd.setValue(String(this.plugin.settings.chapterHeadingLevel || '1'))
+          .onChange(async val => {
+            this.plugin.settings.chapterHeadingLevel = val;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    this.addSupportSection(containerEl, uiLang === 'fa');
+  }
+
+  addSupportSection(container, fa) {
+    const t = I18N[fa ? 'fa' : 'en'];
+    const root = container.createDiv({ cls: 'nora-support' });
+    root.setAttribute('dir', fa ? 'rtl' : 'ltr');
+    root.createEl('h3', { cls: 'nora-support-heading', text: t.supportHeading });
+    root.createEl('p', { cls: 'nora-support-intro', text: t.supportIntro });
+
+    const grid = root.createDiv({ cls: 'nora-channel-grid' });
+    const channels = [
+      ['💬', fa ? 'بله' : 'Bale', 'https://ble.ir/obsidiantut'],
+      ['✈️', fa ? 'تلگرام' : 'Telegram', 'https://t.me/obsidiantut'],
+      ['▶️', fa ? 'یوتیوب' : 'YouTube', 'https://youtube.com/@obsidiantut']
+    ];
+    for (const [symbol, name, url] of channels) {
+      const card = grid.createEl('a', { cls: 'nora-channel' });
+      card.href = url;
+      card.setAttribute('target', '_blank');
+      card.setAttribute('rel', 'noopener noreferrer');
+      card.setAttribute('aria-label', (fa ? 'عضویت در کانال ' : 'Join our ') + name);
+      card.createSpan({ cls: 'nora-channel-icon', text: symbol });
+      card.createSpan({ cls: 'nora-channel-name', text: name });
+      card.createSpan({ cls: 'nora-channel-handle', text: '@obsidiantut' });
+      card.createSpan({ cls: 'nora-channel-join', text: t.supportJoin });
+    }
+
+    const donation = root.createDiv({ cls: 'nora-donation' });
+    donation.createDiv({ cls: 'nora-donation-icon', text: '♥' });
+    const copy = donation.createDiv({ cls: 'nora-donation-copy' });
+    copy.createEl('h4', { cls: 'nora-donation-title', text: t.supportDonationTitle });
+    copy.createEl('p', { cls: 'nora-donation-desc', text: t.supportDonationDesc });
+    const button = donation.createEl('a', { cls: 'nora-donation-button', text: t.supportDonate });
+    button.href = 'https://reymit.ir/singhaf9270';
+    button.setAttribute('target', '_blank');
+    button.setAttribute('rel', 'noopener noreferrer');
   }
 }
 
@@ -3560,9 +3633,10 @@ class NoraHtmlExporterPlugin extends Plugin {
         : file.path.slice(folderPath.length).replace(/^\/+/, '');
       const sectionTitle = file.basename || file.name;
 
-      // Each note is placed under a level-one heading so the reader can build
-      // one continuous table of contents and unique section anchors.
-      combinedParts.push(`# ${sectionTitle}\n\n<!-- Nora source: ${relativePath.replace(/-->/g, '')} -->\n\n${cleanMarkdown}`);
+      // Each source note starts a new chapter using the configured heading level.
+      const chapterLevel = Math.min(6, Math.max(1, parseInt(this.settings.chapterHeadingLevel, 10) || 1));
+      const chapterHeading = '#'.repeat(chapterLevel);
+      combinedParts.push(`${chapterHeading} ${sectionTitle}\n\n${cleanMarkdown}`);
 
       const noteAttachments = await resolveAttachmentsMap(this.app, markdown, file, {
         forExport: true,
@@ -3589,6 +3663,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       fontSize: state.fontSize,
       width: state.width,
       readerLanguage: state.readerLanguage,
+      chapterHeadingLevel: this.settings.chapterHeadingLevel || '1',
       uiLang,
       forExport: true
     }, attachmentsMap);
