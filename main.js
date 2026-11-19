@@ -3628,9 +3628,6 @@ class NoraHtmlExporterPlugin extends Plugin {
 
       const markdown = await this.app.vault.read(file);
       const cleanMarkdown = stripFrontmatter(markdown);
-      const relativePath = folderPath === '/'
-        ? file.path
-        : file.path.slice(folderPath.length).replace(/^\/+/, '');
       const sectionTitle = file.basename || file.name;
 
       // Each source note starts a new chapter using the configured heading level.
