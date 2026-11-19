@@ -1,1 +1,83 @@
-# nora-html-exlplorer
+# Nora HTML Exporter
+
+Create beautiful, standalone HTML reading experiences from your Obsidian notes. Nora supports Persian and English interfaces, right-to-left and left-to-right layouts, interactive reading tools, and offline-friendly attachment embedding.
+
+## Features
+
+- **Single-note export:** Export the current Markdown note with a customizable cover and reader appearance.
+- **Quick export:** Generate HTML using your saved defaults.
+- **Batch folder export:** Export every Markdown note in a selected folder as a separate HTML file.
+- **Merged folder export:** Combine every Markdown note in a selected folder into **one complete HTML document**. Each note becomes a section in a shared table of contents.
+- **Nested folders:** Include subfolders when exporting a folder.
+- **Attachment embedding:** Embed local Vault images and supported attachments as Base64 data so exported documents can work offline.
+- **Live preview:** Preview a note in an Obsidian side panel.
+- **Bilingual interface:** Persian and English plugin UI and exported reader.
+- **Reader customization:** Light/dark mode, color palettes, cover styles, text direction, font size, and page width.
+- **Interactive reader:** Table of contents, text search, bookmarks, highlights, annotations, footnotes, and print/PDF support.
+- **Frontmatter metadata:** Use note metadata for the exported cover and document details.
+
+## Installation
+
+### Community plugins
+Once published, install **Nora HTML Exporter** from Obsidian's Community plugins browser.
+
+### Manual installation
+1. Download `main.js`, `manifest.json`, and `styles.css` from the latest GitHub release.
+2. Create a folder named `nora-html-exporter` inside your Vault's `.obsidian/plugins/` directory.
+3. Place the three files in that folder.
+4. Reload Obsidian and enable **Nora HTML Exporter** in Community plugins.
+
+## Usage
+
+### Export one note
+Open a Markdown note and use the Nora ribbon button, the command palette, or the note context menu. Choose the full export dialog to customize the cover and reader, or use **Quick export** to apply your defaults.
+
+### Export a folder as separate HTML files
+1. Run **Batch export a folder to HTML** from the command palette, or right-click a folder.
+2. Select a folder and decide whether to include subfolders.
+3. Optionally preserve the subfolder structure in the output.
+4. Click **Start Batch Export**.
+
+### Export a folder as one merged HTML file
+1. Run **Batch export a folder to HTML** from the command palette, or right-click a folder.
+2. Select the source folder.
+3. Enable **Include subfolders** if the nested notes should also be included.
+4. Click **Export Entire Folder as One HTML**.
+5. Nora creates one standalone HTML reader containing all selected notes, separated into sections and listed in a shared table of contents.
+
+The merged document is saved under the configured export directory, inside a folder named after the source folder. The output is a single HTML file; it does not create a separate HTML file for each note.
+
+## Settings
+
+Open **Settings → Nora HTML Exporter** to configure:
+
+- Plugin interface language (Persian, English, or automatic)
+- Default exported reader language
+- Export destination folder
+- Default document type, theme, palette, and cover style
+- Default text direction
+- Automatic attachment embedding
+- Opening exported HTML after creation
+
+## Offline attachments
+
+When **Embed Vault images & attachments** is enabled, Nora attempts to embed referenced local Vault files into the HTML document. This makes the output portable and suitable for offline reading. Large media files can significantly increase the resulting HTML file size. Remote web links still require an internet connection.
+
+## Compatibility
+
+- Obsidian desktop and mobile (the plugin manifest does not restrict the platform).
+- Minimum Obsidian version: **1.4.0**.
+
+Some operating-system browser-opening behavior is desktop-only; exported files can still be opened manually on mobile.
+
+## Development
+
+The plugin is implemented in JavaScript and uses the Obsidian plugin API. The repository includes:
+
+- `main.js` — plugin logic and standalone HTML reader generator
+- `styles.css` — plugin modal, settings, and preview styles
+- `manifest.json` — Obsidian plugin metadata
+
+## License
+
+No license file is currently included in this repository. Please check with the repository maintainer before redistributing or modifying the project.
