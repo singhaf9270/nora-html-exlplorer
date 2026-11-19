@@ -1266,10 +1266,12 @@ function renderMarkdown(md, opts = {}) {
 
     if (/^#{1,6}\s/.test(t)) {
       let m = t.match(/^(#{1,6})\s+(.*)$/), level = m[1].length, text = m[2].replace(/\s+#+\s*$/, '');
+      const isNoraChapter = text.startsWith('NORA_CHAPTER_START::');
+      if (isNoraChapter) text = text.slice('NORA_CHAPTER_START::'.length).trim();
       let id = 'section-' + headings.length;
       text = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/__(.*?)__/g, '$1');
       headings.push({ level, text, id });
-      html += `<h${level} id="${id}">${renderInline(text, inlineOpts)}</h${level}>`;
+      html += `<h${level} id="${id}"${isNoraChapter ? ' data-nora-chapter="true"' : ''}>${renderInline(text, inlineOpts)}</h${level}>`;
       i++;
       continue;
     }
@@ -1382,9 +1384,7 @@ function buildStandaloneHtml(mdText, options, attachmentsMap) {
   const dir = options.direction === 'auto' ? t.dir : (options.direction || t.dir);
   const size = parseInt(options.fontSize, 10) || 16;
   const initWidth = options.width || '850';
-  const splitHeadingTag = options.chapterHeadingLevel
-    ? `H${Math.min(6, Math.max(1, parseInt(options.chapterHeadingLevel, 10) || 1))}`
-    : null;
+  const splitMarkedChaptersOnly = options.splitMarkedChaptersOnly === true;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
   const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang });
@@ -2170,7 +2170,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   const sourceEl=document.querySelector('#chapters');
   const coverEl=document.querySelector('#coverSection');
   const raw=${JSON.stringify(content)};
-  const splitHeadingTag=${JSON.stringify(splitHeadingTag)};
+  const splitMarkedChaptersOnly=${JSON.stringify(splitMarkedChaptersOnly)};
   const nf=n=>Number(n||0).toLocaleString(S.locale);
   const isRtl=getComputedStyle(document.documentElement).direction!=='ltr';
   const prev=document.querySelector('#prev'), next=document.querySelector('#next');
@@ -2198,7 +2198,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   }
   let pages=[],chunk=null;
   for(const node of [...temp.childNodes]){
-    if(node.nodeType===1&&(splitHeadingTag ? node.tagName===splitHeadingTag : /^H[12]$/.test(node.tagName))){
+    if(node.nodeType===1&&(splitMarkedChaptersOnly ? node.hasAttribute('data-nora-chapter') : /^H[12]$/.test(node.tagName))){
       if(chunk&&chunk.childNodes.length) pages.push(chunk);
       chunk=document.createElement('div');
       chunk.className='article';
@@ -3633,7 +3633,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       // Each source note starts a new chapter using the configured heading level.
       const chapterLevel = Math.min(6, Math.max(1, parseInt(this.settings.chapterHeadingLevel, 10) || 1));
       const chapterHeading = '#'.repeat(chapterLevel);
-      combinedParts.push(`${chapterHeading} ${sectionTitle}\n\n${cleanMarkdown}`);
+      combinedParts.push(`${chapterHeading} NORA_CHAPTER_START::${sectionTitle}\n\n${cleanMarkdown}`);
 
       const noteAttachments = await resolveAttachmentsMap(this.app, markdown, file, {
         forExport: true,
@@ -3661,6 +3661,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       width: state.width,
       readerLanguage: state.readerLanguage,
       chapterHeadingLevel: this.settings.chapterHeadingLevel || '1',
+      splitMarkedChaptersOnly: true,
       uiLang,
       forExport: true
     }, attachmentsMap);
