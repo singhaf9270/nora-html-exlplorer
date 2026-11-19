@@ -59,6 +59,8 @@ const I18N = {
     statFolderNotes: n => `📚 ${n} یادداشت Markdown پیدا شد`,
     statExportDest: p => `📁 مسیر ذخیره: ${p}`,
     btnStartBatch: '✦ شروع خروجی دسته‌جمعی',
+    btnMergedExport: '📖 ساخت یک HTML یکپارچه از کل پوشه',
+    mergedExportDone: (name, count, path) => `فایل HTML یکپارچه شامل ${count} یادداشت ساخته شد: ${path}`,
     batchProgress: (cur, tot, name) => `در حال تبدیل ${cur} از ${tot}: ${name}`,
     batchDone: (ok, tot, dir) => `خروجی دسته‌جمعی کامل شد: ${ok} از ${tot} فایل در «${dir}» ذخیره شد.`,
     batchNoNotes: 'هیچ یادداشت Markdown در پوشه انتخاب‌شده پیدا نشد.',
@@ -305,6 +307,8 @@ const I18N = {
     statFolderNotes: n => `📚 ${n} Markdown note(s) found`,
     statExportDest: p => `📁 Output path: ${p}`,
     btnStartBatch: '✦ Start Batch Export',
+    btnMergedExport: '📖 Export Entire Folder as One HTML',
+    mergedExportDone: (name, count, path) => `Merged HTML with ${count} notes created: ${path}`,
     batchProgress: (cur, tot, name) => `Exporting ${cur} of ${tot}: ${name}`,
     batchDone: (ok, tot, dir) => `Batch export finished: ${ok} of ${tot} file(s) saved to "${dir}".`,
     batchNoNotes: 'No Markdown notes found in the selected folder.',
@@ -2966,6 +2970,7 @@ class NoraFolderExportModal extends Modal {
     actions.createDiv({ cls: 'nora-actions-group' });
     const rightGroup = actions.createDiv({ cls: 'nora-actions-group' });
     const startBtn = rightGroup.createEl('button', { cls: 'nora-btn primary', text: t.btnStartBatch });
+    const mergedBtn = rightGroup.createEl('button', { cls: 'nora-btn', text: t.btnMergedExport });
 
     const getDestBase = () => {
       const baseExport = (this.plugin.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
@@ -3068,6 +3073,34 @@ class NoraFolderExportModal extends Modal {
       } catch (err) {
         console.error('[Nora HTML Exporter] Batch export error:', err);
         new Notice(t.noticeError(err.message || err));
+        startBtn.disabled = false;
+        folderSel.disabled = false;
+      }
+    });
+
+    mergedBtn.addEventListener('click', async () => {
+      const files = this.getMarkdownFilesInFolder(state.folderPath, state.includeSubfolders);
+      if (!files.length) {
+        new Notice(t.batchNoNotes);
+        return;
+      }
+      mergedBtn.disabled = true;
+      startBtn.disabled = true;
+      folderSel.disabled = true;
+      progressBox.addClass('active');
+      try {
+        await this.plugin.exportMergedFolder(files, state, {
+          folderPath: state.folderPath,
+          onProgress: (index, total, file) => {
+            progressText.textContent = t.batchProgress(fmtNum(index, uiLang), fmtNum(total, uiLang), file.basename);
+            progressFill.style.width = `${Math.round((index / total) * 100)}%`;
+          }
+        });
+        this.close();
+      } catch (err) {
+        console.error('[Nora HTML Exporter] Merged folder export error:', err);
+        new Notice(t.noticeError(err.message || err));
+        mergedBtn.disabled = false;
         startBtn.disabled = false;
         folderSel.disabled = false;
       }
@@ -3589,6 +3622,74 @@ class NoraHtmlExporterPlugin extends Plugin {
       console.error('[Nora HTML Exporter] Export error:', err);
       new Notice(t.noticeError(err.message || err));
     }
+  }
+
+  async exportMergedFolder(files, state, { folderPath = '/', onProgress = null } = {}) {
+    if (!Array.isArray(files) || files.length === 0) {
+      throw new Error('No Markdown files were selected.');
+    }
+
+    const uiLang = this.getUiLang();
+    const t = I18N[uiLang];
+    const combinedParts = [];
+    const attachmentsMap = new Map();
+
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
+      if (typeof onProgress === 'function') onProgress(index + 1, files.length, file);
+
+      const markdown = await this.app.vault.read(file);
+      const cleanMarkdown = stripFrontmatter(markdown);
+      const relativePath = folderPath === '/'
+        ? file.path
+        : file.path.slice(folderPath.length).replace(/^\/+/, '');
+      const sectionTitle = file.basename || file.name;
+
+      // Each note is placed under a level-one heading so the reader can build
+      // one continuous table of contents and unique section anchors.
+      combinedParts.push(`# ${sectionTitle}\n\n<!-- Nora source: ${relativePath.replace(/-->/g, '')} -->\n\n${cleanMarkdown}`);
+
+      const noteAttachments = await resolveAttachmentsMap(this.app, markdown, file, {
+        forExport: true,
+        embedAttachments: state.embedAttachments
+      });
+      for (const [key, value] of noteAttachments.entries()) {
+        attachmentsMap.set(key, value);
+      }
+    }
+
+    const combinedMarkdown = combinedParts.join('\n\n---\n\n');
+    const folderLabel = folderPath === '/' ? 'Vault' : folderPath.split('/').pop();
+    const html = buildStandaloneHtml(combinedMarkdown, {
+      title: folderLabel || 'Nora Collection',
+      fileName: safeFileName(folderLabel || 'Nora-Collection'),
+      docType: uiLang === 'fa' ? 'مجموعه یادداشت‌ها' : 'Note Collection',
+      description: uiLang === 'fa'
+        ? `مجموعه‌ای شامل ${files.length} یادداشت از پوشه ${folderPath}`
+        : `A collection of ${files.length} notes from ${folderPath}`,
+      theme: state.theme,
+      palette: state.palette,
+      coverStyle: state.coverStyle,
+      direction: state.direction,
+      fontSize: state.fontSize,
+      width: state.width,
+      readerLanguage: state.readerLanguage,
+      uiLang,
+      forExport: true
+    }, attachmentsMap);
+
+    const baseExport = (this.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
+    const folderName = folderPath === '/' ? 'Vault-Root' : safeFileName(folderLabel);
+    const targetDir = normalizePath(`${baseExport}/${folderName}`);
+    await this.ensureFolderExists(targetDir);
+
+    const outName = safeFileName(folderLabel || 'Nora-Collection') + '-Complete.html';
+    const targetPath = normalizePath(`${targetDir}/${outName}`);
+    await this.app.vault.adapter.write(targetPath, html);
+
+    new Notice(t.mergedExportDone(outName, fmtNum(files.length, uiLang), targetPath), 7000);
+    if (state.openFolderAfter) this.openFileInSystemBrowser(targetPath);
+    return targetPath;
   }
 
   openFileInSystemBrowser(vaultRelativePath) {
