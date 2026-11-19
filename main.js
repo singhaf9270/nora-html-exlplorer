@@ -297,7 +297,7 @@ const I18N = {
     btnBatchHeader: '📁 Folder',
     btnBatchHeaderTitle: 'Batch export entire folder',
     folderModalTitle: 'Nora Batch Folder Exporter',
-    folderModalDesc: 'Convert all Markdown notes in the selected folder into standalone Nora HTML Reader files.',
+    folderModalDesc: 'Combine all Markdown notes in the selected folder into one Nora HTML Reader file.',
     fieldSelectFolder: 'Select Vault Folder',
     vaultRootLabel: 'Vault Root (/)',
     toggleSubfolders: 'Include subfolders',
