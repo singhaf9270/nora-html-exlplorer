@@ -50,7 +50,7 @@ const I18N = {
     btnBatchHeader: '📁 کل پوشه',
     btnBatchHeaderTitle: 'خروجی دسته‌جمعی کل پوشه',
     folderModalTitle: 'خروجی دسته‌جمعی پوشه با نورا',
-    folderModalDesc: 'همه یادداشت‌های Markdown پوشه انتخاب‌شده با تنظیمات زیر به HTML مستقل تبدیل می‌شوند.',
+    folderModalDesc: 'همه یادداشت‌های Markdown پوشه انتخاب‌شده در یک فایل HTML واحد و یکپارچه قرار می‌گیرند.',
     fieldSelectFolder: 'انتخاب پوشه از Vault',
     vaultRootLabel: 'ریشه Vault (/)',
     toggleSubfolders: 'شامل زیرپوشه‌ها هم باشد',
@@ -58,8 +58,7 @@ const I18N = {
     toggleOpenFolder: 'باز کردن پوشه خروجی پس از اتمام',
     statFolderNotes: n => `📚 ${n} یادداشت Markdown پیدا شد`,
     statExportDest: p => `📁 مسیر ذخیره: ${p}`,
-    btnStartBatch: '✦ شروع خروجی دسته‌جمعی',
-    btnMergedExport: '📖 ساخت یک HTML یکپارچه از کل پوشه',
+    btnStartBatch: '📖 ساخت یک فایل HTML یکپارچه از کل پوشه',
     mergedExportDone: (name, count, path) => `فایل HTML یکپارچه شامل ${count} یادداشت ساخته شد: ${path}`,
     batchProgress: (cur, tot, name) => `در حال تبدیل ${cur} از ${tot}: ${name}`,
     batchDone: (ok, tot, dir) => `خروجی دسته‌جمعی کامل شد: ${ok} از ${tot} فایل در «${dir}» ذخیره شد.`,
@@ -306,8 +305,7 @@ const I18N = {
     toggleOpenFolder: 'Open output folder when finished',
     statFolderNotes: n => `📚 ${n} Markdown note(s) found`,
     statExportDest: p => `📁 Output path: ${p}`,
-    btnStartBatch: '✦ Start Batch Export',
-    btnMergedExport: '📖 Export Entire Folder as One HTML',
+    btnStartBatch: '📖 Export Entire Folder as One HTML',
     mergedExportDone: (name, count, path) => `Merged HTML with ${count} notes created: ${path}`,
     batchProgress: (cur, tot, name) => `Exporting ${cur} of ${tot}: ${name}`,
     batchDone: (ok, tot, dir) => `Batch export finished: ${ok} of ${tot} file(s) saved to "${dir}".`,
@@ -2970,7 +2968,6 @@ class NoraFolderExportModal extends Modal {
     actions.createDiv({ cls: 'nora-actions-group' });
     const rightGroup = actions.createDiv({ cls: 'nora-actions-group' });
     const startBtn = rightGroup.createEl('button', { cls: 'nora-btn primary', text: t.btnStartBatch });
-    const mergedBtn = rightGroup.createEl('button', { cls: 'nora-btn', text: t.btnMergedExport });
 
     const getDestBase = () => {
       const baseExport = (this.plugin.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
@@ -3002,92 +2999,11 @@ class NoraFolderExportModal extends Modal {
         new Notice(t.batchNoNotes);
         return;
       }
+
       startBtn.disabled = true;
       folderSel.disabled = true;
       progressBox.addClass('active');
 
-      const destBase = getDestBase();
-      let okCount = 0;
-      const usedPaths = new Set();
-
-      try {
-        await this.plugin.ensureFolderExists(destBase);
-
-        for (let idx = 0; idx < files.length; idx++) {
-          const f = files[idx];
-          progressText.textContent = t.batchProgress(fmtNum(idx + 1, uiLang), fmtNum(files.length, uiLang), f.basename);
-          progressFill.style.width = `${Math.round(((idx + 1) / files.length) * 100)}%`;
-
-          // محاسبه مسیر خروجی برای هر فایل
-          let relSubDir = '';
-          if (state.preserveStructure) {
-            const parentPath = f.parent ? f.parent.path : '/';
-            if (state.folderPath === '/') {
-              relSubDir = parentPath === '/' ? '' : parentPath;
-            } else if (parentPath.startsWith(state.folderPath + '/')) {
-              relSubDir = parentPath.slice(state.folderPath.length + 1);
-            }
-          }
-
-          const targetFolder = relSubDir ? normalizePath(`${destBase}/${relSubDir}`) : destBase;
-          await this.plugin.ensureFolderExists(targetFolder);
-
-          const md = await this.app.vault.read(f);
-          const effectiveReaderLang = resolveReaderLang(state.readerLanguage, md, uiLang);
-          const meta = extractNoteMetadata(this.app, f, this.plugin.settings, effectiveReaderLang);
-          let baseOutName = safeFileName(meta.fileName || meta.title || f.basename);
-          let targetPath = normalizePath(`${targetFolder}/${baseOutName}.html`);
-          let dup = 2;
-          while (usedPaths.has(targetPath.toLowerCase())) {
-            targetPath = normalizePath(`${targetFolder}/${baseOutName}-${dup++}.html`);
-          }
-          usedPaths.add(targetPath.toLowerCase());
-
-          const attachmentsMap = await resolveAttachmentsMap(this.app, md, f, {
-            forExport: true,
-            embedAttachments: state.embedAttachments
-          });
-
-          const html = buildStandaloneHtml(md, {
-            ...meta,
-            theme: state.theme,
-            palette: state.palette,
-            coverStyle: state.coverStyle,
-            direction: state.direction,
-            fontSize: state.fontSize,
-            width: state.width,
-            readerLanguage: state.readerLanguage,
-            uiLang,
-            forExport: true
-          }, attachmentsMap);
-
-          await this.app.vault.adapter.write(targetPath, html);
-          okCount++;
-        }
-
-        new Notice(t.batchDone(fmtNum(okCount, uiLang), fmtNum(files.length, uiLang), destBase), 6000);
-        if (state.openFolderAfter) {
-          this.plugin.openFileInSystemBrowser(destBase);
-        }
-        this.close();
-      } catch (err) {
-        console.error('[Nora HTML Exporter] Batch export error:', err);
-        new Notice(t.noticeError(err.message || err));
-        startBtn.disabled = false;
-        folderSel.disabled = false;
-      }
-    });
-
-    mergedBtn.addEventListener('click', async () => {
-      const files = this.getMarkdownFilesInFolder(state.folderPath, state.includeSubfolders);
-      if (!files.length) {
-        new Notice(t.batchNoNotes);
-        return;
-      }
-      mergedBtn.disabled = true;
-      startBtn.disabled = true;
-      folderSel.disabled = true;
-      progressBox.addClass('active');
       try {
         await this.plugin.exportMergedFolder(files, state, {
           folderPath: state.folderPath,
@@ -3100,7 +3016,6 @@ class NoraFolderExportModal extends Modal {
       } catch (err) {
         console.error('[Nora HTML Exporter] Merged folder export error:', err);
         new Notice(t.noticeError(err.message || err));
-        mergedBtn.disabled = false;
         startBtn.disabled = false;
         folderSel.disabled = false;
       }
