@@ -6,7 +6,7 @@ Create beautiful, standalone HTML reading experiences from your Obsidian notes. 
 
 - **Single-note export:** Export the current Markdown note with a customizable cover and reader appearance.
 - **Quick export:** Generate HTML using your saved defaults.
-- **Folder export:** Combine every Markdown note in a selected folder into **one complete HTML document**. Each note becomes a section in a shared table of contents. Folder export creates one HTML file, not one file per note.
+- **Folder export:** Combine every Markdown note in a selected folder into **one complete HTML document**. Each note starts a new chapter in the shared reader. Choose the chapter heading level from H1 to H6. Folder export creates one HTML file, not one file per note.
 - **Nested folders:** Include subfolders when exporting a folder.
 - **Attachment embedding:** Embed local Vault images and supported attachments as Base64 data so exported documents can work offline.
 - **Live preview:** Preview a note in an Obsidian side panel.
@@ -36,7 +36,7 @@ Open a Markdown note and use the Nora ribbon button, the command palette, or the
 2. Select the source folder.
 3. Enable **Include subfolders** if nested notes should also be included.
 4. Click **Export Entire Folder as One HTML**.
-5. Nora combines all selected Markdown notes into one standalone HTML reader. Each note becomes a separate section in the same document, with a shared table of contents.
+5. Nora combines all selected Markdown notes into one standalone HTML reader. Each file starts a new chapter, and you can choose the heading level (H1–H6) in plugin settings. The generated chapter titles are used to split the reader into sections.
 
 The result is exactly one `.html` file for the selected folder, regardless of how many Markdown notes it contains. It is saved under the configured export directory, inside a folder named after the source folder.
 
@@ -51,6 +51,11 @@ Open **Settings → Nora HTML Exporter** to configure:
 - Default text direction
 - Automatic attachment embedding
 - Opening exported HTML after creation
+- Chapter heading level for merged folder exports (H1–H6)
+
+## Community and support
+
+The plugin settings include quick links to the ObsidianTut channels on Bale, Telegram, and YouTube, plus an optional link to support development.
 
 ## Offline attachments
 
