@@ -3641,15 +3641,20 @@ class NoraHtmlExporterPlugin extends Plugin {
     try {
       await this.ensureFolderExists('Nora Guides');
       if (!(await this.app.vault.adapter.exists(path))) {
-        const response = await requestUrl({ url });
+        const response = await requestUrl({ url, method: 'GET' });
+        if (response.status < 200 || response.status >= 300 || !response.text) {
+          throw new Error(`Guide request failed (HTTP ${response.status})`);
+        }
         await this.app.vault.create(path, response.text);
       }
       this.settings.guideDownloaded = true;
       await this.saveSettings();
       new Notice(I18N[lang].guideDownloadedNotice, 7000);
     } catch (error) {
-      this.settings.guideDownloaded = true;
+      // Keep the flag false so the first-run download can be retried next launch.
+      this.settings.guideDownloaded = false;
       await this.saveSettings();
+      console.error('Nora: automatic guide download failed', error);
       new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
     }
   }
@@ -3665,11 +3670,15 @@ class NoraHtmlExporterPlugin extends Plugin {
     try {
       await this.ensureFolderExists('Nora Guides');
       if (!(await this.app.vault.adapter.exists(path))) {
-        const response = await requestUrl({ url });
+        const response = await requestUrl({ url, method: 'GET' });
+        if (response.status < 200 || response.status >= 300 || !response.text) {
+          throw new Error(`Guide request failed (HTTP ${response.status})`);
+        }
         await this.app.vault.create(path, response.text);
       }
       openWithDefaultApp(this.app.vault.adapter.getFullPath(path));
     } catch (error) {
+      console.error('Nora: opening user guide failed', error);
       new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
     }
   }
