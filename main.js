@@ -3415,13 +3415,26 @@ class NoraSettingTab extends PluginSettingTab {
     root.createEl('p', { cls: 'nora-guides-desc', text: t.guideIntro });
     const actions = root.createDiv({ cls: 'nora-guide-actions' });
     const guides = [
-      { label: t.guideFa, language: 'fa', primary: fa },
-      { label: t.guideEn, language: 'en', primary: !fa }
+      {
+        label: t.guideFa,
+        url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Guide-FA.md',
+        primary: fa
+      },
+      {
+        label: t.guideEn,
+        url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora_HTML_Exporter_Complete_English_Guide.md',
+        primary: !fa
+      }
     ];
     for (const guide of guides) {
-      const button = actions.createEl('button', { cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button', text: guide.label });
-      button.type = 'button';
-      button.addEventListener('click', () => this.plugin.openGuide(guide.language));
+      const link = actions.createEl('a', {
+        cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button',
+        text: guide.label,
+        href: guide.url
+      });
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+      link.setAttribute('aria-label', guide.label);
     }
     const row = root.createDiv({ cls: 'nora-changelog-row' });
     row.createSpan({ cls: 'nora-changelog-label', text: t.changelogTitle });
