@@ -1,0 +1,42 @@
+/* === Nora Snippet 3: Cyber Neon === */
+body[data-palette] {
+  --bg: #eef2ff;
+  --paper: #ffffff;
+  --ink: #12132a;
+  --muted: #5a5f85;
+  --line: #dbe1ff;
+  --accent: #7c3aed;
+  --accent2: #06b6d4;
+  --quote-bg: #f3f0ff;
+  --code-bg: #12132a;
+  --code-ink: #22d3ee;
+  background: radial-gradient(circle at 10% 10%, rgba(124,58,237,.16), transparent 36%),
+              radial-gradient(circle at 90% 90%, rgba(6,182,212,.18), transparent 38%), #eef2ff !important;
+}
+body.night[data-palette] {
+  --bg: #070815;
+  --paper: #0f1126;
+  --ink: #eef2ff;
+  --muted: #8b94c7;
+  --line: #232754;
+  --accent: #f43f5e;
+  --accent2: #22d3ee;
+  --quote-bg: #151836;
+  background: radial-gradient(circle at 15% 15%, rgba(244,63,94,.18), transparent 40%),
+              radial-gradient(circle at 85% 85%, rgba(34,211,238,.16), transparent 42%), #070815 !important;
+}
+.book {
+  border-radius: 20px;
+  border: 1.5px solid color-mix(in srgb, var(--accent2) 45%, var(--line));
+  box-shadow: 0 0 36px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.cover[data-cover] {
+  background: linear-gradient(135deg, #10122a, #1d1542 55%, #0c263b) !important;
+  color: #fff;
+}
+.cover[data-cover] h1 { color: #22d3ee !important; text-shadow: 0 0 24px rgba(34,211,238,.4); }
+.cover[data-cover] .cover-subtitle, .cover[data-cover] .cover-description { color: #c7d2fe !important; }
+.article h1 { color: var(--accent) !important; border-bottom: 2px solid var(--accent2); }
+.article h2 { color: var(--accent2) !important; border-inline-start: 4px solid var(--accent); }
+.article pre { border: 1px solid rgba(34,211,238,.35); box-shadow: 0 0 18px rgba(34,211,238,.12); }
+.start-reading-btn { background: linear-gradient(90deg, #7c3aed, #06b6d4) !important; box-shadow: 0 0 22px rgba(6,182,212,.45); }
