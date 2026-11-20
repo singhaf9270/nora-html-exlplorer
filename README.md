@@ -78,4 +78,6 @@ The plugin is implemented in JavaScript and uses the Obsidian plugin API. The re
 
 ## License
 
-No license file is currently included in this repository. Please check with the repository maintainer before redistributing or modifying the project.
+Nora HTML Exporter is released under the **MIT License**. You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software in accordance with the terms of the [MIT License](LICENSE).
+
+Copyright (c) 2026 Saeed Ghobadi.
