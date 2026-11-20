@@ -31,6 +31,8 @@ const DEFAULT_SETTINGS = {
   embedAttachments: true,
   openAfterExport: true,
   chapterHeadingLevel: '1',
+  customCssPath: '',
+  customCss: '',
   lastSeenVersion: '',
   guideDownloaded: false
 };
@@ -182,6 +184,13 @@ const I18N = {
     setOpenDesc: 'در نسخه دسکتاپ، بلافاصله بعد از ساخت HTML آن را در مرورگر پیش‌فرض سیستم باز می‌کند.',
     setChapterHeadingName: 'سطح هدینگ شروع فصل در خروجی یکپارچه',
     setChapterHeadingDesc: 'عنوان هر فایل به‌عنوان شروع یک فصل درج می‌شود. سطح هدینگ را برای فصل‌ها انتخاب کنید (H1 تا H6).',
+    setCustomCssFileName: 'انتخاب اسنیپت CSS از Vault (اختیاری)',
+    setCustomCssFileDesc: 'یکی از فایل‌های CSS موجود در پوشه snippets ابسیدین (یا Vault) را انتخاب کنید تا به‌صورت خودکار و آفلاین در خروجی HTML و پیش‌نمایش اعمال شود.',
+    setCustomCssNone: 'بدون فایل CSS (غیرفعال)',
+    setCustomCssRefresh: 'به‌روزرسانی لیست اسنیپت‌ها',
+    setCustomCssName: 'کد CSS سفارشی (Custom CSS)',
+    setCustomCssDesc: 'کدهای CSS دلخواه شما که در انتهای استایل خوانشگر HTML تزریق می‌شوند (با اولویت بالاتر از استایل پیش‌فرض و فایل CSS).',
+    setCustomCssPh: '.article h1 { color: #c2513d; }\n.article p { text-align: justify; }',
     supportHeading: 'همراه ما باشید',
     supportIntro: 'آموزش‌ها، تازه‌ها و نکته‌های کاربردی ابسیدین را در کانال‌های ما دنبال کنید.',
     supportJoin: 'عضویت در کانال',
@@ -194,13 +203,14 @@ const I18N = {
     guideDownloadedNotice: 'راهنمای فارسی نورا در پوشه «Nora Guides» ذخیره شد.',
     guideDownloadFailedNotice: 'دانلود خودکار راهنما انجام نشد. می‌توانید از بخش راهنما در تنظیمات دوباره آن را دریافت کنید.',
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
-    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.7',
+    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.8',
     changelogItems: [
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در خروجی HTML و پیش‌نمایش زنده.',
       'رندر دوگانه نمودارهای Mermaid برای حالت روز و شب و نمایش بهینه در چاپ و خروجی PDF.',
       'پشتیبانی از بلوک‌های Mermaid دارای ویژگی‌های اضافی (مانند {align: "center"}).',
       'پشتیبانی یکپارچه از نمودارهای Mermaid در خروجی تکی و خروجی یکپارچه پوشه.',
-      'امکان زوم تمام‌صفحه و جابه‌جایی (Pan) روی نمودارهای Mermaid در فایل HTML خروجی.'
+      'امکان زوم تمام‌صفحه و جابه‌جایی (Pan) روی نمودارهای Mermaid در فایل HTML خروجی.',
+      'افزودن قابلیت اعمال استایل دلخواه (انتخاب فایل CSS از Vault و کادر Custom CSS در تنظیمات) به خروجی HTML و پیش‌نمایش زنده.'
     ],
 
     // Exported Reader UI
@@ -451,6 +461,13 @@ const I18N = {
     setOpenDesc: 'On desktop, automatically opens the generated HTML file in your default web browser.',
     setChapterHeadingName: 'Chapter heading level for merged export',
     setChapterHeadingDesc: 'Each file title starts a new chapter. Choose the heading level (H1–H6).',
+    setCustomCssFileName: 'Select CSS Snippet from Vault (optional)',
+    setCustomCssFileDesc: 'Pick a .css file from Obsidian snippets (or your Vault) to automatically embed offline in HTML exports and Live Preview.',
+    setCustomCssNone: 'None (Disabled)',
+    setCustomCssRefresh: 'Refresh snippets list',
+    setCustomCssName: 'Custom CSS',
+    setCustomCssDesc: 'Inline CSS rules injected at the end of the exported HTML reader stylesheet (overrides default styles and custom CSS file).',
+    setCustomCssPh: '.article h1 { color: #c2513d; }\n.article p { text-align: justify; }',
     supportHeading: 'Stay Connected',
     supportIntro: 'Follow our channels for Obsidian tutorials, updates, and practical tips.',
     supportJoin: 'Join channel',
@@ -463,13 +480,14 @@ const I18N = {
     guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
     guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
-    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.7',
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.6',
     changelogItems: [
       'Added full, 100% offline support for all Mermaid diagram types in HTML exports and Live Preview.',
       'Dual-theme Mermaid rendering (Light & Dark) with clean print and PDF output.',
       'Added support for Mermaid code blocks with extra attributes (such as {align: "center"}).',
       'Seamless Mermaid rendering across single-note exports and merged folder exports.',
-      'Interactive fullscreen zoom and drag-to-pan viewer for Mermaid diagrams in exported HTML.'
+      'Interactive fullscreen zoom and drag-to-pan viewer for Mermaid diagrams in exported HTML.',
+      'Added Custom CSS support in Settings (both loading a .css file from Vault/snippets and inline Custom CSS) for HTML exports and Live Preview.'
     ],
 
     // Exported Reader UI
@@ -990,6 +1008,62 @@ async function renderMermaidBlocksMap(md) {
     console.warn('[Nora] Could not load Obsidian Mermaid:', err);
   }
   return map;
+}
+
+async function listVaultCssSnippets(app) {
+  const seen = new Set();
+  const items = [];
+  const configDir = (app.vault && app.vault.configDir) || '.obsidian';
+  const snippetsDir = normalizePath(`${configDir}/snippets`);
+  try {
+    if (await app.vault.adapter.exists(snippetsDir)) {
+      const listed = await app.vault.adapter.list(snippetsDir);
+      const files = (listed && Array.isArray(listed.files)) ? listed.files : [];
+      for (const fPath of files) {
+        if (/\.css$/i.test(fPath)) {
+          const norm = normalizePath(fPath);
+          if (!seen.has(norm)) {
+            seen.add(norm);
+            const name = norm.split('/').pop();
+            items.push({ path: norm, label: `🎨 ${name}` });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Nora] Failed to list snippets folder:', err);
+  }
+  try {
+    const vaultCss = app.vault.getFiles().filter(f => f.extension && f.extension.toLowerCase() === 'css');
+    for (const f of vaultCss) {
+      const norm = normalizePath(f.path);
+      if (!seen.has(norm)) {
+        seen.add(norm);
+        items.push({ path: norm, label: `📄 ${norm}` });
+      }
+    }
+  } catch (err) {}
+  return items.sort((a, b) => a.label.localeCompare(b.label));
+}
+
+async function resolveCustomCss(app, settings) {
+  const parts = [];
+  const rawPath = String((settings && settings.customCssPath) || '').trim();
+  if (rawPath) {
+    const cleanPath = normalizePath(rawPath);
+    try {
+      if (await app.vault.adapter.exists(cleanPath)) {
+        const fileCss = await app.vault.adapter.read(cleanPath);
+        if (fileCss && fileCss.trim()) parts.push(fileCss.trim());
+      }
+    } catch (err) {
+      console.warn('[Nora] Failed to read custom CSS file:', cleanPath, err);
+    }
+  }
+  const inlineCss = String((settings && settings.customCss) || '').trim();
+  if (inlineCss) parts.push(inlineCss);
+  if (!parts.length) return '';
+  return '\n/* ===== Custom User CSS ===== */\n' + parts.join('\n\n').replace(/<\/style/gi, '<\\/style');
 }
 
 /* =========================================================
@@ -2177,7 +2251,7 @@ body.night .mmd-lb-canvas{background:#1c2035}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="${dark ? '#0f1220' : '#f3f5fb'}">
 <title>${safeTitle}</title>
-<style>${css}</style>
+<style>${css}${options.customCss ? String(options.customCss).replace(/<\/style/gi, '<\\/style') : ''}</style>
 </head>
 <body class="${dark ? 'night' : ''}" data-palette="${esc(initPalette)}">
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
@@ -3439,12 +3513,14 @@ class NoraPreviewView extends ItemView {
     });
 
     const mermaidMap = await renderMermaidBlocksMap(md);
+    const customCss = await resolveCustomCss(this.app, this.plugin.settings);
     const html = buildStandaloneHtml(md, {
       ...meta,
       ...this.viewPrefs,
       uiLang,
       fontSize: this.plugin.settings.fontSize,
       width: this.plugin.settings.width,
+      customCss,
       forExport: false
     }, attachmentsMap, mermaidMap);
 
@@ -3619,6 +3695,71 @@ class NoraSettingTab extends PluginSettingTab {
             this.plugin.settings.chapterHeadingLevel = val;
             await this.plugin.saveSettings();
           });
+      });
+
+    const cssFileSetting = new Setting(containerEl)
+      .setName(t.setCustomCssFileName)
+      .setDesc(t.setCustomCssFileDesc);
+
+    let cssDropdown = null;
+    const populateSnippets = async () => {
+      if (!cssDropdown) return;
+      const selectEl = cssDropdown.selectEl;
+      const currentVal = this.plugin.settings.customCssPath || '';
+      const snippets = await listVaultCssSnippets(this.app);
+      selectEl.empty();
+      cssDropdown.addOption('', t.setCustomCssNone);
+      let foundCurrent = !currentVal;
+      for (const item of snippets) {
+        cssDropdown.addOption(item.path, item.label);
+        if (item.path === currentVal) foundCurrent = true;
+      }
+      if (currentVal && !foundCurrent) {
+        cssDropdown.addOption(currentVal, `⚠️ ${currentVal}`);
+      }
+      cssDropdown.setValue(currentVal);
+    };
+
+    cssFileSetting
+      .addDropdown(dd => {
+        cssDropdown = dd;
+        dd.addOption('', t.setCustomCssNone);
+        const currentVal = this.plugin.settings.customCssPath || '';
+        if (currentVal) dd.addOption(currentVal, currentVal);
+        dd.setValue(currentVal);
+        dd.onChange(async val => {
+          this.plugin.settings.customCssPath = val;
+          await this.plugin.saveSettings();
+          this.plugin.refreshOpenPreviews();
+        });
+        return dd;
+      })
+      .addExtraButton(btn => btn
+        .setIcon('refresh-cw')
+        .setTooltip(t.setCustomCssRefresh)
+        .onClick(() => { void populateSnippets(); }));
+
+    void populateSnippets();
+
+    new Setting(containerEl)
+      .setName(t.setCustomCssName)
+      .setDesc(t.setCustomCssDesc)
+      .addTextArea(text => {
+        text
+          .setPlaceholder(t.setCustomCssPh)
+          .setValue(this.plugin.settings.customCss || '')
+          .onChange(async val => {
+            this.plugin.settings.customCss = val;
+            await this.plugin.saveSettings();
+            this.plugin.refreshOpenPreviews();
+          });
+        text.inputEl.rows = 6;
+        text.inputEl.dir = 'ltr';
+        text.inputEl.style.width = '100%';
+        text.inputEl.style.minWidth = '240px';
+        text.inputEl.style.fontFamily = 'var(--font-monospace, ui-monospace, SFMono-Regular, Consolas, monospace)';
+        text.inputEl.style.fontSize = '12px';
+        return text;
       });
 
     this.addGuidesSection(containerEl, uiLang === 'fa');
@@ -3971,7 +4112,8 @@ class NoraHtmlExporterPlugin extends Plugin {
       });
 
       const mermaidMap = await renderMermaidBlocksMap(md);
-      const html = buildStandaloneHtml(md, { ...options, uiLang, forExport: true }, attachmentsMap, mermaidMap);
+      const customCss = await resolveCustomCss(this.app, this.settings);
+      const html = buildStandaloneHtml(md, { ...options, uiLang, customCss, forExport: true }, attachmentsMap, mermaidMap);
       const outName = safeFileName(options.fileName || options.title || file.basename) + '.html';
 
       if (mode === 'download') {
@@ -4042,7 +4184,9 @@ class NoraHtmlExporterPlugin extends Plugin {
     const combinedMarkdown = combinedParts.join('\n\n---\n\n');
     const folderLabel = folderPath === '/' ? 'Vault' : folderPath.split('/').pop();
     const mermaidMap = await renderMermaidBlocksMap(combinedMarkdown);
+    const customCss = await resolveCustomCss(this.app, this.settings);
     const html = buildStandaloneHtml(combinedMarkdown, {
+      customCss,
       title: folderLabel || 'Nora Collection',
       fileName: safeFileName(folderLabel || 'Nora-Collection'),
       docType: uiLang === 'fa' ? 'مجموعه یادداشت‌ها' : 'Note Collection',
