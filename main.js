@@ -3517,7 +3517,7 @@ class NoraHtmlExporterPlugin extends Plugin {
     await this.loadSettings();
     const currentVersion = this.manifest.version;
     const previousVersion = this.settings.lastSeenVersion;
-    const isUpgrade = previousVersion ? previousVersion !== currentVersion : this._hadSavedSettings;
+    const isUpgrade = previousVersion !== currentVersion;
     if (isUpgrade) {
       new Notice(I18N[this.getUiLang()].changelogUpdated, 7000);
       window.setTimeout(() => new NoraChangelogModal(this.app, this.getUiLang()).open(), 500);
@@ -3626,9 +3626,7 @@ class NoraHtmlExporterPlugin extends Plugin {
   }
 
   async loadSettings() {
-    const savedData = await this.loadData();
-    this._hadSavedSettings = !!savedData && Object.keys(savedData).length > 0;
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, savedData || {});
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
 
   async saveSettings() {
