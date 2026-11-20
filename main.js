@@ -194,7 +194,7 @@ const I18N = {
     guideDownloadedNotice: 'راهنمای فارسی نورا در پوشه «Nora Guides» ذخیره شد.',
     guideDownloadFailedNotice: 'دانلود خودکار راهنما انجام نشد. می‌توانید از بخش راهنما در تنظیمات دوباره آن را دریافت کنید.',
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
-    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.6',
+    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.7',
     changelogItems: [
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در خروجی HTML و پیش‌نمایش زنده.',
       'رندر دوگانه نمودارهای Mermaid برای حالت روز و شب و نمایش بهینه در چاپ و خروجی PDF.',
@@ -463,7 +463,7 @@ const I18N = {
     guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
     guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
-    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.6',
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.7',
     changelogItems: [
       'Added full, 100% offline support for all Mermaid diagram types in HTML exports and Live Preview.',
       'Dual-theme Mermaid rendering (Light & Dark) with clean print and PDF output.',
