@@ -3239,7 +3239,7 @@ class NoraChangelogModal extends Modal {
   constructor(app, language) { super(app); this.language = language === 'en' ? 'en' : 'fa'; }
   onOpen() {
     const fa = this.language === 'fa', t = I18N[this.language], { contentEl } = this;
-    contentEl.empty(); contentEl.addClass('nora-changelog-modal'); contentEl.setAttr('dir', fa ? 'rtl' : 'ltr');
+    contentEl.empty(); contentEl.addClass('nora-changelog-modal'); contentEl.setAttribute('dir', fa ? 'rtl' : 'ltr');
     contentEl.createEl('h2', { text: t.changelogTitle });
     contentEl.createEl('p', { text: t.changelogVersion, cls: 'nora-changelog-version' });
     const list = contentEl.createEl('ul');
