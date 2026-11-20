@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f3f5fb">
+<title>راهنمای جامع Nora HTML Exporter در Obsidian</title>
+<style>
+:root{
+  --reader-font:16px;
+  --reader-lh:2.05;
+  --reader-maxw:850px;
+  --reader-family:'Vazirmatn','IRANSans','Segoe UI',Tahoma,system-ui,-apple-system,sans-serif;
+}
+body,
+body[data-palette="default"]{
+  --bg:#f3f5fb;--paper:#ffffff;--ink:#22253a;--muted:#636b84;--line:#e6e8f2;
+  --accent:#5849c7;--accent2:#15948f;
+  --chip-bg:rgba(255,255,255,.88);--chip-border:rgba(88,73,199,.22);
+  --stat-bg:rgba(21,148,143,.09);--stat-border:rgba(21,148,143,.25);--stat-ink:#126e6a;
+  --quote-bg:#f4f2ff;--code-bg:#f1effa;--code-ink:#9a4383;
+}
+body[data-palette="ocean"]{
+  --bg:#eef5fa;--paper:#ffffff;--ink:#182a3a;--muted:#566e84;--line:#dae7f2;
+  --accent:#156fa3;--accent2:#129a95;
+  --chip-border:rgba(21,111,163,.24);
+  --stat-bg:rgba(18,154,149,.1);--stat-border:rgba(18,154,149,.26);--stat-ink:#0f6f6b;
+  --quote-bg:#eef7fd;--code-bg:#ebf4fb;--code-ink:#0e5f8c;
+}
+body[data-palette="forest"]{
+  --bg:#f1f7f2;--paper:#ffffff;--ink:#1c2d23;--muted:#5a6f62;--line:#dbe9df;
+  --accent:#227a56;--accent2:#a47f2f;
+  --chip-border:rgba(34,122,86,.24);
+  --stat-bg:rgba(34,122,86,.09);--stat-border:rgba(34,122,86,.26);--stat-ink:#1b6346;
+  --quote-bg:#eff8f3;--code-bg:#ecf5ef;--code-ink:#1e6a4a;
+}
+body[data-palette="sunset"]{
+  --bg:#fbf4ef;--paper:#fffdfb;--ink:#30221d;--muted:#7b6359;--line:#efe0d6;
+  --accent:#c2513d;--accent2:#c78328;
+  --chip-border:rgba(194,81,61,.24);
+  --stat-bg:rgba(199,131,40,.1);--stat-border:rgba(199,131,40,.28);--stat-ink:#915b14;
+  --quote-bg:#fdf2ec;--code-bg:#faeee8;--code-ink:#a8412f;
+}
+body[data-palette="royal"]{
+  --bg:#f2f4fa;--paper:#ffffff;--ink:#1e2340;--muted:#5d6585;--line:#dfe4f2;
+  --accent:#393c97;--accent2:#be8534;
+  --chip-border:rgba(57,60,151,.24);
+  --stat-bg:rgba(190,133,52,.1);--stat-border:rgba(190,133,52,.28);--stat-ink:#8a5d1c;
+  --quote-bg:#f2f3fc;--code-bg:#eff0fa;--code-ink:#323587;
+}
+body[data-palette="plum"]{
+  --bg:#f9f3fa;--paper:#ffffff;--ink:#2d1f33;--muted:#735e7c;--line:#ece0f0;
+  --accent:#8a3fa8;--accent2:#c9507f;
+  --chip-border:rgba(138,63,168,.24);
+  --stat-bg:rgba(201,80,127,.09);--stat-border:rgba(201,80,127,.26);--stat-ink:#9b355d;
+  --quote-bg:#f8f0fb;--code-bg:#f5ebf9;--code-ink:#7a3496;
+}
+body[data-palette="mono"]{
+  --bg:#f5f3ee;--paper:#fcfbf8;--ink:#262522;--muted:#6d6a62;--line:#e6e2d8;
+  --accent:#454f5e;--accent2:#8a7248;
+  --chip-border:rgba(69,79,94,.22);
+  --stat-bg:rgba(138,114,72,.1);--stat-border:rgba(138,114,72,.26);--stat-ink:#695532;
+  --quote-bg:#f5f2eb;--code-bg:#f1eee6;--code-ink:#4e4a41;
+}
+body.night,
+body.night[data-palette="default"]{
+  --bg:#0f1220;--paper:#181c2e;--ink:#eaecf8;--muted:#a6aec8;--line:#2c324d;
+  --accent:#b5abff;--accent2:#5ed9cf;
+  --chip-bg:rgba(255,255,255,.07);--chip-border:rgba(181,171,255,.26);
+  --stat-bg:rgba(94,217,207,.13);--stat-border:rgba(94,217,207,.30);--stat-ink:#8eeae2;
+  --quote-bg:#21253d;--code-bg:#252942;--code-ink:#f2b6e1;
+}
+body.night[data-palette="ocean"]{
+  --bg:#0b1520;--paper:#122030;--ink:#e6f1fb;--muted:#96b0c8;--line:#233a52;
+  --accent:#6ec6ff;--accent2:#52dfd4;
+  --chip-border:rgba(110,198,255,.28);
+  --stat-bg:rgba(82,223,212,.13);--stat-border:rgba(82,223,212,.30);--stat-ink:#89ece4;
+  --quote-bg:#182b40;--code-bg:#1b3047;--code-ink:#9cd8ff;
+}
+body.night[data-palette="forest"]{
+  --bg:#0d1712;--paper:#15221b;--ink:#e8f3ec;--muted:#9cb6a6;--line:#273e32;
+  --accent:#6ce0a8;--accent2:#e6c26e;
+  --chip-border:rgba(108,224,168,.28);
+  --stat-bg:rgba(108,224,168,.13);--stat-border:rgba(108,224,168,.30);--stat-ink:#93ecc0;
+  --quote-bg:#1b2e24;--code-bg:#1f3328;--code-ink:#9be8c2;
+}
+body.night[data-palette="sunset"]{
+  --bg:#19110f;--paper:#241916;--ink:#f7ece7;--muted:#c6aaa0;--line:#402e29;
+  --accent:#ff9b87;--accent2:#f5c16c;
+  --chip-border:rgba(255,155,135,.28);
+  --stat-bg:rgba(245,193,108,.13);--stat-border:rgba(245,193,108,.30);--stat-ink:#fad391;
+  --quote-bg:#2f211d;--code-bg:#352520;--code-ink:#ffb8a8;
+}
+body.night[data-palette="royal"]{
+  --bg:#0e1022;--paper:#161932;--ink:#edeffb;--muted:#a5acce;--line:#2c3159;
+  --accent:#98a8ff;--accent2:#e8be74;
+  --chip-border:rgba(152,168,255,.28);
+  --stat-bg:rgba(232,190,116,.13);--stat-border:rgba(232,190,116,.30);--stat-ink:#f2d193;
+  --quote-bg:#1e2242;--code-bg:#23284c;--code-ink:#b9c4ff;
+}
+body.night[data-palette="plum"]{
+  --bg:#16101c;--paper:#221829;--ink:#f4eaf9;--muted:#bca5c9;--line:#3d2d4a;
+  --accent:#da9eff;--accent2:#f68fb7;
+  --chip-border:rgba(218,158,255,.28);
+  --stat-bg:rgba(246,143,183,.13);--stat-border:rgba(246,143,183,.30);--stat-ink:#fab3ce;
+  --quote-bg:#2d2037;--code-bg:#33243f;--code-ink:#e8bfff;
+}
+body.night[data-palette="mono"]{
+  --bg:#121315;--paper:#1b1c20;--ink:#eaebef;--muted:#a0a4b0;--line:#30333c;
+  --accent:#cfd5e2;--accent2:#dcbf89;
+  --chip-border:rgba(207,213,226,.24);
+  --stat-bg:rgba(220,191,137,.13);--stat-border:rgba(220,191,137,.30);--stat-ink:#ead3a6;
+  --quote-bg:#23252b;--code-bg:#282a31;--code-ink:#dce0ea;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:var(--reader-family);transition:background .22s ease,color .22s ease}
+button,input,select{font-family:inherit}
+.progress{height:3px;position:fixed;z-index:35;top:0;left:0;width:100%;background:transparent}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .15s}
+
+/* ===== نوار بالای مینیمال و شیشه‌ای ===== */
+.readerbar{
+  position:sticky;top:10px;z-index:25;max-width:var(--reader-maxw);margin:0 auto 14px;padding:8px 12px;
+  background:var(--paper);background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--line);border-radius:16px;
+  display:flex;gap:8px;align-items:center;justify-content:space-between;
+  box-shadow:0 8px 26px rgba(15,20,45,.07);
+  transition:max-width .22s ease;
+}
+body.night .readerbar{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.bar-start,.bar-end{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bar-center{flex:1;display:flex;justify-content:center;min-width:120px;max-width:260px}
+.brand{
+  font-weight:900;color:var(--accent);font-size:13.5px;cursor:pointer;
+  background:none;border:0;padding:5px 6px;border-radius:9px;white-space:nowrap;
+  transition:background .15s;
+}
+.brand:hover{background:var(--quote-bg)}
+.search-wrap{position:relative;width:100%}
+.search-wrap input{
+  width:100%;font-size:12px;border:1px solid var(--line);
+  background:color-mix(in srgb,var(--bg) 72%,var(--paper));color:var(--ink);
+  border-radius:999px;padding:6.5px 12px;outline:none;transition:border-color .15s,background .15s;
+}
+.search-wrap input:focus{border-color:var(--accent);background:var(--paper)}
+.bar-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:600;border:1px solid var(--line);
+  background:var(--paper);color:var(--ink);border-radius:10px;padding:6.5px 10px;
+  cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s,color .15s;
+}
+.bar-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bar-btn.is-active{background:var(--stat-bg);border-color:var(--accent2);color:var(--accent2);font-weight:700}
+.bar-btn.icon-only{padding:6.5px 9px}
+.bar-btn.settings-trigger{
+  background:color-mix(in srgb,var(--accent) 10%,var(--paper));
+  border-color:color-mix(in srgb,var(--accent) 26%,var(--line));
+  color:var(--accent);font-weight:700;
+}
+.bar-btn.settings-trigger:hover{background:color-mix(in srgb,var(--accent) 16%,var(--paper))}
+.hl-indicator{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.18)}
+
+.search-status{display:block;max-width:var(--reader-maxw);margin:0 auto 10px;font-size:12px;color:var(--muted);padding:0 6px}
+.search-status:empty{display:none}
+
+/* ===== پنل کشویی تنظیمات (Settings Drawer) ===== */
+.settings-shade{position:fixed;inset:0;background:rgba(10,14,30,.46);z-index:44;opacity:0;visibility:hidden;transition:.2s;backdrop-filter:blur(3px)}
+.settings-shade.open{opacity:1;visibility:visible}
+.settings-drawer{
+  position:fixed;z-index:45;top:0;inset-inline-end:0;height:100dvh;width:min(360px,92vw);
+  background:var(--paper);color:var(--ink);border-inline-start:1px solid var(--line);
+  box-shadow:0 0 40px rgba(10,14,30,.24);
+  transform:translateX(-105%);transition:transform .26s cubic-bezier(.22,1,.36,1);
+  display:flex;flex-direction:column;
+}
+.settings-drawer.open{transform:translateX(0)}
+.settings-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 18px;border-bottom:1px solid var(--line);
+}
+.settings-head strong{font-size:14.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:7px}
+.settings-close{
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  border-radius:9px;font-size:20px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;line-height:1;
+}
+.settings-close:hover{border-color:var(--accent);color:var(--accent)}
+.settings-body{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:16px}
+.set-group{display:flex;flex-direction:column;gap:8px}
+.set-label{font-size:12px;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.set-val{font-size:11.5px;font-weight:700;color:var(--accent);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+
+.seg-control{
+  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;
+  padding:4px;border-radius:11px;background:var(--bg);border:1px solid var(--line);
+}
+.seg-btn{
+  border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:700;
+  padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;
+}
+.seg-btn:hover{color:var(--ink)}
+.seg-btn.active{background:var(--paper);color:var(--accent);box-shadow:0 2px 8px rgba(15,20,45,.08)}
+body.night .seg-btn.active{box-shadow:0 2px 8px rgba(0,0,0,.32)}
+
+.font-stepper{
+  display:flex;align-items:center;gap:8px;padding:4px;border-radius:11px;
+  background:var(--bg);border:1px solid var(--line);
+}
+.font-stepper button{
+  flex:1;border:0;background:var(--paper);color:var(--ink);font-size:13px;font-weight:800;
+  padding:7px 10px;border-radius:8px;cursor:pointer;transition:color .15s,background .15s;
+}
+.font-stepper button:hover{color:var(--accent)}
+.font-stepper span{min-width:52px;text-align:center;font-size:12.5px;font-weight:800;color:var(--accent)}
+
+.set-select{
+  width:100%;padding:8px 11px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font-size:12.5px;font-weight:600;outline:none;cursor:pointer;
+}
+.set-select:focus{border-color:var(--accent)}
+
+.swatch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.swatch-btn{
+  display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  font-size:11.5px;font-weight:600;cursor:pointer;text-align:start;transition:border-color .15s,background .15s;
+}
+.swatch-btn:hover{border-color:var(--accent)}
+.swatch-btn.active{border-color:var(--accent);background:var(--quote-bg);color:var(--accent);font-weight:700}
+.swatch-dot{width:18px;height:18px;border-radius:50%;flex:0 0 18px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.swatch-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.pill-grid{display:flex;flex-wrap:wrap;gap:6px}
+.pill-btn{
+  padding:6px 11px;border-radius:999px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font-size:11.5px;font-weight:600;cursor:pointer;
+  transition:border-color .15s,background .15s,color .15s;
+}
+.pill-btn:hover{border-color:var(--accent)}
+.pill-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+body.night .pill-btn.active{color:#121524}
+
+.hl-dots{display:flex;align-items:center;gap:10px;padding:4px 2px}
+.hl-dot{
+  width:28px;height:28px;border-radius:50%;border:2px solid transparent;
+  background:var(--dot);cursor:pointer;transition:transform .15s,box-shadow .15s;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+}
+.hl-dot:hover{transform:scale(1.1)}
+.hl-dot.active{border-color:var(--ink);transform:scale(1.12);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+
+.settings-foot{
+  padding:14px 18px;border-top:1px solid var(--line);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.settings-foot button{
+  flex:1;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);transition:border-color .15s,color .15s;
+}
+.settings-foot button:hover{border-color:var(--accent);color:var(--accent)}
+.settings-foot button.primary-action{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#fff;
+}
+body.night .settings-foot button.primary-action{color:#121524}
+
+/* ===== کتاب و صفحات ===== */
+.book{
+  max-width:var(--reader-maxw);margin:0 auto;background:var(--paper);
+  border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 45px rgba(25,35,75,.10);
+  overflow:hidden;min-height:74vh;transition:max-width .22s ease;
+}
+body.night .book{box-shadow:0 18px 50px rgba(0,0,0,.42)}
+.cover{
+  display:none;min-height:min(82svh,720px);padding:clamp(36px,8vw,92px) clamp(22px,6vw,70px);
+  justify-content:center;align-items:center;text-align:center;position:relative;isolation:isolate;overflow:hidden;
+  background:radial-gradient(circle at 16% 18%,rgba(37,182,174,.22),transparent 38%),radial-gradient(circle at 84% 82%,rgba(103,89,214,.22),transparent 42%),linear-gradient(145deg,var(--paper),var(--bg));
+  break-after:page;
+}
+.cover.active{display:flex}
+.cover:before,.cover:after{content:"";position:absolute;z-index:-1;pointer-events:none;border:1.5px solid color-mix(in srgb,var(--accent) 26%,transparent);border-radius:50%;width:clamp(200px,38vw,460px);height:clamp(200px,38vw,460px)}
+.cover:before{top:-20%;right:-13%}
+.cover:after{bottom:-28%;left:-15%;width:clamp(240px,45vw,540px);height:clamp(240px,45vw,540px);border-color:color-mix(in srgb,var(--accent2) 28%,transparent)}
+body.night .cover[data-cover="aurora"]{background:radial-gradient(circle at 18% 20%,rgba(55,190,193,.26),transparent 40%),radial-gradient(circle at 82% 78%,rgba(128,112,240,.30),transparent 44%),linear-gradient(150deg,#181c30,#232042 55%,#152936)}
+.cover[data-cover="ocean"]{background:radial-gradient(ellipse at 85% 15%,rgba(14,165,233,.28),transparent 46%),radial-gradient(ellipse at 12% 88%,rgba(20,184,166,.26),transparent 48%),linear-gradient(160deg,#f0f9ff 0%,#dff2fb 52%,#e4f7f5 100%)}
+.cover[data-cover="ocean"]:before{border-color:rgba(14,165,233,.34)}
+.cover[data-cover="ocean"]:after{border-color:rgba(20,184,166,.34)}
+body.night .cover[data-cover="ocean"]{background:radial-gradient(ellipse at 85% 15%,rgba(56,189,248,.28),transparent 46%),radial-gradient(ellipse at 12% 88%,rgba(45,212,191,.24),transparent 48%),linear-gradient(160deg,#0c1e30 0%,#12314a 55%,#0e333a 100%)}
+.cover[data-cover="botanical"]{background:radial-gradient(circle at 88% 16%,rgba(130,195,65,.28),transparent 42%),radial-gradient(circle at 14% 84%,rgba(34,139,94,.24),transparent 46%),linear-gradient(150deg,#f4fbf4 0%,#e5f4ea 52%,#eef6e6 100%)}
+.cover[data-cover="botanical"]:before{border-radius:64% 36% 70% 30% / 45% 60% 40% 55%;border-color:rgba(46,139,87,.32)}
+.cover[data-cover="botanical"]:after{border-radius:38% 62% 42% 58% / 58% 42% 58% 42%;border-color:rgba(130,195,65,.36)}
+body.night .cover[data-cover="botanical"]{background:radial-gradient(circle at 88% 16%,rgba(130,195,65,.22),transparent 42%),radial-gradient(circle at 14% 84%,rgba(52,211,153,.20),transparent 46%),linear-gradient(150deg,#112018 0%,#183226 55%,#1c2e21 100%)}
+.cover[data-cover="classic"]{background:radial-gradient(circle at 50% 0%,rgba(224,173,112,.22),transparent 52%),linear-gradient(180deg,#fdfaf3,#f6efe2);box-shadow:inset 0 0 0 12px rgba(255,255,255,.55),inset 0 0 0 14px rgba(186,142,82,.32)}
+.cover[data-cover="classic"]:before,.cover[data-cover="classic"]:after{display:none}
+body.night .cover[data-cover="classic"]{background:radial-gradient(circle at 50% 0%,rgba(224,173,112,.16),transparent 55%),linear-gradient(180deg,#1f1b17,#171412);box-shadow:inset 0 0 0 12px rgba(255,255,255,.03),inset 0 0 0 14px rgba(224,173,112,.28)}
+.cover[data-cover="minimal"]{background:var(--paper);border-top:7px solid var(--accent)}
+.cover[data-cover="minimal"]:before,.cover[data-cover="minimal"]:after{display:none}
+body.night .cover[data-cover="minimal"]{background:var(--paper);border-top:7px solid var(--accent)}
+.cover-inner{max-width:780px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center}
+.cover-kicker{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent2);font-weight:800;padding:6px 16px;border-radius:999px;background:var(--stat-bg);border:1px solid var(--stat-border);margin-bottom:22px}
+.cover h1{font-size:clamp(30px,5.6vw,58px);line-height:1.45;color:var(--accent);font-weight:900;letter-spacing:-.02em;margin:0;max-width:100%;overflow-wrap:anywhere}
+.cover-subtitle{font-size:clamp(15px,2vw,21px);line-height:1.85;color:var(--muted);margin-top:16px;max-width:640px;font-weight:500}
+.cover-divider{width:76px;height:3px;border-radius:999px;margin:24px auto 0;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.75}
+.cover-meta{display:flex;justify-content:center;align-items:center;gap:10px 12px;flex-wrap:wrap;margin-top:24px;max-width:720px}
+.cover-meta .meta-chip{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px 15px;border-radius:999px;font-size:13px;line-height:1.5;color:var(--ink);background:var(--chip-bg);border:1px solid var(--chip-border);box-shadow:0 2px 10px rgba(25,35,75,.05)}
+.cover-meta .meta-chip.meta-group{border-radius:16px;padding:7px 13px;gap:6px}
+.cover-meta .meta-chip b{font-weight:700;color:var(--accent)}
+.cover-meta .meta-tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:12.5px;line-height:1.55;background:color-mix(in srgb,var(--accent) 11%,transparent);border:1px solid color-mix(in srgb,var(--accent) 24%,transparent);color:var(--ink)}
+.cover-meta .meta-chip.stat{background:var(--stat-bg);border-color:var(--stat-border);color:var(--stat-ink)}
+.cover-description{max-width:620px;margin:26px auto 0;padding-top:20px;border-top:1px dashed var(--line);line-height:2.1;color:var(--muted);font-size:14.5px;white-space:pre-line}
+.start-reading-btn{margin-top:32px;border:0;border-radius:999px;padding:12px 28px;font:inherit;font-size:14px;font-weight:800;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 34%,transparent);transition:transform .16s ease,box-shadow .16s ease}
+body.night .start-reading-btn{color:#121524}
+.start-reading-btn:hover{transform:translateY(-2px)}
+.chapter-page{display:none;min-height:68vh;padding:clamp(22px,5vw,60px);position:relative}
+.chapter-page.active{display:block}
+.article{font-size:var(--reader-font);line-height:var(--reader-lh);overflow-wrap:anywhere;padding:0 0 56px}
+.article h1,.article h2,.article h3,.article h4{line-height:1.55;scroll-margin-top:90px}
+.article h1{font-size:2em;color:var(--accent);border-bottom:3px solid var(--line);padding-bottom:16px}
+.article h2{font-size:1.5em;color:var(--accent2);margin:2em 0 .7em;padding-inline-start:13px;border-inline-start:5px solid var(--accent2)}
+.article h3{font-size:1.22em;color:#c06b35;margin:1.6em 0 .55em}
+body.night .article h3{color:#f2b688}
+.article h4{font-size:1.08em;color:var(--accent)}
+.article p{margin:.85em 0}
+.article strong{color:var(--accent);font-weight:800}
+.article h1 strong,.article h2 strong,.article h3 strong,.article h4 strong{color:inherit;font-weight:inherit}
+.article em{color:#b36b35}
+body.night .article em{color:#ebb485}
+.article a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed currentColor}
+.md-wikilink{color:var(--accent);font-weight:600;border-bottom:1px dotted color-mix(in srgb,var(--accent) 45%,transparent)}
+.article blockquote{margin:1.4em 0;padding:14px 18px;background:var(--quote-bg);border-inline-start:4px solid var(--accent);border-radius:12px}
+.article ul,.article ol{padding-inline-start:1.6em}
+.article li{padding:.18em 0}
+.article li::marker{color:var(--accent)}
+.article hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:2.3em 0}
+.article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code-bg);color:var(--code-ink);padding:.15em .45em;border-radius:6px;font-size:.88em;direction:ltr;unicode-bidi:plaintext}
+.article pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
+.article pre code{background:none;color:inherit;padding:0}
+.article table{border-collapse:separate;border-spacing:0;width:100%;margin:1.3em 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9em}
+.article th{background:var(--quote-bg);color:var(--accent)}
+.article td,.article th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:start}
+.article tr:last-child td{border-bottom:0}
+.article tr:nth-child(even) td{background:color-mix(in srgb,var(--accent) 4%,var(--paper))}
+.article img{max-width:100%;height:auto;border-radius:12px;display:inline-block;vertical-align:middle}
+.article img.md-zoomable{cursor:zoom-in;transition:transform .16s ease}
+.article img.md-zoomable:hover{transform:scale(1.008)}
+.article input{accent-color:var(--accent)}
+.md-figure{margin:1.45em auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.md-figure img,.md-figure video{max-width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 8px 24px rgba(15,20,45,.10)}
+.md-figure figcaption{font-size:.84em;color:var(--muted);line-height:1.6;max-width:90%}
+.md-img-missing{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;padding:11px 16px;border-radius:12px;background:var(--quote-bg);border:1.5px dashed var(--line);color:var(--muted);font-size:.85em}
+.md-embed-card{margin:1.3em 0;border:1px solid var(--line);border-radius:14px;background:var(--quote-bg);overflow:hidden}
+.md-embed-row{display:flex;align-items:center;gap:12px;padding:12px 15px;flex-wrap:wrap}
+.md-file-icon{width:42px;height:42px;flex:0 0 42px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:11px;letter-spacing:.03em;background:var(--paper);color:var(--accent);border:1px solid var(--chip-border);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.md-file-info{display:flex;flex-direction:column;min-width:0;flex:1;gap:2px}
+.md-file-name{font-weight:700;font-size:.92em;color:var(--ink);overflow-wrap:anywhere;line-height:1.5}
+.md-file-sub{font-size:.76em;color:var(--muted);line-height:1.4;direction:ltr;text-align:start}
+.md-file-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.md-file-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:9px;font-size:.8em;font-weight:700;background:var(--paper);color:var(--accent)!important;border:1px solid var(--chip-border)!important;text-decoration:none;cursor:pointer;line-height:1.5}
+.md-file-btn:hover{border-color:var(--accent)!important}
+.md-audio-wrap{padding:0 15px 13px}
+.md-audio-wrap audio{width:100%;height:40px;display:block}
+.md-video-wrap{padding:0 15px 14px;text-align:center}
+.md-video-wrap video{max-width:100%;border-radius:10px;background:#000}
+.md-pdf-details{border-top:1px solid var(--line)}
+.md-pdf-details summary{padding:9px 15px;font-size:.82em;font-weight:700;color:var(--accent2);cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:6px}
+.md-pdf-details summary::-webkit-details-marker{display:none}
+.md-pdf-frame{width:100%;height:540px;border:0;display:block;background:#fff}
+.md-inline-file{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;padding:2px 10px;margin:0 2px;border-radius:999px;font-size:.84em;font-weight:700;background:var(--quote-bg);border:1px solid var(--chip-border)!important;color:var(--accent)!important;text-decoration:none}
+.md-inline-file small{font-weight:600;opacity:.75;font-family:monospace;font-size:.85em}
+.lightbox{position:fixed;inset:0;z-index:60;background:rgba(8,11,24,.86);display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:94vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lightbox-close{position:fixed;top:16px;left:16px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#fff;font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.lightbox-open{position:fixed;top:18px;right:18px;padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.5);color:#fff;font-size:12px;font-weight:700;text-decoration:none}
+.lightbox-open:hover{background:rgba(255,255,255,.16)}
+.md-img-link{display:inline-block;border:0!important;line-height:0}
+.toc{display:none}
+.toc-shade{position:fixed;inset:0;background:rgba(10,14,30,.5);z-index:39;opacity:0;visibility:hidden;transition:.2s;backdrop-filter:blur(3px)}
+.toc-drawer{position:fixed;z-index:40;top:0;inset-inline-start:0;height:100dvh;width:min(340px,88vw);background:var(--paper);color:var(--ink);border-inline-end:1px solid var(--line);box-shadow:0 0 35px rgba(10,14,30,.22);transform:translateX(105%);transition:transform .25s ease;padding:18px;overflow:auto}
+.toc-drawer.open{transform:translateX(0)}
+.toc-shade.open{opacity:1;visibility:visible}
+.toc-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.toc-head button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;font-size:20px;width:34px;height:34px;cursor:pointer}
+.toc-items a{display:block;padding:9px 11px;margin:3px 0;border-radius:9px;color:var(--ink);text-decoration:none;font-size:13px;line-height:1.7}
+.toc-items a:hover,.toc-items a.current{background:var(--quote-bg);color:var(--accent);font-weight:700}
+.toc-items a.toc-cover-link{border-bottom:1px dashed var(--line);margin-bottom:8px;padding-bottom:10px;color:var(--accent2);font-weight:700}
+.toc-items a.level3{padding-inline-start:24px;font-size:12px}
+.article mark{display:inline;line-height:inherit;vertical-align:baseline;border-radius:4px;padding:.05em .18em;cursor:pointer;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.article mark.hl-yellow{background:#ffec99;color:#3d3418}
+.article mark.hl-green{background:#c5f0c4;color:#1e4720}
+.article mark.hl-blue{background:#c7e6ff;color:#143a5c}
+.article mark.hl-pink{background:#ffd2e5;color:#632543}
+.article mark.hl-purple{background:#e3d4ff;color:#41266b}
+.article mark.note{background:#c5efe7;color:#124542;border-bottom:2px solid #168d89}
+body.night .article mark.hl-yellow{background:rgba(250,214,72,.28);color:#fff6cc}
+body.night .article mark.hl-green{background:rgba(92,214,141,.26);color:#d7ffea}
+body.night .article mark.hl-blue{background:rgba(96,178,245,.28);color:#daf0ff}
+body.night .article mark.hl-pink{background:rgba(244,128,176,.28);color:#ffe0ee}
+body.night .article mark.hl-purple{background:rgba(181,142,248,.28);color:#efe4ff}
+body.night .article mark.note{background:rgba(56,192,182,.26);color:#d8fffb;border-bottom:2px solid #5ed9cf}
+.chapter-footer{position:absolute;bottom:18px;inset-inline:clamp(22px,5vw,60px);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line);padding-top:10px}
+.bookmarks{max-width:var(--reader-maxw);margin:12px auto;padding:10px 14px;background:var(--paper);border:1px solid var(--line);border-radius:13px;font-size:12.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);transition:max-width .22s ease}
+.bm-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:var(--stat-bg);border:1px solid var(--stat-border)}
+.bm-chip a{color:var(--stat-ink);text-decoration:none;font-weight:600}
+.bm-chip a:hover{text-decoration:underline}
+.bm-del{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:14px;line-height:1;cursor:pointer;padding:0;transition:background .15s,color .15s}
+.bm-del:hover{background:rgba(220,60,60,.16);color:#d93838}
+body.night .bm-del:hover{background:rgba(255,107,107,.22);color:#ff8f8f}
+.bm-clear{margin-inline-start:auto;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:4px 9px;font:inherit;font-size:11.5px;cursor:pointer}
+.bm-clear:hover{border-color:#d93838;color:#d93838}
+.navrow{max-width:var(--reader-maxw);margin:12px auto 24px;display:flex;justify-content:space-between;align-items:center;gap:10px;transition:max-width .22s ease}
+.navrow button{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:11px;padding:10px 16px;cursor:pointer;font-weight:700;font-size:13px;transition:border-color .15s,color .15s}
+.navrow button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.navrow button:disabled{opacity:.38;cursor:not-allowed}
+.page-indicator{font-size:12.5px;color:var(--muted);font-weight:700}
+
+/* ===== پاورقی‌ها (Obsidian Footnotes + Popover تعاملی) ===== */
+.fn-ref{font-size:.72em;line-height:0;vertical-align:super;margin-inline:2px}
+.fn-link{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;padding:0 5px;border-radius:999px;
+  background:color-mix(in srgb,var(--accent) 13%,var(--paper));
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)!important;
+  color:var(--accent)!important;font-weight:800;font-size:.95em;
+  text-decoration:none;cursor:pointer;transition:transform .14s,background .14s,color .14s;
+}
+.fn-link:hover,.fn-link.is-open{background:var(--accent);color:#fff!important;transform:translateY(-1px)}
+body.night .fn-link:hover,body.night .fn-link.is-open{color:#121524!important}
+
+.chapter-footnotes{
+  margin-top:2.4em;padding-top:18px;border-top:1.5px dashed var(--line);
+  font-size:.86em;line-height:1.85;color:var(--muted);
+}
+.chapter-footnotes-title{
+  font-size:.92em;font-weight:800;color:var(--accent);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.chapter-footnotes ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.chapter-footnotes li{
+  display:flex;align-items:flex-start;gap:9px;padding:8px 12px;border-radius:11px;
+  background:color-mix(in srgb,var(--accent) 4%,var(--paper));
+  border:1px solid color-mix(in srgb,var(--line) 85%,transparent);
+  scroll-margin-top:95px;transition:border-color .2s,background .2s;
+}
+.chapter-footnotes li.fn-flash{
+  border-color:var(--accent);
+  background:var(--quote-bg);
+}
+.fn-num{
+  flex:0 0 auto;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--quote-bg);color:var(--accent);font-weight:800;font-size:.85em;
+  margin-top:2px;
+}
+.fn-body{flex:1;min-width:0;color:var(--ink)}
+.fn-back{
+  margin-inline-start:6px;font-size:.88em;font-weight:700;
+  color:var(--accent2)!important;border:0!important;text-decoration:none;opacity:.85;
+}
+.fn-back:hover{opacity:1}
+
+.fn-popover{
+  position:fixed;z-index:55;width:min(360px,calc(100vw - 24px));
+  background:var(--paper);color:var(--ink);
+  border:1px solid var(--chip-border);border-radius:15px;
+  box-shadow:0 16px 46px rgba(10,16,40,.22);
+  padding:13px 15px;display:none;flex-direction:column;gap:8px;
+  backdrop-filter:blur(16px);
+}
+body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.fn-popover.open{display:flex;animation:fnPopIn .16s ease}
+@keyframes fnPopIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fn-pop-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.fn-pop-badge{font-size:12px;font-weight:800;color:var(--accent);display:inline-flex;align-items:center;gap:5px}
+.fn-pop-close{
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  width:26px;height:26px;border-radius:8px;font-size:16px;line-height:1;
+  display:grid;place-items:center;cursor:pointer;
+}
+.fn-pop-close:hover{border-color:var(--accent);color:var(--accent)}
+.fn-pop-body{font-size:13.5px;line-height:1.9;color:var(--ink);max-height:42vh;overflow:auto;overflow-wrap:anywhere}
+.fn-pop-body a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed currentColor}
+.fn-pop-foot{display:flex;justify-content:flex-end;padding-top:4px}
+.fn-pop-jump{
+  border:0;background:transparent;color:var(--accent2);font-size:11.5px;font-weight:700;
+  cursor:pointer;padding:2px 4px;
+}
+.fn-pop-jump:hover{text-decoration:underline}
+@media(max-width:600px){
+  .fn-popover{left:12px!important;right:12px!important;top:auto!important;bottom:14px!important;width:auto}
+}
+
+@media(max-width:720px){
+  .readerbar{flex-wrap:wrap;gap:8px;padding:9px 10px}
+  .bar-start{order:1;flex:1 1 100%;min-width:0}
+  .bar-end{order:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;flex:1 1 100%;width:100%;min-width:0}
+  .bar-center{order:3;flex:1 1 100%;width:100%;max-width:none;min-width:0}
+  .bar-end .bar-btn{width:100%;min-width:0;min-height:42px;justify-content:center;padding:7px 4px;gap:3px}
+  .bar-end .bar-btn.icon-only{padding:7px 4px}
+  .btn-label-hide{display:none}
+}
+@media(max-width:600px){
+  body{padding:8px}
+  .readerbar{top:4px;border-radius:13px}
+  .book{border-radius:14px}
+  .chapter-page{padding:22px 17px;min-height:70vh}
+  .article h1{font-size:1.65em}
+  .article h2{font-size:1.35em}
+  .cover{min-height:80svh;padding:30px 18px}
+  .cover h1{font-size:clamp(28px,8.5vw,42px)}
+  .navrow button{padding:9px 12px;font-size:12px}
+}
+@media print{
+  body{padding:0;background:#fff;color:#111}
+  .readerbar,.progress,.bookmarks,.navrow,#searchStatus,.toc-drawer,.toc-shade,.settings-drawer,.settings-shade,.start-reading-btn,.lightbox,.md-pdf-details,.fn-popover,.fn-back{display:none!important}
+  .book{box-shadow:none;border:0;max-width:none;border-radius:0}
+  .cover,.cover.active{display:flex!important;min-height:94vh;break-after:page}
+  .chapter-page,.chapter-page.active{display:block!important;min-height:0;break-after:page;padding:15mm}
+  .chapter-footer{position:static;margin-top:28px}
+  .article{padding:0}
+  .article a{color:#111}
+}
+</style>
+</head>
+<body class="" data-palette="default">
+<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+
+<nav class="readerbar">
+  <div class="bar-start">
+    <button type="button" class="bar-btn icon-only" id="tocBtn" title="فهرست مطالب">☷</button>
+    <button type="button" class="brand" id="coverJumpBtn" title="بازگشت به جلد و معرفی">📖 نورا | خوانشگر</button>
+  </div>
+  <div class="bar-center">
+    <div class="search-wrap">
+      <input id="find" type="search" placeholder="جست‌وجو در متن… (Enter)">
+    </div>
+  </div>
+  <div class="bar-end">
+    <button type="button" class="bar-btn" id="highlightBtn" title="🖍 هایلایت"><span class="hl-indicator" id="hlIndicator"></span><span class="btn-label-hide">هایلایت</span></button>
+    <button type="button" class="bar-btn" id="commentBtn" title="💬 یادداشت">💬<span class="btn-label-hide"> یادداشت</span></button>
+    <button type="button" class="bar-btn" id="markBtn" title="🔖 نشانک"><span aria-hidden="true">🔖</span><span class="btn-label-hide" id="markBtnLabel">نشانک</span></button>
+    <button type="button" class="bar-btn icon-only" id="themeBtn" title="تغییر روز/شب">🌓</button>
+    <button type="button" class="bar-btn settings-trigger" id="settingsBtn" title="تنظیمات نمایش و مطالعه">⚙️ <span class="btn-label-hide">تنظیمات</span></button>
+  </div>
+</nav>
+
+<div id="tocShade" class="toc-shade"></div>
+<aside id="tocDrawer" class="toc-drawer" aria-label="فهرست مطالب">
+  <div class="toc-head"><strong>فهرست مطالب</strong><button id="tocClose" aria-label="بستن فهرست">×</button></div>
+  <div id="tocItems" class="toc-items"></div>
+</aside>
+
+<div id="settingsShade" class="settings-shade"></div>
+<aside id="settingsDrawer" class="settings-drawer" aria-label="تنظیمات نمایش و مطالعه">
+  <div class="settings-head">
+    <strong>⚙️ تنظیمات نمایش و مطالعه</strong>
+    <button type="button" class="settings-close" id="settingsClose" aria-label="بستن تنظیمات">×</button>
+  </div>
+  <div class="settings-body">
+    <div class="set-group">
+      <div class="set-label"><span>حالت نمایش</span></div>
+      <div class="seg-control">
+        <button type="button" class="seg-btn" data-theme-val="light">☀️ روز</button>
+        <button type="button" class="seg-btn" data-theme-val="dark">🌙 شب</button>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>اندازه قلم</span><span class="set-val" id="fontSizeVal">16px</span></div>
+      <div class="font-stepper">
+        <button type="button" id="smaller" title="کوچک‌تر">A−</button>
+        <span id="fontSizeReadout">16px</span>
+        <button type="button" id="bigger" title="بزرگ‌تر">A+</button>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>فاصله خطوط</span></div>
+      <div class="seg-control">
+        <button type="button" class="seg-btn" data-lh-val="1.75">فشرده</button>
+        <button type="button" class="seg-btn" data-lh-val="2.05">معمولی</button>
+        <button type="button" class="seg-btn" data-lh-val="2.35">راحت</button>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>عرض صفحه</span></div>
+      <div class="seg-control">
+        <button type="button" class="seg-btn" data-width-val="680">باریک</button>
+        <button type="button" class="seg-btn" data-width-val="850">معمولی</button>
+        <button type="button" class="seg-btn" data-width-val="100%">تمام عرض</button>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>قلم متن</span></div>
+      <select id="readerFont" class="set-select" title="فونت متن">
+        <option value="default">فونت پیش‌فرض</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="system-ui">System UI</option>
+        <option value="Georgia">Georgia</option>
+        <option value="serif">Serif</option>
+      </select>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>پالت رنگی</span></div>
+      <div class="swatch-grid" id="paletteGrid"><button type="button" class="swatch-btn" data-palette-val="default" title="یاسی و فیروزه‌ای"><span class="swatch-dot" style="background:linear-gradient(135deg,#5849c7,#15948f)"></span><span class="swatch-label">یاسی و فیروزه‌ای</span></button><button type="button" class="swatch-btn" data-palette-val="ocean" title="اقیانوسی"><span class="swatch-dot" style="background:linear-gradient(135deg,#156fa3,#129a95)"></span><span class="swatch-label">اقیانوسی</span></button><button type="button" class="swatch-btn" data-palette-val="forest" title="جنگلی و زمردی"><span class="swatch-dot" style="background:linear-gradient(135deg,#227a56,#a47f2f)"></span><span class="swatch-label">جنگلی و زمردی</span></button><button type="button" class="swatch-btn" data-palette-val="sunset" title="غروب گرم"><span class="swatch-dot" style="background:linear-gradient(135deg,#c2513d,#c78328)"></span><span class="swatch-label">غروب گرم</span></button><button type="button" class="swatch-btn" data-palette-val="royal" title="لاجوردی و طلایی"><span class="swatch-dot" style="background:linear-gradient(135deg,#393c97,#be8534)"></span><span class="swatch-label">لاجوردی و طلایی</span></button><button type="button" class="swatch-btn" data-palette-val="plum" title="آلویی"><span class="swatch-dot" style="background:linear-gradient(135deg,#8a3fa8,#c9507f)"></span><span class="swatch-label">آلویی</span></button><button type="button" class="swatch-btn" data-palette-val="mono" title="کاغذی / خنثی"><span class="swatch-dot" style="background:linear-gradient(135deg,#454f5e,#8a7248)"></span><span class="swatch-label">کاغذی / خنثی</span></button></div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>طرح جلد</span></div>
+      <div class="pill-grid" id="coverGrid"><button type="button" class="pill-btn" data-cover-val="aurora">جلد شفق</button><button type="button" class="pill-btn" data-cover-val="ocean">جلد اقیانوس</button><button type="button" class="pill-btn" data-cover-val="botanical">جلد گیاهی</button><button type="button" class="pill-btn" data-cover-val="classic">جلد کلاسیک</button><button type="button" class="pill-btn" data-cover-val="minimal">جلد مینیمال</button></div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>رنگ هایلایت پیش‌فرض</span></div>
+      <div class="hl-dots" id="hlDots"><button type="button" class="hl-dot" data-hl-val="yellow" title="زرد" aria-label="زرد" style="--dot:#ffe066"></button><button type="button" class="hl-dot" data-hl-val="green" title="سبز" aria-label="سبز" style="--dot:#8ce99a"></button><button type="button" class="hl-dot" data-hl-val="blue" title="آبی" aria-label="آبی" style="--dot:#74c0fc"></button><button type="button" class="hl-dot" data-hl-val="pink" title="صورتی" aria-label="صورتی" style="--dot:#faa2c1"></button><button type="button" class="hl-dot" data-hl-val="purple" title="بنفش" aria-label="بنفش" style="--dot:#d0bfff"></button></div>
+    </div>
+  </div>
+  <div class="settings-foot">
+    <button type="button" id="resetSettingsBtn">↺ بازنشانی پیش‌فرض</button>
+    <button type="button" class="primary-action" id="printBtn">🖨 چاپ / ذخیره PDF</button>
+  </div>
+</aside>
+
+<div id="fnPopover" class="fn-popover" role="dialog" aria-hidden="true">
+  <div class="fn-pop-head">
+    <span class="fn-pop-badge" id="fnPopBadge"></span>
+    <button type="button" class="fn-pop-close" id="fnPopClose" aria-label="بستن پاورقی">×</button>
+  </div>
+  <div class="fn-pop-body" id="fnPopBody"></div>
+  <div class="fn-pop-foot">
+    <button type="button" class="fn-pop-jump" id="fnPopJump">رفتن به پاورقی ↓</button>
+  </div>
+</div>
+
+<div id="lightbox" class="lightbox" aria-hidden="true">
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="بستن">×</button>
+  <a id="lightboxOpen" class="lightbox-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none">باز کردن تصویر اصلی ↗</a>
+  <img id="lightboxImg" alt="" referrerpolicy="no-referrer">
+</div>
+
+<span id="searchStatus" aria-live="polite" class="search-status"></span>
+
+<div class="book">
+  <section class="cover active" id="coverSection" data-cover="aurora" aria-label="راهنمای جامع نرم‌افزار">
+    <div class="cover-inner">
+      <div class="cover-kicker">راهنمای جامع نرم‌افزار</div>
+      <h1>راهنمای جامع Nora HTML Exporter در Obsidian</h1>
+      <div class="cover-subtitle">راهنمای کامل استفاده، تنظیمات، قابلیت‌ها و خروجی‌گیری از یادداشت‌های Obsidian در قالب HTML تعاملی</div>
+      <div class="cover-divider"></div>
+      <div class="cover-meta"><span class="meta-chip"><b>نویسنده:</b> کانال آموزش کاربردی ابسیدین obsidiantut</span><span class="meta-chip meta-group"><b>موضوعات:</b> <span class="meta-tag">Obsidian</span><span class="meta-tag">Nora HTML Exporter</span><span class="meta-tag">خروجی HTML</span><span class="meta-tag">مستندسازی</span><span class="meta-tag">کتاب‌خوان دیجیتال</span></span><span class="meta-chip"><b>انتشار:</b> ۱۴۰۵</span><span class="meta-chip stat">⏱ حدود ۱۱ دقیقه مطالعه</span><span class="meta-chip stat">📄 ۲٬۲۳۱ واژه</span></div>
+      <p class="cover-description">مرجعی جامع برای نصب، تنظیم و استفاده از Nora HTML Exporter؛ از تبدیل یادداشت‌های Markdown به کتاب‌خوان HTML مستقل تا فهرست مطالب، جست‌وجو، نشانک، هایلایت، یادداشت‌گذاری، پیوست‌ها و چاپ PDF.</p>
+      <button type="button" class="start-reading-btn" id="startReadingBtn">شروع مطالعه</button>
+    </div>
+  </section>
+  <div id="chapters"></div>
+</div>
+<div class="bookmarks" id="marks">🔖 هنوز نشانکی ثبت نشده است</div>
+<div class="navrow">
+  <button id="prev">قبلی</button>
+  <span class="page-indicator" id="pageIndicator">راهنمای جامع نرم‌افزار</span>
+  <button id="next">بعدی</button>
+</div>
+<script>
+(()=>{
+  const S={"locale":"fa-IR","startReading":"شروع مطالعه","tocCoverSuffix":"(جلد)","footerBrand":"نورا · نسخه مطالعه","sectionWord":"بخش","ofWord":"از","imgRemoteFail":"🖼 بارگذاری تصویر اینترنتی ناموفق بود — ","imgRemoteOpen":"باز کردن لینک تصویر ↗","imgLocalFailPre":"🖼 تصویر «","imgLocalFailPost":"» در دسترس نیست.","markBtn":"🔖 نشانک","markRemoveBtn":"🔖 حذف نشانک","coverPage":"صفحهٔ معرفی","prevSection":"بخش قبلی","nextSection":"بخش بعدی","noBookmarks":"🔖 هنوز نشانکی ثبت نشده است","bookmarksLabel":"🔖 نشانک‌ها:","clearAllMarks":"حذف همه","clearAllConfirm":"همهٔ نشانک‌ها حذف شوند؟","delMarkTitle":"حذف این نشانک","alertBookmarkSection":"برای ثبت نشانک، ابتدا وارد یکی از بخش‌ها شوید.","alertAnnotateSection":"برای هایلایت یا یادداشت، وارد یکی از بخش‌ها شوید.","alertSelectText":"ابتدا بخشی از متن را انتخاب کن.","alertSameSection":"متن انتخاب‌شده باید از همین بخش باشد.","alertInvalidSelection":"این بخش قبلاً هایلایت شده یا متن معتبری انتخاب نشده است.","promptNote":"یادداشتت را درباره این بخش بنویس:","titleNoteMark":"برای دیدن یا حذف یادداشت کلیک کن","titleHlMark":"برای حذف هایلایت کلیک کن","alertNotePrefix":"یادداشت: ","confirmDeleteNote":"این یادداشت حذف شود؟","confirmDeleteHl":"این هایلایت حذف شود؟","searchNotFound":"موردی پیدا نشد","searchMatchWord":"نتیجه","searchFoundIn":"— در بخش","searchFoundEnd":"پیدا شد","footnotesHeading":"پاورقی‌های این بخش","footnoteLabel":"پاورقی","footnoteGoTo":"رفتن به پاورقی ↓","footnoteBack":"بازگشت به متن","footnoteClose":"بستن پاورقی"};
+  const FN_LIST=[];
+  const FN_MAP=new Map(FN_LIST.map(f=>[String(f.num),f]));
+  const HL_HEX={yellow:'#ffe066',green:'#8ce99a',blue:'#74c0fc',pink:'#faa2c1',purple:'#d0bfff'};
+  const bookId="1g969mg";
+  const docLabel="راهنمای جامع نرم‌افزار";
+  const defaultPrefs={
+    night:false,
+    palette:"default",
+    cover:"aurora",
+    font:'default',
+    size:16,
+    lh:'2.05',
+    width:"850",
+    hlColor:'yellow'
+  };
+  const sourceEl=document.querySelector('#chapters');
+  const coverEl=document.querySelector('#coverSection');
+  const raw="<nav class=\"toc\"><div class=\"toc-title\">در این نوشته می‌خوانید</div><a class=\"\" href=\"#section-0\">1. معرفی پلاگین</a><a class=\"\" href=\"#section-1\">2. قابلیت‌های اصلی</a><a class=\"level3\" href=\"#section-2\">2.1. خروجی گرفتن از Canvas</a><a class=\"level3\" href=\"#section-3\">2.2. دو نوع خروجی HTML</a><a class=\"level3\" href=\"#section-6\">2.3. پشتیبانی از Canvasهای تو در تو</a><a class=\"level3\" href=\"#section-7\">2.4. پشتیبانی از فایل‌های Markdown</a><a class=\"level3\" href=\"#section-8\">2.5. پشتیبانی از لینک‌ها</a><a class=\"level3\" href=\"#section-9\">2.6. پشتیبانی از تصاویر و فایل‌ها</a><a class=\"level3\" href=\"#section-10\">2.7. پشتیبانی از LaTeX</a><a class=\"level3\" href=\"#section-11\">2.8. نمایش کدها</a><a class=\"level3\" href=\"#section-12\">2.9. پشتیبانی از Advanced Canvas</a><a class=\"\" href=\"#section-13\">3. امکانات تعاملی خروجی</a><a class=\"level3\" href=\"#section-14\">3.1. Zoom</a><a class=\"level3\" href=\"#section-15\">3.2. Fit / Reset</a><a class=\"level3\" href=\"#section-16\">3.3. Minimap</a><a class=\"level3\" href=\"#section-17\">3.4. Search</a><a class=\"level3\" href=\"#section-18\">3.5. Navigation Panel</a><a class=\"level3\" href=\"#section-19\">3.6. Folding</a><a class=\"\" href=\"#section-20\">4. نصب پلاگین</a><a class=\"level3\" href=\"#section-21\">روش اول: نصب از Community Plugins</a><a class=\"level3\" href=\"#section-22\">روش دوم: نصب دستی</a><a class=\"\" href=\"#section-23\">5. تنظیمات پلاگین</a><a class=\"level3\" href=\"#section-24\">5.1. Export Format</a><a class=\"level3\" href=\"#section-25\">5.2. Dark Default Theme</a><a class=\"level3\" href=\"#section-26\">5.3. Show Minimap</a><a class=\"level3\" href=\"#section-27\">5.4. Show Search</a><a class=\"level3\" href=\"#section-28\">5.5. Navigation</a><a class=\"level3\" href=\"#section-29\">5.6. Folding</a><a class=\"level3\" href=\"#section-30\">5.7. Syntax Highlighting</a><a class=\"level3\" href=\"#section-31\">5.8. Output Folder</a><a class=\"\" href=\"#section-32\">6. آموزش گام‌به‌گام خروجی گرفتن</a><a class=\"level3\" href=\"#section-33\">مرحله اول: بازکردن Canvas</a><a class=\"level3\" href=\"#section-34\">مرحله دوم: اجرای دستور Export</a><a class=\"level3\" href=\"#section-35\">مرحله سوم: انتخاب نوع خروجی</a><a class=\"level3\" href=\"#section-36\">مرحله چهارم: تعیین پوشه مقصد</a><a class=\"level3\" href=\"#section-37\">مرحله پنجم: تولید فایل</a><a class=\"level3\" href=\"#section-38\">مرحله ششم: مشاهده خروجی</a><a class=\"\" href=\"#section-39\">7. آموزش استفاده از خروجی HTML</a><a class=\"level3\" href=\"#section-40\">جست‌وجو در Canvas</a><a class=\"level3\" href=\"#section-41\">پیمایش بین Canvasها</a><a class=\"level3\" href=\"#section-42\">جمع‌کردن شاخه‌ها</a><a class=\"\" href=\"#section-43\">8. مثال‌های کاربردی</a><a class=\"level3\" href=\"#section-44\">مثال اول: انتشار نقشه ذهنی</a><a class=\"level3\" href=\"#section-45\">مثال دوم: ساخت مستندات آموزشی</a><a class=\"level3\" href=\"#section-46\">مثال سوم: ارائه پروژه</a><a class=\"level3\" href=\"#section-47\">مثال چهارم: آرشیو دانش</a><a class=\"\" href=\"#section-48\">9. نکات مهم و محدودیت‌ها</a><a class=\"level3\" href=\"#section-49\">9.1. پشتیبانی از موبایل</a><a class=\"level3\" href=\"#section-50\">9.2. وابستگی به اینترنت</a><a class=\"level3\" href=\"#section-51\">9.3. حجم فایل</a><a class=\"level3\" href=\"#section-52\">9.4. پشتیبانی از پلاگین‌های دیگر</a><a class=\"level3\" href=\"#section-53\">9.5. به‌روزرسانی خروجی</a><a class=\"level3\" href=\"#section-54\">9.6. نمایش فایل‌های HTML در Obsidian</a><a class=\"\" href=\"#section-55\">10. پیشنهادهای حرفه‌ای</a><a class=\"\" href=\"#section-56\">11. پرسش‌های متداول</a><a class=\"level3\" href=\"#section-57\">آیا برای مشاهده خروجی HTML باید Obsidian نصب باشد؟</a><a class=\"level3\" href=\"#section-58\">آیا خروجی به اینترنت نیاز دارد؟</a><a class=\"level3\" href=\"#section-59\">آیا می‌توان خروجی را در وب‌سایت منتشر کرد؟</a><a class=\"level3\" href=\"#section-60\">کدام حالت خروجی بهتر است؟</a><a class=\"level3\" href=\"#section-61\">آیا Canvas اصلی تغییر می‌کند؟</a><a class=\"level3\" href=\"#section-62\">آیا می‌توان Canvasهای مرتبط را نیز خروجی گرفت؟</a><a class=\"level3\" href=\"#section-63\">آیا امکان جست‌وجو در خروجی وجود دارد؟</a><a class=\"level3\" href=\"#section-64\">آیا فایل خروجی قابل‌ویرایش است؟</a><a class=\"\" href=\"#section-65\">12. جمع‌بندی</a><a class=\"\" href=\"#section-66\">منابع</a></nav><h2 id=\"section-0\">1. معرفی پلاگین</h2><p><strong>Canvas HTML Exporter</strong> یک افزونه برای نرم‌افزار Obsidian است که امکان تبدیل فایل‌های Canvas به صفحات HTML تعاملی و قابل‌استفاده در مرورگر را فراهم می‌کند.</p><p>هدف اصلی این پلاگین این است که بتوانید نمودارها، نقشه‌های ذهنی، ساختارهای بصری، یادداشت‌ها و ارتباطات موجود در Canvas را بدون نیاز به نصب Obsidian در اختیار دیگران قرار دهید.</p><p>فایل HTML تولیدشده را می‌توان در مرورگر باز کرد، به دیگران فرستاد یا روی وب‌سایت منتشر کرد.</p><p>ویژگی مهم این پلاگین، حفظ ساختار بصری Canvas و تبدیل آن به یک خروجی تعاملی است.</p><h2 id=\"section-1\">2. قابلیت‌های اصلی</h2><h3 id=\"section-2\">2.1. خروجی گرفتن از Canvas</h3><p>امکان تبدیل Canvas فعال به خروجی HTML وجود دارد.</p><p>خروجی می‌تواند شامل موارد زیر باشد:</p><ul><li>موقعیت و چیدمان گره‌ها (Nodes)</li><li>گروه‌بندی‌ها (Groups)</li><li>ارتباطات بین گره‌ها (Connections)</li><li>برچسب ارتباطات (Connection Labels)</li><li>رنگ‌بندی گره‌ها</li><li>شکل و استایل گره‌ها</li><li>تصاویر و فایل‌های ضمیمه</li><li>محتوای Markdown</li><li>لینک‌های داخلی و خارجی</li></ul><h3 id=\"section-3\">2.2. دو نوع خروجی HTML</h3><p>پلاگین دو روش اصلی برای تولید خروجی دارد.</p><h4 id=\"section-4\">حالت اول: Package Folder</h4><p>در این روش، خروجی به شکل یک پوشه شامل فایل HTML و منابع جانبی ساخته می‌شود.</p><p>ساختار نمونه:</p><p>Canvas-Exports/<br>└── My-Canvas/<br>├── index.html<br>├── canvas-001-Linked.html<br>└── assets/<br>├── images/<br>└── files/</p><p>ویژگی‌ها:</p><ul><li>فایل HTML اصلی جداگانه ذخیره می‌شود.</li><li>تصاویر در پوشه Assets قرار می‌گیرند.</li><li>فایل‌های ضمیمه در پوشه مربوطه ذخیره می‌شوند.</li><li>Canvasهای مرتبط می‌توانند به‌صورت صفحات جداگانه خروجی گرفته شوند.</li><li>فایل اصلی سبک‌تر خواهد بود.</li><li>بارگذاری اولیه معمولاً سریع‌تر است.</li></ul><p><strong>چه زمانی استفاده کنیم؟</strong></p><p>وقتی Canvas بزرگ است یا تصاویر و فایل‌های زیادی دارد، این حالت انتخاب مناسب‌تری است.</p><p>نکته: هنگام انتقال یا انتشار خروجی، باید کل پوشه را همراه با فایل‌های جانبی منتقل کنید.</p><h4 id=\"section-5\">حالت دوم: Single HTML File</h4><p>در این حالت تمام محتوا و منابع موردنیاز تا حد امکان داخل یک فایل HTML قرار می‌گیرند.</p><p>ساختار نمونه:</p><p>Canvas-Exports/<br>└── My-Canvas.html</p><p>ویژگی‌ها:</p><ul><li>تمام منابع به‌صورت داخلی در HTML قرار می‌گیرند.</li><li>تصاویر و فایل‌های پشتیبانی‌شده در خروجی جاسازی می‌شوند.</li><li>صفحات Canvas مرتبط در همان فایل قابل‌دسترسی هستند.</li><li>نیازی به انتقال پوشه Assets نیست.</li><li>اشتراک‌گذاری فایل بسیار ساده‌تر است.</li></ul><p><strong>چه زمانی استفاده کنیم؟</strong></p><p>وقتی می‌خواهید یک فایل مستقل برای ارسال با ایمیل، پیام‌رسان یا ذخیره‌سازی داشته باشید.</p><p>نکته: حجم فایل ممکن است بسیار زیاد شود و بارگذاری اولیه در Canvasهای بزرگ زمان بیشتری ببرد.</p><h3 id=\"section-6\">2.3. پشتیبانی از Canvasهای تو در تو</h3><p>پلاگین می‌تواند Canvasهای مرتبط را دنبال کند.</p><p>برای مثال:</p><ul><li>Canvas اصلی</li><li>Canvas مربوط به یک موضوع خاص</li><li>Canvas زیرمجموعه</li><li>Canvasهای مرتبط با پروژه</li></ul><p>این ساختار می‌تواند در خروجی نیز حفظ شود.</p><p>امکان پیمایش بین Canvas اصلی و Canvasهای فرزند وجود دارد.</p><p>پلاگین در دنبال‌کردن Canvasهای مرتبط، چرخه‌های ارتباطی را نیز مدیریت می‌کند تا وارد پیمایش بی‌پایان نشود.</p><h3 id=\"section-7\">2.4. پشتیبانی از فایل‌های Markdown</h3><p>یکی از امکانات مهم پلاگین، نمایش محتوای یادداشت‌های Markdown در خروجی HTML است.</p><p>موارد پشتیبانی‌شده عبارت‌اند از:</p><ul><li>Heading</li><li>Paragraph</li><li>Lists</li><li>Tables</li><li>Blockquotes</li><li>Callouts</li><li>Code Blocks</li><li>Horizontal Rules</li><li>Highlights</li><li>LaTeX Math</li></ul><p>یادداشت‌های Markdown متصل به Canvas می‌توانند به صفحات HTML جداگانه یا صفحات داخلی خروجی تک‌فایلی تبدیل شوند.</p><h3 id=\"section-8\">2.5. پشتیبانی از لینک‌ها</h3><p>پلاگین قابلیت بازنویسی بسیاری از لینک‌های Obsidian را برای استفاده در خروجی HTML دارد.</p><p>از جمله:</p><ul><li>Wiki Links</li><li>Markdown Links</li><li>Heading Links</li><li>Section Embeds</li><li>Block References</li><li>لینک‌های داخلی Canvas</li></ul><p>هدف این است که ارتباط میان یادداشت‌ها پس از خروج از محیط Obsidian نیز تا حد امکان حفظ شود.</p><h3 id=\"section-9\">2.6. پشتیبانی از تصاویر و فایل‌ها</h3><p>انواع محتوای قابل‌استفاده در Canvas شامل موارد زیر هستند:</p><ul><li>Image</li><li>PDF</li><li>Audio</li><li>Video</li><li>Generic File</li></ul><p>در حالت Package Folder منابع در پوشه خروجی کپی می‌شوند.</p><p>در حالت Single HTML فایل‌های پشتیبانی‌شده تا حد امکان داخل سند جاسازی می‌شوند.</p><h3 id=\"section-10\">2.7. پشتیبانی از LaTeX</h3><p>فرمول‌های ریاضی موجود در یادداشت‌ها با استفاده از KaTeX رندر می‌شوند.</p><p>برای مثال:</p><p>$E = mc^2$</p><p>و فرمول‌های چندخطی:</p><p>$$<br>\\int_0^1 x^2 dx = \\frac{1}{3}<br>$$</p><h3 id=\"section-11\">2.8. نمایش کدها</h3><p>پلاگین برای نمایش بهتر کدهای برنامه‌نویسی از Shiki استفاده می‌کند.</p><p>امکانات:</p><ul><li>Syntax Highlighting</li><li>انتخاب تم نمایش کد</li><li>خوانایی بهتر قطعه‌کدها</li><li>نمایش کدهای زبان‌های مختلف</li></ul><h3 id=\"section-12\">2.9. پشتیبانی از Advanced Canvas</h3><p>پلاگین می‌تواند برخی ویژگی‌های ذخیره‌شده توسط Advanced Canvas را نیز بازسازی کند.</p><p>موارد پشتیبانی‌شده:</p><ul><li>شکل‌های مختلف Node</li><li>Border Styles</li><li>Text Alignment</li><li>Edge Paths</li><li>Edge Heads</li><li>رنگ‌های شماره‌گذاری‌شده Canvas</li><li>Custom Colors</li><li>تنظیمات گروه‌ها</li></ul><p>نکته: تمام قابلیت‌های Advanced Canvas پشتیبانی نمی‌شوند.</p><p>مواردی مانند Floating Edges، Portals و Presentation Mode در لایه سازگاری این پلاگین بازسازی نمی‌شوند.</p><h2 id=\"section-13\">3. امکانات تعاملی خروجی</h2><p>خروجی HTML فقط یک تصویر ثابت از Canvas نیست؛ بلکه امکانات تعاملی نیز دارد.</p><h3 id=\"section-14\">3.1. Zoom</h3><p>امکان بزرگ‌نمایی و کوچک‌نمایی Canvas وجود دارد.</p><p>این قابلیت برای مشاهده نمودارهای بزرگ و ساختارهای پیچیده کاربرد دارد.</p><h3 id=\"section-15\">3.2. Fit / Reset</h3><p>می‌توان نمای Canvas را به وضعیت مناسب بازگرداند تا تمام محتوا در محدوده قابل‌مشاهده قرار بگیرد.</p><h3 id=\"section-16\">3.3. Minimap</h3><p>Minimap یک نمای کوچک از ساختار کلی Canvas است.</p><p>کاربردها:</p><ul><li>مشاهده موقعیت فعلی در Canvas</li><li>درک ساختار کلی</li><li>پیمایش در نمودارهای بزرگ</li></ul><p>این قابلیت از تنظیمات پلاگین قابل‌فعال‌سازی است.</p><h3 id=\"section-17\">3.4. Search</h3><p>امکان جست‌وجو در محتوای Canvas وجود دارد.</p><p>در ساختارهای چندلایه، جست‌وجو می‌تواند محتوای Canvasهای مرتبط را نیز پوشش دهد.</p><h3 id=\"section-18\">3.5. Navigation Panel</h3><p>پنل Navigation برای پیمایش بین صفحات و Canvasهای مختلف استفاده می‌شود.</p><p>امکانات:</p><ul><li>نمایش ساختار Canvas</li><li>نمایش Canvasهای مرتبط</li><li>نمایش صفحات HTML موجود در Canvas</li><li>مرتب‌سازی الفبایی سلسله‌مراتب Canvas</li></ul><h3 id=\"section-19\">3.6. Folding</h3><p>قابلیت Folding برای جمع‌کردن و بازکردن شاخه‌های Canvas طراحی شده است.</p><p>امکانات:</p><ul><li>فعال‌کردن Folding</li><li>غیرفعال‌کردن Folding</li><li>جمع‌کردن شاخه‌ها</li><li>نمایش یک سطح مشخص</li><li>تمرکز روی یک شاخه</li><li>بازگرداندن وضعیت اولیه</li></ul><p>این قابلیت حتی در صورتی که افزونه Canvas Folding نصب نباشد نیز در خروجی HTML قابل‌استفاده است.</p><h2 id=\"section-20\">4. نصب پلاگین</h2><h3 id=\"section-21\">روش اول: نصب از Community Plugins</h3><ol><li>نرم‌افزار Obsidian را باز کنید.</li><li>وارد Settings شوید.</li><li>بخش Community Plugins را باز کنید.</li><li>گزینه Browse را انتخاب کنید.</li><li>عبارت Canvas HTML Exporter را جست‌وجو کنید.</li><li>پلاگین را انتخاب کنید.</li><li>روی Install کلیک کنید.</li><li>پس از نصب، گزینه Enable را بزنید.</li></ol><h3 id=\"section-22\">روش دوم: نصب دستی</h3><ol><li>مخزن GitHub پلاگین را دانلود کنید.</li><li>فایل ZIP را استخراج کنید.</li><li>فایل‌های زیر را پیدا کنید:</li></ol><ul><li>manifest.json</li><li>main.js</li><li>styles.css</li></ul><ol><li>به پوشه Vault خود بروید.</li><li>وارد مسیر زیر شوید:</li></ol><p>.obsidian/plugins/</p><ol><li>پوشه‌ای با نام زیر ایجاد کنید:</li></ol><p>canvas-html-exporter</p><ol><li>فایل‌های پلاگین را در این پوشه قرار دهید.</li><li>Obsidian را مجدداً بارگذاری کنید.</li><li>از بخش Community Plugins افزونه را فعال کنید.</li></ol><h2 id=\"section-23\">5. تنظیمات پلاگین</h2><p>برای مشاهده تنظیمات:</p><p>Settings → Community Plugins → Canvas HTML Exporter</p><h3 id=\"section-24\">5.1. Export Format</h3><p>نوع خروجی را تعیین می‌کند.</p><p>گزینه‌ها:</p><ul><li>Package Folder</li><li>Single HTML File</li></ul><p>پیشنهاد:</p><p>برای Canvasهای بزرگ از Package Folder و برای اشتراک‌گذاری ساده از Single HTML File استفاده کنید.</p><h3 id=\"section-25\">5.2. Dark Default Theme</h3><p>این گزینه مشخص می‌کند که خروجی HTML در حالت پیش‌فرض از تم تاریک استفاده کند یا خیر.</p><h3 id=\"section-26\">5.3. Show Minimap</h3><p>با فعال‌کردن این گزینه، Minimap در صفحه خروجی نمایش داده می‌شود.</p><h3 id=\"section-27\">5.4. Show Search</h3><p>با فعال‌کردن این گزینه، امکان جست‌وجو در خروجی HTML اضافه می‌شود.</p><h3 id=\"section-28\">5.5. Navigation</h3><p>مشخص می‌کند که پنل Navigation هنگام بازشدن صفحه HTML به‌صورت پیش‌فرض باز باشد یا بسته.</p><p>بازدیدکننده نیز می‌تواند وضعیت نمایش این پنل را تغییر دهد.</p><h3 id=\"section-29\">5.6. Folding</h3><p>وضعیت اولیه قابلیت Folding را مشخص می‌کند.</p><p>حالت‌های مستندشده:</p><ul><li>شروع با Folding غیرفعال</li><li>شروع با Folding فعال و Canvas کاملاً باز</li><li>واردکردن وضعیت مؤثر فعلی از افزونه اختیاری Canvas Folding</li></ul><h3 id=\"section-30\">5.7. Syntax Highlighting</h3><p>تم مربوط به نمایش کدهای برنامه‌نویسی را مشخص می‌کند.</p><p>این قابلیت با موتور Shiki پیاده‌سازی شده است.</p><h3 id=\"section-31\">5.8. Output Folder</h3><p>مسیر ذخیره خروجی HTML را تعیین می‌کند.</p><p>می‌توان از مسیر داخل Vault یا مسیر مطلق سیستم استفاده کرد.</p><p>دو روش انتخاب پوشه وجود دارد:</p><ul><li>Choose Vault Folder</li><li>Choose System Folder</li></ul><h2 id=\"section-32\">6. آموزش گام‌به‌گام خروجی گرفتن</h2><h3 id=\"section-33\">مرحله اول: بازکردن Canvas</h3><p>یک فایل Canvas را در Obsidian باز کنید.</p><p>توجه داشته باشید که فایل فعال باید پسوند <code>.canvas</code> داشته باشد.</p><h3 id=\"section-34\">مرحله دوم: اجرای دستور Export</h3><p>دو روش برای شروع خروجی وجود دارد.</p><p>روش اول:</p><ol><li>کلیدهای Ctrl + P را فشار دهید.</li><li>دستور زیر را جست‌وجو کنید:</li></ol><p>Export active canvas as HTML</p><ol><li>دستور را اجرا کنید.</li></ol><p>روش دوم:</p><p>از آیکون پلاگین در Ribbon استفاده کنید.</p><h3 id=\"section-35\">مرحله سوم: انتخاب نوع خروجی</h3><p>با توجه به نیاز خود یکی از دو حالت را انتخاب کنید:</p><ul><li>Package Folder</li><li>Single HTML File</li></ul><h3 id=\"section-36\">مرحله چهارم: تعیین پوشه مقصد</h3><p>پوشه‌ای را برای ذخیره خروجی انتخاب کنید.</p><h3 id=\"section-37\">مرحله پنجم: تولید فایل</h3><p>پس از اجرای دستور، پلاگین Canvas فعال را پردازش کرده و فایل‌های HTML و منابع موردنیاز را تولید می‌کند.</p><h3 id=\"section-38\">مرحله ششم: مشاهده خروجی</h3><p>در حالت Package Folder فایل زیر را باز کنید:</p><p>index.html</p><p>در حالت Single HTML File فایل تولیدشده را مستقیماً باز کنید.</p><p>می‌توانید از مرورگرهایی مانند Chrome، Firefox، Safari و Edge استفاده کنید.</p><h2 id=\"section-39\">7. آموزش استفاده از خروجی HTML</h2><p>پس از بازکردن فایل HTML، می‌توانید از امکانات زیر استفاده کنید:</p><table><thead><tr><th>قابلیت</th><th>کاربرد</th></tr></thead><tbody><tr><td>Zoom In</td><td>بزرگ‌نمایی</td></tr><tr><td>Zoom Out</td><td>کوچک‌نمایی</td></tr><tr><td>Fit</td><td>تنظیم نمای Canvas</td></tr><tr><td>Minimap</td><td>مشاهده نمای کلی</td></tr><tr><td>Search</td><td>جست‌وجوی محتوا</td></tr><tr><td>Navigation</td><td>جابه‌جایی بین صفحات</td></tr><tr><td>Folding</td><td>جمع و باز کردن شاخه‌ها</td></tr></tbody></table><h3 id=\"section-40\">جست‌وجو در Canvas</h3><ol><li>صفحه HTML را باز کنید.</li><li>گزینه Search را انتخاب کنید.</li><li>عبارت موردنظر را وارد کنید.</li><li>نتایج مرتبط را مشاهده کنید.</li></ol><h3 id=\"section-41\">پیمایش بین Canvasها</h3><ol><li>پنل Navigation را باز کنید.</li><li>Canvas موردنظر را انتخاب کنید.</li><li>وارد صفحه مربوطه شوید.</li><li>در صورت وجود Canvasهای زیرمجموعه، به آن‌ها نیز دسترسی خواهید داشت.</li></ol><h3 id=\"section-42\">جمع‌کردن شاخه‌ها</h3><ol><li>منوی Folding را باز کنید.</li><li>Folding را فعال کنید.</li><li>شاخه موردنظر را جمع کنید.</li><li>برای بازگرداندن ساختار، از گزینه‌های مربوط به Expand یا Restore استفاده کنید.</li></ol><h2 id=\"section-43\">8. مثال‌های کاربردی</h2><h3 id=\"section-44\">مثال اول: انتشار نقشه ذهنی</h3><p>فرض کنید یک نقشه ذهنی درباره مدیریت پروژه ساخته‌اید.</p><p>ساختار آن شامل:</p><ul><li>مدیریت منابع</li><li>برنامه‌ریزی</li><li>مدیریت زمان</li><li>مدیریت ریسک</li><li>ارزیابی عملکرد</li></ul><p>با استفاده از پلاگین می‌توانید آن را به یک صفحه HTML تعاملی تبدیل کنید.</p><p>سپس فایل خروجی را برای اعضای تیم ارسال کنید.</p><h3 id=\"section-45\">مثال دوم: ساخت مستندات آموزشی</h3><p>فرض کنید برای یک دوره آموزشی Canvasهای مختلفی ساخته‌اید.</p><p>هر Canvas شامل:</p><ul><li>عنوان درس</li><li>توضیحات</li><li>تصاویر</li><li>لینک‌ها</li><li>فرمول‌ها</li><li>کدهای آموزشی</li></ul><p>با استفاده از قابلیت Navigation می‌توانید ساختار صفحات مرتبط را در خروجی قابل‌پیمایش کنید.</p><h3 id=\"section-46\">مثال سوم: ارائه پروژه</h3><p>برای ارائه یک پروژه به کارفرما می‌توانید ساختار ایده‌ها، مراحل توسعه و ارتباطات میان بخش‌های پروژه را در Canvas نمایش دهید.</p><p>خروجی Single HTML File امکان ارسال یک فایل مستقل را فراهم می‌کند.</p><h3 id=\"section-47\">مثال چهارم: آرشیو دانش</h3><p>اگر از Obsidian به‌عنوان سیستم مدیریت دانش استفاده می‌کنید، می‌توانید Canvasهای مهم را به HTML تبدیل کرده و در یک آرشیو جداگانه نگهداری کنید.</p><h2 id=\"section-48\">9. نکات مهم و محدودیت‌ها</h2><h3 id=\"section-49\">9.1. پشتیبانی از موبایل</h3><p>این پلاگین در حال حاضر Desktop Only است.</p><p>بنابراین فرآیند تولید خروجی باید در نسخه دسکتاپ Obsidian انجام شود.</p><p>البته فایل HTML تولیدشده برای مشاهده در مرورگر طراحی شده است.</p><h3 id=\"section-50\">9.2. وابستگی به اینترنت</h3><p>بخش عمده خروجی به‌صورت محلی و قابل‌انتقال طراحی شده است.</p><p>با این حال، پیش‌نمایش برخی وب‌سایت‌های خارجی ممکن است به اینترنت نیاز داشته باشد.</p><p>همچنین بعضی وب‌سایت‌ها اجازه نمایش در iframe را نمی‌دهند.</p><h3 id=\"section-51\">9.3. حجم فایل</h3><p>در حالت Single HTML File تصاویر و فایل‌های جاسازی‌شده می‌توانند حجم خروجی را افزایش دهند.</p><p>برای پروژه‌های بزرگ، Package Folder انتخاب مناسب‌تری است.</p><h3 id=\"section-52\">9.4. پشتیبانی از پلاگین‌های دیگر</h3><p>تمام قابلیت‌های افزونه‌های Obsidian الزاماً در خروجی HTML قابل‌بازسازی نیستند.</p><p>برخی قابلیت‌های اختصاصی ممکن است به‌درستی نمایش داده نشوند.</p><h3 id=\"section-53\">9.5. به‌روزرسانی خروجی</h3><p>خروجی HTML به‌صورت خودکار با تغییر Canvas به‌روزرسانی نمی‌شود.</p><p>پس از تغییر محتوای Canvas باید مجدداً خروجی بگیرید.</p><h3 id=\"section-54\">9.6. نمایش فایل‌های HTML در Obsidian</h3><p>ممکن است Obsidian فایل‌های HTML تولیدشده را در File Explorer نمایش ندهد.</p><p>برای حل این مسئله:</p><p>Settings → Files and links → Detect all file extensions</p><p>این تنظیم را برای Vault فعال کنید.</p><h2 id=\"section-55\">10. پیشنهادهای حرفه‌ای</h2><p>برای دستیابی به بهترین نتیجه:</p><ol><li>برای Canvasهای بزرگ از Package Folder استفاده کنید.</li><li>برای ارسال یک فایل به دیگران از Single HTML File استفاده کنید.</li><li>در Canvasهای پیچیده Minimap را فعال کنید.</li><li>برای مستندات چندصفحه‌ای Navigation را فعال کنید.</li><li>از نام‌گذاری مناسب برای Canvasها استفاده کنید.</li><li>پیش از انتشار، لینک‌ها و فایل‌های ضمیمه را بررسی کنید.</li><li>خروجی را در چند مرورگر مختلف آزمایش کنید.</li><li>برای انتشار عمومی، تمام فایل‌های پوشه خروجی را با هم منتقل کنید.</li><li>بعد از تغییر Canvas، خروجی قبلی را مجدداً تولید کنید.</li><li>از نسخه اصلی Vault نسخه پشتیبان تهیه کنید.</li></ol><h2 id=\"section-56\">11. پرسش‌های متداول</h2><h3 id=\"section-57\">آیا برای مشاهده خروجی HTML باید Obsidian نصب باشد؟</h3><p>خیر. خروجی برای مشاهده در مرورگر طراحی شده است.</p><h3 id=\"section-58\">آیا خروجی به اینترنت نیاز دارد؟</h3><p>برای محتوای محلی و منابع جاسازی‌شده معمولاً خیر؛ اما برخی پیش‌نمایش‌ها و منابع خارجی ممکن است به اینترنت نیاز داشته باشند.</p><h3 id=\"section-59\">آیا می‌توان خروجی را در وب‌سایت منتشر کرد؟</h3><p>بله. می‌توانید خروجی Package Folder را با حفظ ساختار فایل‌ها روی یک وب‌سرور قرار دهید.</p><h3 id=\"section-60\">کدام حالت خروجی بهتر است؟</h3><p>برای فایل‌های بزرگ Package Folder و برای اشتراک‌گذاری ساده Single HTML File پیشنهاد می‌شود.</p><h3 id=\"section-61\">آیا Canvas اصلی تغییر می‌کند؟</h3><p>خیر. عملیات Export برای تولید خروجی است و محتوای Canvas اصلی را تغییر نمی‌دهد.</p><h3 id=\"section-62\">آیا می‌توان Canvasهای مرتبط را نیز خروجی گرفت؟</h3><p>بله. پلاگین قابلیت دنبال‌کردن Canvasهای مرتبط و ایجاد صفحات قابل‌پیمایش را دارد.</p><h3 id=\"section-63\">آیا امکان جست‌وجو در خروجی وجود دارد؟</h3><p>بله. در صورت فعال‌بودن Search می‌توان از قابلیت جست‌وجوی داخلی استفاده کرد.</p><h3 id=\"section-64\">آیا فایل خروجی قابل‌ویرایش است؟</h3><p>فایل HTML یک خروجی مستقل است و می‌توان کد آن را ویرایش کرد؛ اما تغییرات آن به Canvas اصلی برنمی‌گردد.</p><hr><h2 id=\"section-65\">12. جمع‌بندی</h2><p>Canvas HTML Exporter ابزاری برای تبدیل Canvasهای Obsidian به صفحات HTML تعاملی و قابل‌انتقال است.</p><p>مهم‌ترین مزیت آن حفظ بخش قابل‌توجهی از ساختار بصری Canvas در کنار امکاناتی مانند:</p><ul><li>جست‌وجو</li><li>Navigation</li><li>Zoom</li><li>Minimap</li><li>Folding</li><li>پشتیبانی از Markdown</li><li>پشتیبانی از تصاویر و فایل‌ها</li><li>نمایش فرمول‌های ریاضی</li><li>Syntax Highlighting</li><li>خروجی تک‌فایلی یا پوشه‌ای</li></ul><p>این پلاگین برای انتشار نقشه‌های ذهنی، ارائه پروژه‌ها، مستندسازی و اشتراک‌گذاری دانش بسیار کاربردی است.</p><hr><h2 id=\"section-66\">منابع</h2><ul><li>مستندات و معرفی پلاگین در Obsidian: <a href=\"https://community.obsidian.md/plugins/canvas-html-exporter\" target=\"_blank\" rel=\"noopener noreferrer\">https://community.obsidian.md/plugins/canvas-html-exporter</a></li><li>صفحه آماری و اطلاعات نسخه‌ها: <a href=\"https://www.obsidianstats.com/plugins/canvas-html-exporter\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.obsidianstats.com/plugins/canvas-html-exporter</a></li></ul>";
+  const splitMarkedChaptersOnly=false;
+  const nf=n=>Number(n||0).toLocaleString(S.locale);
+  const isRtl=getComputedStyle(document.documentElement).direction!=='ltr';
+  const prev=document.querySelector('#prev'), next=document.querySelector('#next');
+  const startBtn=document.querySelector('#startReadingBtn');
+  startBtn.textContent=isRtl?(S.startReading+' ←'):(S.startReading+' →');
+
+  const temp=document.createElement('div');
+  temp.innerHTML=raw;
+  const tocSource=temp.querySelector('.toc');
+  const tocItems=document.querySelector('#tocItems');
+  const coverTocLink=document.createElement('a');
+  coverTocLink.href='#cover';
+  coverTocLink.className='toc-cover-link';
+  coverTocLink.textContent='📖 '+docLabel+' '+S.tocCoverSuffix;
+  tocItems.append(coverTocLink);
+  if(tocSource){
+    [...tocSource.querySelectorAll('a')].forEach(a=>{
+      const link=document.createElement('a');
+      link.href=a.getAttribute('href');
+      link.textContent=a.textContent;
+      link.className=a.className;
+      tocItems.append(link);
+    });
+    tocSource.remove();
+  }
+  let pages=[],chunk=null;
+  for(const node of [...temp.childNodes]){
+    if(node.nodeType===1&&(splitMarkedChaptersOnly ? node.hasAttribute('data-nora-chapter') : /^H[12]$/.test(node.tagName))){
+      if(chunk&&chunk.childNodes.length) pages.push(chunk);
+      chunk=document.createElement('div');
+      chunk.className='article';
+    }
+    if(!chunk){chunk=document.createElement('div');chunk.className='article'}
+    chunk.append(node);
+  }
+  if(chunk&&chunk.childNodes.length) pages.push(chunk);
+  if(!pages.length){const d=document.createElement('div');d.className='article';d.innerHTML=raw;pages=[d]}
+  pages.forEach((p,i)=>{
+    const fnNums=[];
+    const fnSeen=new Set();
+    p.querySelectorAll('a.fn-link[data-fn-num]').forEach(a=>{
+      const n=String(a.dataset.fnNum);
+      if(!fnSeen.has(n)&&FN_MAP.has(n)){fnSeen.add(n);fnNums.push(n)}
+    });
+    if(fnNums.length){
+      const fnAside=document.createElement('aside');
+      fnAside.className='chapter-footnotes';
+      fnAside.innerHTML='<div class="chapter-footnotes-title">✦ '+S.footnotesHeading+'</div><ol>'+
+        fnNums.map(n=>{
+          const item=FN_MAP.get(n);
+          return '<li id="fn-'+item.num+'"><span class="fn-num">'+item.label+'</span><div class="fn-body">'+item.html+' <a class="fn-back" href="#'+item.firstRefId+'" title="'+S.footnoteBack+'">↩</a></div></li>';
+        }).join('')+
+      '</ol>';
+      p.append(fnAside);
+    }
+    const section=document.createElement('section');
+    section.className='chapter-page';
+    section.dataset.index=i;
+    section.append(p);
+    const foot=document.createElement('div');
+    foot.className='chapter-footer';
+    foot.innerHTML='<span>'+S.footerBrand+'</span><span>'+S.sectionWord+' '+nf(i+1)+' '+S.ofWord+' '+nf(pages.length)+'</span>';
+    section.append(foot);
+    sourceEl.append(section);
+  });
+
+  /* ===== پاپ‌آور تعاملی پاورقی‌ها ===== */
+  const fnPop=document.querySelector('#fnPopover');
+  const fnPopBadge=document.querySelector('#fnPopBadge');
+  const fnPopBody=document.querySelector('#fnPopBody');
+  const fnPopJump=document.querySelector('#fnPopJump');
+  let activeFnLink=null, activeFnNum=null;
+  const closeFnPop=()=>{
+    fnPop.classList.remove('open');
+    fnPop.setAttribute('aria-hidden','true');
+    if(activeFnLink){activeFnLink.classList.remove('is-open');activeFnLink=null}
+    activeFnNum=null;
+  };
+  document.querySelector('#fnPopClose').onclick=closeFnPop;
+  fnPopJump.onclick=()=>{
+    const num=activeFnNum;
+    closeFnPop();
+    if(!num) return;
+    const el=all[current]&&all[current].querySelector('#fn-'+CSS.escape(String(num)));
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.classList.add('fn-flash');
+      setTimeout(()=>el.classList.remove('fn-flash'),1600);
+    }
+  };
+  sourceEl.addEventListener('click',e=>{
+    const back=e.target.closest('a.fn-back');
+    if(back){
+      e.preventDefault();
+      const targetId=(back.getAttribute('href')||'').slice(1);
+      const refEl=targetId&&all[current]&&all[current].querySelector('#'+CSS.escape(targetId));
+      if(refEl) refEl.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    const link=e.target.closest('a.fn-link[data-fn-num]');
+    if(!link) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const num=String(link.dataset.fnNum);
+    if(activeFnLink===link&&fnPop.classList.contains('open')){closeFnPop();return}
+    const item=FN_MAP.get(num);
+    if(!item) return;
+    if(activeFnLink) activeFnLink.classList.remove('is-open');
+    activeFnLink=link;activeFnNum=num;
+    link.classList.add('is-open');
+    fnPopBadge.textContent='✦ '+S.footnoteLabel+' '+item.label;
+    fnPopBody.innerHTML=item.html;
+    fnPop.classList.add('open');
+    fnPop.setAttribute('aria-hidden','false');
+    if(window.innerWidth>600){
+      const rect=link.getBoundingClientRect();
+      const pw=fnPop.offsetWidth||340, ph=fnPop.offsetHeight||150;
+      let left=rect.left+(rect.width/2)-(pw/2);
+      left=Math.max(12,Math.min(window.innerWidth-pw-12,left));
+      let top=rect.bottom+10;
+      if(top+ph>window.innerHeight-12) top=Math.max(12,rect.top-ph-10);
+      fnPop.style.left=left+'px';
+      fnPop.style.top=top+'px';
+    }
+  });
+  document.addEventListener('click',e=>{
+    if(fnPop.classList.contains('open')&&!fnPop.contains(e.target)&&!e.target.closest('a.fn-link')) closeFnPop();
+  });
+
+  sourceEl.querySelectorAll('img[data-fallback-name]').forEach(img=>{
+    img.onerror=function(){
+      const span=document.createElement('span');
+      span.className='md-img-missing';
+      const remote=this.dataset.remoteUrl||'';
+      if(remote){
+        span.textContent=S.imgRemoteFail;
+        const a=document.createElement('a');
+        a.href=remote;a.target='_blank';a.rel='noopener noreferrer';
+        a.textContent=S.imgRemoteOpen;
+        span.append(a);
+      }else{
+        span.textContent=S.imgLocalFailPre+(this.dataset.fallbackName||'')+S.imgLocalFailPost;
+      }
+      this.replaceWith(span);
+    };
+  });
+
+  function dataUrlToBlobUrl(dataUrl){
+    try{
+      const parts=dataUrl.split(','), mime=(parts[0].match(/:(.*?);/)||[])[1]||'application/pdf';
+      const bin=atob(parts[1]), bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      return URL.createObjectURL(new Blob([bytes],{type:mime}));
+    }catch(e){return dataUrl}
+  }
+  sourceEl.querySelectorAll('details.md-pdf-details').forEach(det=>{
+    det.addEventListener('toggle',()=>{
+      if(!det.open) return;
+      const frame=det.querySelector('iframe[data-pdf-src]');
+      if(frame&&!frame.src){
+        const rawSrc=frame.dataset.pdfSrc||'';
+        frame.src=rawSrc.startsWith('data:')?dataUrlToBlobUrl(rawSrc):rawSrc;
+      }
+    });
+  });
+
+  const lightbox=document.querySelector('#lightbox'), lbImg=document.querySelector('#lightboxImg'), lbOpen=document.querySelector('#lightboxOpen');
+  const closeLb=()=>{lightbox.classList.remove('open');lightbox.setAttribute('aria-hidden','true')};
+  lightbox.onclick=e=>{if(e.target===lbOpen)return;closeLb()};
+  document.querySelector('#lightboxClose').onclick=closeLb;
+  sourceEl.addEventListener('click',e=>{
+    const img=e.target.closest('img.md-zoomable');
+    if(!img) return;
+    const full=img.dataset.fullSrc||img.src;
+    lbImg.src=full;lbImg.alt=img.alt||'';
+    if(full.startsWith('http://')||full.startsWith('https://')){lbOpen.href=full;lbOpen.style.display='inline-block'}
+    else{lbOpen.style.display='none'}
+    lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');
+  });
+
+  const all=[...sourceEl.querySelectorAll('.chapter-page')];
+  const indicator=document.querySelector('#pageIndicator');
+  const progress=document.querySelector('.progress span');
+  const markBtn=document.querySelector('#markBtn');
+  const posKey='nora-pos-v2-'+bookId;
+  const prefsKey='nora-prefs-v3-'+bookId;
+  let current=-1;
+  const marksKey='nora-marks-'+bookId;
+  let marks=[];
+  try{marks=JSON.parse(localStorage.getItem(marksKey)||'[]')}catch(e){}
+
+  function updateMarkBtn(){
+    const isBookmarked=current>=0&&marks.some(m=>m.page===current);
+    markBtn.classList.toggle('is-active',isBookmarked);
+    const label=isBookmarked?S.markRemoveBtn:S.markBtn;
+    const labelEl=document.querySelector('#markBtnLabel');
+    if(labelEl) labelEl.textContent=label.replace(/^🔖s*/, '');
+    markBtn.title=label;
+    markBtn.setAttribute('aria-label',label);
+  }
+  function setProgress(){
+    if(current<0){progress.style.width='0%';return}
+    const page=all[current];
+    if(!page) return;
+    const top=page.offsetTop,height=page.offsetHeight||1;
+    const within=Math.max(0,Math.min(1,(window.scrollY+window.innerHeight-top)/(height+window.innerHeight)));
+    progress.style.width=((current+within)/all.length*100)+'%';
+  }
+  function show(n, shouldScroll=true){
+    closeFnPop();
+    current=Math.max(-1,Math.min(all.length-1,n));
+    coverEl.classList.toggle('active',current===-1);
+    all.forEach((p,i)=>p.classList.toggle('active',i===current));
+    if(current===-1){
+      indicator.textContent=docLabel+' '+S.tocCoverSuffix;
+      prev.disabled=true;prev.textContent=isRtl?('→ '+S.coverPage):('← '+S.coverPage);
+      next.disabled=all.length===0;next.textContent=isRtl?(S.startReading+' ←'):(S.startReading+' →');
+    }else{
+      indicator.textContent=S.sectionWord+' '+nf(current+1)+' '+S.ofWord+' '+nf(all.length);
+      prev.disabled=false;
+      prev.textContent=current===0?(isRtl?('→ '+S.coverPage):('← '+S.coverPage)):(isRtl?('→ '+S.prevSection):('← '+S.prevSection));
+      next.disabled=current===all.length-1;
+      next.textContent=isRtl?(S.nextSection+' ←'):(S.nextSection+' →');
+    }
+    updateMarkBtn();
+    try{localStorage.setItem(posKey,String(current))}catch(e){}
+    if(shouldScroll) window.scrollTo({top:0,behavior:'smooth'});
+    setProgress();
+  }
+  window.addEventListener('scroll',setProgress,{passive:true});
+  let savedPos=-1;
+  try{const rawPos=localStorage.getItem(posKey);if(rawPos!==null){const parsed=parseInt(rawPos,10);if(!Number.isNaN(parsed)) savedPos=parsed}}catch(e){}
+  show(savedPos,false);
+  startBtn.onclick=()=>show(0,true);
+  document.querySelector('#coverJumpBtn').onclick=()=>show(-1,true);
+  prev.onclick=()=>show(current-1,true);
+  next.onclick=()=>show(current+1,true);
+
+  /* ===== کشوی فهرست و کشوی تنظیمات ===== */
+  const tocDrawer=document.querySelector('#tocDrawer'), tocShade=document.querySelector('#tocShade');
+  const setDrawer=document.querySelector('#settingsDrawer'), setShade=document.querySelector('#settingsShade');
+  const toggleToc=open=>{
+    if(open) toggleSettings(false);
+    tocDrawer.classList.toggle('open',open);
+    tocShade.classList.toggle('open',open);
+  };
+  const toggleSettings=open=>{
+    if(open) toggleToc(false);
+    setDrawer.classList.toggle('open',open);
+    setShade.classList.toggle('open',open);
+  };
+  document.querySelector('#tocBtn').onclick=()=>toggleToc(!tocDrawer.classList.contains('open'));
+  document.querySelector('#tocClose').onclick=()=>toggleToc(false);
+  tocShade.onclick=()=>toggleToc(false);
+  document.querySelector('#settingsBtn').onclick=()=>toggleSettings(!setDrawer.classList.contains('open'));
+  document.querySelector('#settingsClose').onclick=()=>toggleSettings(false);
+  setShade.onclick=()=>toggleSettings(false);
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if(lightbox.classList.contains('open')){closeLb();return}
+      if(fnPop.classList.contains('open')){closeFnPop();return}
+      if(setDrawer.classList.contains('open')){toggleSettings(false);return}
+      if(tocDrawer.classList.contains('open')){toggleToc(false);return}
+    }
+    if(e.target.matches('input,textarea,select')) return;
+    if(e.key==='ArrowLeft') show(isRtl?current+1:current-1,true);
+    if(e.key==='ArrowRight') show(isRtl?current-1:current+1,true);
+  });
+
+  /* ===== مدیریت تنظیمات مدرن خوانشگر ===== */
+  let prefs={...defaultPrefs};
+  try{const savedPrefs=JSON.parse(localStorage.getItem(prefsKey)||'null');if(savedPrefs&&typeof savedPrefs==='object') prefs={...prefs,...savedPrefs}}catch(e){}
+
+  const fontSel=document.querySelector('#readerFont');
+  const fontSizeVal=document.querySelector('#fontSizeVal');
+  const fontSizeReadout=document.querySelector('#fontSizeReadout');
+  const hlIndicator=document.querySelector('#hlIndicator');
+  const themeBtn=document.querySelector('#themeBtn');
+
+  function applyPrefs(){
+    document.body.classList.toggle('night',!!prefs.night);
+    document.body.dataset.palette=prefs.palette||'default';
+    coverEl.dataset.cover=prefs.cover||'aurora';
+    const fz=prefs.size||16;
+    document.documentElement.style.setProperty('--reader-font',fz+'px');
+    document.documentElement.style.setProperty('--reader-lh',prefs.lh||'2.05');
+    const wVal=prefs.width||'850';
+    document.documentElement.style.setProperty('--reader-maxw',wVal==='100%'?'100%':wVal+'px');
+    if(!prefs.font||prefs.font==='default') document.documentElement.style.removeProperty('--reader-family');
+    else document.documentElement.style.setProperty('--reader-family',prefs.font+',Tahoma,sans-serif');
+
+    fontSel.value=prefs.font||'default';
+    fontSizeVal.textContent=fz+'px';
+    fontSizeReadout.textContent=fz+'px';
+    themeBtn.textContent=prefs.night?'☀️':'🌙';
+    hlIndicator.style.background=HL_HEX[prefs.hlColor||'yellow']||'#ffe066';
+
+    document.querySelectorAll('[data-theme-val]').forEach(b=>b.classList.toggle('active',(b.dataset.themeVal==='dark')===!!prefs.night));
+    document.querySelectorAll('[data-lh-val]').forEach(b=>b.classList.toggle('active',b.dataset.lhVal===String(prefs.lh||'2.05')));
+    document.querySelectorAll('[data-width-val]').forEach(b=>b.classList.toggle('active',b.dataset.widthVal===String(wVal)));
+    document.querySelectorAll('[data-palette-val]').forEach(b=>b.classList.toggle('active',b.dataset.paletteVal===(prefs.palette||'default')));
+    document.querySelectorAll('[data-cover-val]').forEach(b=>b.classList.toggle('active',b.dataset.coverVal===(prefs.cover||'aurora')));
+    document.querySelectorAll('[data-hl-val]').forEach(b=>b.classList.toggle('active',b.dataset.hlVal===(prefs.hlColor||'yellow')));
+
+    try{localStorage.setItem(prefsKey,JSON.stringify(prefs))}catch(e){}
+  }
+  applyPrefs();
+
+  document.querySelector('#smaller').onclick=()=>{prefs.size=Math.max(12,(prefs.size||16)-1);applyPrefs()};
+  document.querySelector('#bigger').onclick=()=>{prefs.size=Math.min(28,(prefs.size||16)+1);applyPrefs()};
+  themeBtn.onclick=()=>{prefs.night=!prefs.night;applyPrefs()};
+  fontSel.onchange=e=>{prefs.font=e.target.value;applyPrefs()};
+  document.querySelectorAll('[data-theme-val]').forEach(b=>b.onclick=()=>{prefs.night=b.dataset.themeVal==='dark';applyPrefs()});
+  document.querySelectorAll('[data-lh-val]').forEach(b=>b.onclick=()=>{prefs.lh=b.dataset.lhVal;applyPrefs()});
+  document.querySelectorAll('[data-width-val]').forEach(b=>b.onclick=()=>{prefs.width=b.dataset.widthVal;applyPrefs()});
+  document.querySelectorAll('[data-palette-val]').forEach(b=>b.onclick=()=>{prefs.palette=b.dataset.paletteVal;applyPrefs()});
+  document.querySelectorAll('[data-cover-val]').forEach(b=>b.onclick=()=>{prefs.cover=b.dataset.coverVal;applyPrefs()});
+  document.querySelectorAll('[data-hl-val]').forEach(b=>b.onclick=()=>{prefs.hlColor=b.dataset.hlVal;applyPrefs()});
+  document.querySelector('#resetSettingsBtn').onclick=()=>{prefs={...defaultPrefs};applyPrefs()};
+  document.querySelector('#printBtn').onclick=()=>{toggleSettings(false);setTimeout(()=>window.print(),180)};
+
+  tocItems.onclick=e=>{
+    const a=e.target.closest('a[href^="#"]');
+    if(!a) return;
+    e.preventDefault();
+    const href=a.getAttribute('href');
+    tocItems.querySelectorAll('a').forEach(x=>x.classList.toggle('current',x===a));
+    if(href==='#cover'){show(-1,true);toggleToc(false);return}
+    const id=href.slice(1);
+    const target=all.map((p,i)=>({p,i,el:p.querySelector('#'+CSS.escape(id))})).find(x=>x.el);
+    if(target){show(target.i,false);setTimeout(()=>target.el.scrollIntoView({behavior:'smooth',block:'start'}),60);toggleToc(false)}
+  };
+
+  const marksBox=document.querySelector('#marks');
+  function saveMarks(){try{localStorage.setItem(marksKey,JSON.stringify(marks))}catch(e){}}
+  function renderMarks(){
+    marksBox.textContent='';
+    if(!marks.length){marksBox.textContent=S.noBookmarks;updateMarkBtn();return}
+    const titleSpan=document.createElement('span');titleSpan.textContent=S.bookmarksLabel;marksBox.append(titleSpan);
+    marks.forEach((m,i)=>{
+      const chip=document.createElement('span');chip.className='bm-chip';
+      const a=document.createElement('a');a.href='#';a.dataset.page=String(m.page);a.textContent=nf(i+1)+'. '+m.label;
+      const del=document.createElement('button');del.type='button';del.className='bm-del';del.dataset.delIndex=String(i);del.title=S.delMarkTitle;del.textContent='×';
+      chip.append(a,del);marksBox.append(chip);
+    });
+    if(marks.length>1){const clearBtn=document.createElement('button');clearBtn.type='button';clearBtn.className='bm-clear';clearBtn.id='clearAllMarks';clearBtn.textContent=S.clearAllMarks;marksBox.append(clearBtn)}
+    updateMarkBtn();
+  }
+  renderMarks();
+  marksBox.onclick=e=>{
+    const del=e.target.closest('button[data-del-index]');
+    if(del){e.preventDefault();e.stopPropagation();const idx=+del.dataset.delIndex;if(idx>=0&&idx<marks.length){marks.splice(idx,1);saveMarks();renderMarks()}return}
+    if(e.target.id==='clearAllMarks'){if(confirm(S.clearAllConfirm)){marks=[];saveMarks();renderMarks()}return}
+    const a=e.target.closest('a[data-page]');
+    if(a){e.preventDefault();show(+a.dataset.page,true)}
+  };
+  markBtn.onclick=()=>{
+    if(current<0){alert(S.alertBookmarkSection);return}
+    const existingIdx=marks.findIndex(m=>m.page===current);
+    if(existingIdx>=0){marks.splice(existingIdx,1);saveMarks();renderMarks();return}
+    const h=all[current].querySelector('h1,h2,h3')||all[current].querySelector('p');
+    const label=(h?h.textContent:(S.sectionWord+' '+nf(current+1))).trim().slice(0,40);
+    marks.push({page:current,label});saveMarks();renderMarks();
+  };
+
+  const annotationKey='nora-annotations-'+bookId;
+  function saveAnnotations(){try{localStorage.setItem(annotationKey,JSON.stringify(all.map(p=>p.querySelector('.article').innerHTML)))}catch(e){}}
+  try{const saved=JSON.parse(localStorage.getItem(annotationKey)||'null');if(Array.isArray(saved)) all.forEach((p,i)=>{if(typeof saved[i]==='string') p.querySelector('.article').innerHTML=saved[i]})}catch(e){}
+  function getSelectedTextSlices(root, range){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+      acceptNode(node){
+        if(!node.nodeValue||!node.nodeValue.length) return NodeFilter.FILTER_REJECT;
+        if(node.parentElement&&node.parentElement.closest('mark')) return NodeFilter.FILTER_REJECT;
+        if(!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const slices=[];let n;
+    while((n=walker.nextNode())){
+      const start=(n===range.startContainer)?range.startOffset:0;
+      const end=(n===range.endContainer)?range.endOffset:n.nodeValue.length;
+      if(end<=start) continue;
+      if(!n.nodeValue.slice(start,end).trim()) continue;
+      slices.push({node:n,start,end});
+    }
+    return slices;
+  }
+  function annotate(withNote){
+    if(current<0){alert(S.alertAnnotateSection);return}
+    const sel=window.getSelection();
+    if(!sel||sel.isCollapsed){alert(S.alertSelectText);return}
+    const range=sel.getRangeAt(0);
+    const article=all[current].querySelector('.article');
+    if(!article.contains(range.commonAncestorContainer)){alert(S.alertSameSection);return}
+    const slices=getSelectedTextSlices(article,range);
+    if(!slices.length){alert(S.alertInvalidSelection);return}
+    let note='';
+    if(withNote){note=prompt(S.promptNote,'');if(note===null) return}
+    const hid='h-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6);
+    const color=prefs.hlColor||'yellow';
+    for(const {node,start,end} of slices){
+      if(end<node.nodeValue.length) node.splitText(end);
+      const target=start>0?node.splitText(start):node;
+      const mark=document.createElement('mark');
+      mark.dataset.hid=hid;
+      if(withNote){mark.className='note';mark.dataset.comment=note;mark.title=S.titleNoteMark}
+      else{mark.className='hl-'+color;mark.dataset.highlight=color;mark.title=S.titleHlMark}
+      target.parentNode.insertBefore(mark,target);mark.appendChild(target);
+    }
+    sel.removeAllRanges();saveAnnotations();
+  }
+  function removeAnnotation(mark){
+    const article=mark.closest('.article')||sourceEl;
+    const hid=mark.dataset.hid;
+    const targets=hid?[...article.querySelectorAll('mark[data-hid="'+CSS.escape(hid)+'"]')]:[mark];
+    const parents=new Set();
+    targets.forEach(m=>{const parent=m.parentNode;if(!parent) return;parents.add(parent);while(m.firstChild) parent.insertBefore(m.firstChild,m);parent.removeChild(m)});
+    parents.forEach(p=>p.normalize());saveAnnotations();
+  }
+  document.querySelector('#highlightBtn').onclick=()=>annotate(false);
+  document.querySelector('#commentBtn').onclick=()=>annotate(true);
+  sourceEl.addEventListener('click',e=>{
+    const m=e.target.closest('mark');
+    if(!m||!e.currentTarget.contains(m)) return;
+    if(m.classList.contains('note')){alert(S.alertNotePrefix+(m.dataset.comment||''));if(confirm(S.confirmDeleteNote)) removeAnnotation(m)}
+    else if(m.dataset.highlight||m.className.startsWith('hl-')){if(confirm(S.confirmDeleteHl)) removeAnnotation(m)}
+  });
+  const search=document.querySelector('#find'),status=document.querySelector('#searchStatus');
+  let lastQuery='',matchPages=[],matchCursor=-1;
+  search.onkeydown=e=>{
+    if(e.key!=='Enter') return;
+    const q=search.value.trim().toLocaleLowerCase();
+    if(!q){status.textContent='';return}
+    if(q!==lastQuery){lastQuery=q;matchPages=all.map((p,i)=>p.textContent.toLocaleLowerCase().includes(q)?i:-1).filter(i=>i>=0);matchCursor=-1}
+    if(matchPages.length){matchCursor=(matchCursor+1)%matchPages.length;const targetPage=matchPages[matchCursor];show(targetPage,true);status.textContent=(S.searchMatchWord+' '+nf(matchCursor+1)+' '+S.ofWord+' '+nf(matchPages.length)+' '+S.searchFoundIn+' '+nf(targetPage+1)+' '+S.searchFoundEnd).trim()}
+    else{status.textContent=S.searchNotFound}
+  };
+})();
+</script>
+</body>
+</html>
