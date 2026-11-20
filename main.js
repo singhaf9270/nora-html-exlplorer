@@ -199,7 +199,8 @@ const I18N = {
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در خروجی HTML و پیش‌نمایش زنده.',
       'رندر دوگانه نمودارهای Mermaid برای حالت روز و شب و نمایش بهینه در چاپ و خروجی PDF.',
       'پشتیبانی از بلوک‌های Mermaid دارای ویژگی‌های اضافی (مانند {align: "center"}).',
-      'پشتیبانی یکپارچه از نمودارهای Mermaid در خروجی تکی و خروجی یکپارچه پوشه.'
+      'پشتیبانی یکپارچه از نمودارهای Mermaid در خروجی تکی و خروجی یکپارچه پوشه.',
+      'امکان زوم تمام‌صفحه و جابه‌جایی (Pan) روی نمودارهای Mermaid در فایل HTML خروجی.'
     ],
 
     // Exported Reader UI
@@ -467,7 +468,8 @@ const I18N = {
       'Added full, 100% offline support for all Mermaid diagram types in HTML exports and Live Preview.',
       'Dual-theme Mermaid rendering (Light & Dark) with clean print and PDF output.',
       'Added support for Mermaid code blocks with extra attributes (such as {align: "center"}).',
-      'Seamless Mermaid rendering across single-note exports and merged folder exports.'
+      'Seamless Mermaid rendering across single-note exports and merged folder exports.',
+      'Interactive fullscreen zoom and drag-to-pan viewer for Mermaid diagrams in exported HTML.'
     ],
 
     // Exported Reader UI
@@ -2078,12 +2080,17 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   .fn-popover{left:12px!important;right:12px!important;top:auto!important;bottom:14px!important;width:auto}
 }
 
-/* ===== نمودارهای Mermaid (روز و شب — آفلاین) ===== */
+/* ===== نمودارهای Mermaid (روز و شب — آفلاین + زوم و جابه‌جایی) ===== */
 .nora-mermaid-wrap{
   margin:1.5em auto;padding:16px;border-radius:14px;
   border:1px solid var(--line);background:var(--paper);
   overflow-x:auto;text-align:center;direction:ltr;
-  break-inside:avoid;
+  break-inside:avoid;position:relative;cursor:zoom-in;
+  transition:border-color .16s ease,box-shadow .16s ease;
+}
+.nora-mermaid-wrap:hover{
+  border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
+  box-shadow:0 6px 20px rgba(15,20,45,.07);
 }
 body.night .nora-mermaid-wrap{background:#1c2035}
 .nora-mermaid-svg{display:block;width:100%;text-align:center}
@@ -2091,7 +2098,41 @@ body.night .nora-mermaid-wrap{background:#1c2035}
 .nora-mermaid-dark{display:none}
 body.night .nora-mermaid-light{display:none}
 body.night .nora-mermaid-dark{display:block}
+.mmd-lightbox{
+  position:fixed;inset:0;z-index:62;background:rgba(8,11,24,.88);
+  display:none;flex-direction:column;backdrop-filter:blur(6px);
+}
+.mmd-lightbox.open{display:flex}
+.mmd-lb-bar{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:64;
+  display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  background:rgba(18,22,38,.86);border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 28px rgba(0,0,0,.38);direction:ltr;
+}
+.mmd-lb-bar button{
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);
+  color:#fff;border-radius:999px;min-width:34px;height:32px;padding:0 10px;
+  font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  transition:background .14s;
+}
+.mmd-lb-bar button:hover{background:rgba(255,255,255,.22)}
+.mmd-lb-pct{color:#fff;font-size:12px;font-weight:700;min-width:46px;text-align:center;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.mmd-lb-stage{
+  flex:1;width:100%;height:100%;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;touch-action:none;user-select:none;
+}
+.mmd-lb-stage.dragging{cursor:grabbing}
+.mmd-lb-canvas{
+  transform-origin:center center;will-change:transform;
+  background:var(--paper);padding:24px;border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  max-width:92vw;max-height:84vh;display:flex;align-items:center;justify-content:center;
+}
+body.night .mmd-lb-canvas{background:#1c2035}
+.mmd-lb-canvas svg{max-width:86vw;max-height:76vh;width:auto;height:auto;display:block;pointer-events:none}
 @media print{
+  .mmd-lightbox{display:none!important}
   .nora-mermaid-light{display:block!important}
   .nora-mermaid-dark{display:none!important}
 }
@@ -2255,6 +2296,19 @@ body.night .nora-mermaid-dark{display:block}
   <button type="button" class="lightbox-close" id="lightboxClose" aria-label="${esc(r.lightboxClose)}">×</button>
   <a id="lightboxOpen" class="lightbox-open" href="#" target="_blank" rel="noopener noreferrer" style="display:none">${esc(r.lightboxOpen)}</a>
   <img id="lightboxImg" alt="" referrerpolicy="no-referrer">
+</div>
+
+<div id="mmdLightbox" class="mmd-lightbox" aria-hidden="true">
+  <div class="mmd-lb-bar">
+    <button type="button" id="mmdZoomOut" title="Zoom out">−</button>
+    <span class="mmd-lb-pct" id="mmdZoomPct">100%</span>
+    <button type="button" id="mmdZoomIn" title="Zoom in">+</button>
+    <button type="button" id="mmdZoomReset" title="Reset">100%</button>
+    <button type="button" id="mmdLbClose" aria-label="${esc(r.lightboxClose)}">×</button>
+  </div>
+  <div id="mmdLbStage" class="mmd-lb-stage">
+    <div id="mmdLbCanvas" class="mmd-lb-canvas"></div>
+  </div>
 </div>
 
 <span id="searchStatus" aria-live="polite" class="search-status"></span>
@@ -2481,6 +2535,62 @@ body.night .nora-mermaid-dark{display:block}
     lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');
   });
 
+  /* ===== لایت‌باکس زوم و جابه‌جایی نمودارهای Mermaid ===== */
+  const mmdLb=document.querySelector('#mmdLightbox');
+  const mmdStage=document.querySelector('#mmdLbStage');
+  const mmdCanvas=document.querySelector('#mmdLbCanvas');
+  const mmdPct=document.querySelector('#mmdZoomPct');
+  let mmdScale=1, mmdTx=0, mmdTy=0, mmdDrag=false, mmdMoved=false, mmdStartX=0, mmdStartY=0;
+  const applyMmdTransform=()=>{
+    mmdCanvas.style.transform='translate('+mmdTx+'px,'+mmdTy+'px) scale('+mmdScale+')';
+    mmdPct.textContent=Math.round(mmdScale*100)+'%';
+  };
+  const resetMmdView=()=>{mmdScale=1;mmdTx=0;mmdTy=0;applyMmdTransform()};
+  const closeMmdLb=()=>{mmdLb.classList.remove('open');mmdLb.setAttribute('aria-hidden','true');mmdCanvas.innerHTML=''};
+  const setMmdScale=next=>{mmdScale=Math.max(0.4,Math.min(5,next));applyMmdTransform()};
+  document.querySelector('#mmdZoomIn').onclick=()=>setMmdScale(mmdScale+0.25);
+  document.querySelector('#mmdZoomOut').onclick=()=>setMmdScale(mmdScale-0.25);
+  document.querySelector('#mmdZoomReset').onclick=resetMmdView;
+  document.querySelector('#mmdLbClose').onclick=closeMmdLb;
+  mmdStage.addEventListener('wheel',e=>{
+    e.preventDefault();
+    setMmdScale(mmdScale+(e.deltaY<0?0.18:-0.18));
+  },{passive:false});
+  mmdStage.addEventListener('pointerdown',e=>{
+    if(e.button!==0) return;
+    mmdDrag=true;mmdMoved=false;mmdStartX=e.clientX-mmdTx;mmdStartY=e.clientY-mmdTy;
+    mmdStage.classList.add('dragging');
+    try{mmdStage.setPointerCapture(e.pointerId)}catch(err){}
+  });
+  mmdStage.addEventListener('pointermove',e=>{
+    if(!mmdDrag) return;
+    const nx=e.clientX-mmdStartX, ny=e.clientY-mmdStartY;
+    if(Math.abs(nx-mmdTx)>3||Math.abs(ny-mmdTy)>3) mmdMoved=true;
+    mmdTx=nx;mmdTy=ny;applyMmdTransform();
+  });
+  const endMmdDrag=e=>{
+    if(!mmdDrag) return;
+    mmdDrag=false;mmdStage.classList.remove('dragging');
+    try{mmdStage.releasePointerCapture(e.pointerId)}catch(err){}
+  };
+  mmdStage.addEventListener('pointerup',endMmdDrag);
+  mmdStage.addEventListener('pointercancel',endMmdDrag);
+  mmdStage.addEventListener('click',e=>{
+    if(e.target===mmdStage&&!mmdMoved) closeMmdLb();
+  });
+  sourceEl.addEventListener('click',e=>{
+    const wrap=e.target.closest('.nora-mermaid-wrap');
+    if(!wrap) return;
+    const isNight=document.body.classList.contains('night');
+    const svg=wrap.querySelector(isNight?'.nora-mermaid-dark svg':'.nora-mermaid-light svg')||wrap.querySelector('svg');
+    if(!svg) return;
+    mmdCanvas.innerHTML='';
+    mmdCanvas.append(svg.cloneNode(true));
+    resetMmdView();
+    mmdLb.classList.add('open');
+    mmdLb.setAttribute('aria-hidden','false');
+  });
+
   const all=[...sourceEl.querySelectorAll('.chapter-page')];
   const indicator=document.querySelector('#pageIndicator');
   const progress=document.querySelector('.progress span');
@@ -2561,6 +2671,7 @@ body.night .nora-mermaid-dark{display:block}
 
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
+      if(mmdLb.classList.contains('open')){closeMmdLb();return}
       if(lightbox.classList.contains('open')){closeLb();return}
       if(fnPop.classList.contains('open')){closeFnPop();return}
       if(setDrawer.classList.contains('open')){toggleSettings(false);return}
