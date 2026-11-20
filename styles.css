@@ -414,3 +414,9 @@
 .nora-donation-desc { margin: 0; font-size: .82em; line-height: 1.8; color: var(--text-muted); }
 .nora-support a.nora-donation-button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 8px 16px; border-radius: 8px; background: var(--interactive-accent); color: var(--text-on-accent); font-size: .85em; font-weight: 600; text-decoration: none; white-space: nowrap; }
 @media (max-width: 480px) { .nora-channel-grid { gap: 6px; } .nora-support a.nora-channel { padding: 12px 4px 10px; } .nora-channel-icon { width: 36px; height: 36px; } .nora-channel-handle { display: none; } .nora-donation { padding: 12px; gap: 10px; } .nora-support a.nora-donation-button { width: 100%; } }
+
+
+/* Puyan-matched SVG channel logos */
+.nora-channel-logo{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--background-secondary);color:var(--text-normal)}
+.nora-channel-logo svg{width:25px;height:25px;display:block}
+.nora-donation-icon svg{width:23px;height:23px;display:block}
