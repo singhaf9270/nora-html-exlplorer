@@ -11,7 +11,8 @@ const {
   TFolder,
   normalizePath,
   requestUrl,
-  openWithDefaultApp
+  openWithDefaultApp,
+  loadMermaid
 } = require('obsidian');
 
 const VIEW_TYPE_NORA_PREVIEW = 'nora-html-live-preview';
@@ -193,8 +194,13 @@ const I18N = {
     guideDownloadedNotice: 'راهنمای فارسی نورا در پوشه «Nora Guides» ذخیره شد.',
     guideDownloadFailedNotice: 'دانلود خودکار راهنما انجام نشد. می‌توانید از بخش راهنما در تنظیمات دوباره آن را دریافت کنید.',
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
-    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.5',
-    changelogItems: ['بهینه‌سازی نوار ابزار خوانشگر برای نمایش و استفاده راحت‌تر در موبایل.', 'تکمیل بومی‌سازی کنترل‌ها و تنظیمات خوانشگر برای رابط فارسی و انگلیسی.', 'افزودن راهنمای جامع فارسی و انگلیسی برای آشنایی با امکانات و روش استفاده از نورا.', 'نمایش خودکار خلاصه تغییرات پس از به‌روزرسانی و امکان مشاهده دوباره آن از تنظیمات.'],
+    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.6',
+    changelogItems: [
+      'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در خروجی HTML و پیش‌نمایش زنده.',
+      'رندر دوگانه نمودارهای Mermaid برای حالت روز و شب و نمایش بهینه در چاپ و خروجی PDF.',
+      'پشتیبانی از بلوک‌های Mermaid دارای ویژگی‌های اضافی (مانند {align: "center"}).',
+      'پشتیبانی یکپارچه از نمودارهای Mermaid در خروجی تکی و خروجی یکپارچه پوشه.'
+    ],
 
     // Exported Reader UI
     reader: {
@@ -456,8 +462,13 @@ const I18N = {
     guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
     guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
-    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.5',
-    changelogItems: ['Improved the reader toolbar for easier use on mobile screens.', 'Completed Persian and English localization of reader controls and settings.', 'Added comprehensive Persian and English user guides covering Nora’s features and workflows.', 'Added an automatic update summary, which can also be reopened from Settings.'],
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.6',
+    changelogItems: [
+      'Added full, 100% offline support for all Mermaid diagram types in HTML exports and Live Preview.',
+      'Dual-theme Mermaid rendering (Light & Dark) with clean print and PDF output.',
+      'Added support for Mermaid code blocks with extra attributes (such as {align: "center"}).',
+      'Seamless Mermaid rendering across single-note exports and merged folder exports.'
+    ],
 
     // Exported Reader UI
     reader: {
@@ -913,6 +924,73 @@ async function resolveAttachmentsMap(app, md, sourceFile, { forExport = true, em
 }
 
 /* =========================================================
+   رندر دوگانه بلوک‌های Mermaid (روز و شب — کاملاً آفلاین)
+   ========================================================= */
+
+async function renderMermaidBlocksMap(md) {
+  const map = new Map();
+  const lines = stripFrontmatter(md).replace(/\r/g, '').split('\n');
+  const codes = new Set();
+  let i = 0;
+  while (i < lines.length) {
+    const t = lines[i].trim();
+    if (/^```/.test(t)) {
+      const langCode = t.slice(3).trim();
+      const code = [];
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i].trim())) code.push(lines[i++]);
+      if (i < lines.length) i++;
+      if (/^mermaid(?:\s|$|\{)/i.test(langCode)) {
+        const raw = code.join('\n').trim();
+        if (raw) codes.add(raw);
+      }
+      continue;
+    }
+    i++;
+  }
+  if (!codes.size || typeof loadMermaid !== 'function') return map;
+
+  try {
+    const mermaid = await loadMermaid();
+    if (!mermaid || typeof mermaid.render !== 'function') return map;
+
+    const renderWithTheme = async (raw, theme, id) => {
+      try {
+        if (typeof mermaid.initialize === 'function') {
+          mermaid.initialize({ startOnLoad: false, theme, securityLevel: 'loose' });
+        }
+        const res = await mermaid.render(id, raw);
+        return typeof res === 'string' ? res : (res && res.svg ? res.svg : '');
+      } catch (err) {
+        console.warn('[Nora] Mermaid render failed:', err);
+        const stray = document.getElementById('d' + id) || document.getElementById(id);
+        if (stray) stray.remove();
+        return '';
+      }
+    };
+
+    let idx = 0;
+    const stamp = Date.now();
+    for (const raw of codes) {
+      const n = idx++;
+      const light = await renderWithTheme(raw, 'default', `nora-mmd-l-${stamp}-${n}`);
+      const dark = await renderWithTheme(raw, 'dark', `nora-mmd-d-${stamp}-${n}`);
+      if (light || dark) {
+        map.set(raw, { light: light || dark, dark: dark || light });
+      }
+    }
+
+    if (typeof mermaid.initialize === 'function') {
+      const obsDark = document.body && document.body.classList.contains('theme-dark');
+      mermaid.initialize({ startOnLoad: false, theme: obsDark ? 'dark' : 'default' });
+    }
+  } catch (err) {
+    console.warn('[Nora] Could not load Obsidian Mermaid:', err);
+  }
+  return map;
+}
+
+/* =========================================================
    موتور رندر Markdown نورا
    ========================================================= */
 
@@ -1260,7 +1338,7 @@ function renderInline(s, opts = {}) {
 }
 
 function renderMarkdown(md, opts = {}) {
-  const { forExport = false, attachmentsMap = null, lang = 'fa' } = opts;
+  const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null } = opts;
   const r = I18N[lang].reader;
   const bodyMd = stripFrontmatter(md);
   const { cleanLines: lines, fnDefs } = extractFootnoteDefinitions(bodyMd);
@@ -1280,8 +1358,14 @@ function renderMarkdown(md, opts = {}) {
       i++;
       while (i < lines.length && !/^```\s*$/.test(lines[i].trim())) code.push(lines[i++]);
       if (i < lines.length) i++;
-      if (langCode.toLowerCase() === 'mermaid') {
-        html += `<div class="mermaid nora-mermaid">${esc(code.join('\n'))}</div>`;
+      if (/^mermaid(?:\s|$|\{)/i.test(langCode)) {
+        const rawMmd = code.join('\n').trim();
+        const svgs = mermaidMap ? mermaidMap.get(rawMmd) : null;
+        html += `<div class="nora-mermaid-wrap">${
+          svgs
+            ? `<div class="nora-mermaid-svg nora-mermaid-light">${svgs.light}</div><div class="nora-mermaid-svg nora-mermaid-dark">${svgs.dark}</div>`
+            : `<pre class="nora-mermaid-fallback"><code class="language-mermaid">${esc(rawMmd)}</code></pre>`
+        }</div>`;
       } else {
         html += `<pre><code class="language-${esc(langCode)}">${esc(code.join('\n'))}</code></pre>`;
       }
@@ -1398,7 +1482,7 @@ function renderMarkdown(md, opts = {}) {
    تولید سند کامل و مستقل HTML (خوانشگر نورا — دوزبانه)
    ========================================================= */
 
-function buildStandaloneHtml(mdText, options, attachmentsMap) {
+function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null) {
   const lang = resolveReaderLang(options.readerLanguage, mdText, options.uiLang || 'fa');
   const t = I18N[lang];
   const r = t.reader;
@@ -1411,7 +1495,7 @@ function buildStandaloneHtml(mdText, options, attachmentsMap) {
   const splitMarkedChaptersOnly = options.splitMarkedChaptersOnly === true;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
-  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang });
+  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang, mermaidMap });
   const content = rendered.html;
   const footnotes = rendered.footnotes;
   const title = cleanTitle(options.title) || (bodyMd.match(/^#\s+(.+)$/m) || [])[1] || r.defaultTitle;
@@ -1837,10 +1921,7 @@ body.night .article em{color:#ebb485}
 .article li::marker{color:var(--accent)}
 .article hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:2.3em 0}
 .article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code-bg);color:var(--code-ink);padding:.15em .45em;border-radius:6px;font-size:.88em;direction:ltr;unicode-bidi:plaintext}
-.article .nora-mermaid{direction:ltr;text-align:center;overflow-x:auto;margin:1.5rem auto;padding:1rem;border:1px solid var(--line);border-radius:14px;background:var(--paper);line-height:1.45}
-.nora-mermaid svg{max-width:100%;height:auto}
-.nora-mermaid .nodeLabel,.nora-mermaid .edgeLabel{font-family:var(--reader-family)!important}
-pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
+.article pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
 .article pre code{background:none;color:inherit;padding:0}
 .article table{border-collapse:separate;border-spacing:0;width:100%;margin:1.3em 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9em}
 .article th{background:var(--quote-bg);color:var(--accent)}
@@ -1995,6 +2076,24 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
 .fn-pop-jump:hover{text-decoration:underline}
 @media(max-width:600px){
   .fn-popover{left:12px!important;right:12px!important;top:auto!important;bottom:14px!important;width:auto}
+}
+
+/* ===== نمودارهای Mermaid (روز و شب — آفلاین) ===== */
+.nora-mermaid-wrap{
+  margin:1.5em auto;padding:16px;border-radius:14px;
+  border:1px solid var(--line);background:var(--paper);
+  overflow-x:auto;text-align:center;direction:ltr;
+  break-inside:avoid;
+}
+body.night .nora-mermaid-wrap{background:#1c2035}
+.nora-mermaid-svg{display:block;width:100%;text-align:center}
+.nora-mermaid-svg svg{width:100%;max-width:100%;height:auto;display:block;margin:0 auto}
+.nora-mermaid-dark{display:none}
+body.night .nora-mermaid-light{display:none}
+body.night .nora-mermaid-dark{display:block}
+@media print{
+  .nora-mermaid-light{display:block!important}
+  .nora-mermaid-dark{display:none!important}
 }
 
 @media(max-width:720px){
@@ -2180,7 +2279,6 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   <span class="page-indicator" id="pageIndicator">${safeDocType}</span>
   <button id="next">${esc(r.next)}</button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
 (()=>{
   const S=${JSON.stringify(readerStrings)};
@@ -2641,22 +2739,6 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
     if(matchPages.length){matchCursor=(matchCursor+1)%matchPages.length;const targetPage=matchPages[matchCursor];show(targetPage,true);status.textContent=(S.searchMatchWord+' '+nf(matchCursor+1)+' '+S.ofWord+' '+nf(matchPages.length)+' '+S.searchFoundIn+' '+nf(targetPage+1)+' '+S.searchFoundEnd).trim()}
     else{status.textContent=S.searchNotFound}
   };
-
-  // Render Mermaid diagrams after the exported chapter content has been inserted.
-  if (window.mermaid) {
-    try {
-      window.mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: 'strict',
-        theme: document.body.classList.contains('night') ? 'dark' : 'default'
-      });
-      window.mermaid.run({ querySelector: '#chapters .nora-mermaid' }).catch(error => {
-        console.warn('Nora: Mermaid rendering failed', error);
-      });
-    } catch (error) {
-      console.warn('Nora: Mermaid initialization failed', error);
-    }
-  }
 })();
 ${scriptClose}
 </body>
@@ -3245,6 +3327,7 @@ class NoraPreviewView extends ItemView {
       embedAttachments: false
     });
 
+    const mermaidMap = await renderMermaidBlocksMap(md);
     const html = buildStandaloneHtml(md, {
       ...meta,
       ...this.viewPrefs,
@@ -3252,7 +3335,7 @@ class NoraPreviewView extends ItemView {
       fontSize: this.plugin.settings.fontSize,
       width: this.plugin.settings.width,
       forExport: false
-    }, attachmentsMap);
+    }, attachmentsMap, mermaidMap);
 
     this.iframe.srcdoc = html;
   }
@@ -3776,7 +3859,8 @@ class NoraHtmlExporterPlugin extends Plugin {
         embedAttachments: embed
       });
 
-      const html = buildStandaloneHtml(md, { ...options, uiLang, forExport: true }, attachmentsMap);
+      const mermaidMap = await renderMermaidBlocksMap(md);
+      const html = buildStandaloneHtml(md, { ...options, uiLang, forExport: true }, attachmentsMap, mermaidMap);
       const outName = safeFileName(options.fileName || options.title || file.basename) + '.html';
 
       if (mode === 'download') {
@@ -3846,6 +3930,7 @@ class NoraHtmlExporterPlugin extends Plugin {
 
     const combinedMarkdown = combinedParts.join('\n\n---\n\n');
     const folderLabel = folderPath === '/' ? 'Vault' : folderPath.split('/').pop();
+    const mermaidMap = await renderMermaidBlocksMap(combinedMarkdown);
     const html = buildStandaloneHtml(combinedMarkdown, {
       title: folderLabel || 'Nora Collection',
       fileName: safeFileName(folderLabel || 'Nora-Collection'),
@@ -3864,7 +3949,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       splitMarkedChaptersOnly: true,
       uiLang,
       forExport: true
-    }, attachmentsMap);
+    }, attachmentsMap, mermaidMap);
 
     const baseExport = (this.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
     const folderName = folderPath === '/' ? 'Vault-Root' : safeFileName(folderLabel);
@@ -3898,3 +3983,5 @@ class NoraHtmlExporterPlugin extends Plugin {
 }
 
 module.exports = NoraHtmlExporterPlugin;
+
+/* nosourcemap */
