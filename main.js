@@ -27,7 +27,8 @@ const DEFAULT_SETTINGS = {
   exportFolder: 'Nora Exports',
   embedAttachments: true,
   openAfterExport: true,
-  chapterHeadingLevel: '1'
+  chapterHeadingLevel: '1',
+  lastSeenVersion: ''
 };
 
 /* =========================================================
@@ -183,6 +184,12 @@ const I18N = {
     supportDonationTitle: 'با همراهی شما، ادامه می‌دهیم',
     supportDonationDesc: 'اگر این افزونه برایتان مفید بوده، می‌توانید از ادامهٔ توسعهٔ آن حمایت کنید.',
     supportDonate: 'حمایت مالی',
+    guideHeading: 'راهنمای استفاده از نورا',
+    guideIntro: 'برای آشنایی با امکانات و روش کار پلاگین، راهنمای زبان دلخواهتان را باز کنید.',
+    guideFa: 'راهنمای فارسی', guideEn: 'English Guide',
+    changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
+    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.5',
+    changelogItems: ['افزودن دسترسی مستقیم به راهنماهای فارسی و انگلیسی از تنظیمات.', 'هماهنگ‌سازی آیکون‌های بله، تلگرام و یوتیوب با هرمز هبیت.', 'افزودن نمایش تغییرات نسخه پس از به‌روزرسانی و دکمه مشاهده تغییرات در تنظیمات.', 'افزودن لینک حمایت مالی استاندارد به مانیفست.'],
 
     // Exported Reader UI
     reader: {
@@ -438,6 +445,12 @@ const I18N = {
     supportDonationTitle: 'Your support keeps us going',
     supportDonationDesc: 'If this plugin is useful, you can support its continued development.',
     supportDonate: 'Support us',
+    guideHeading: 'Nora User Guides',
+    guideIntro: 'Open the guide in your preferred language to learn how to use Nora.',
+    guideFa: 'راهنمای فارسی', guideEn: 'English Guide',
+    changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.5',
+    changelogItems: ['Added direct access to the Persian and English user guides from Settings.', 'Updated Bale, Telegram, and YouTube logos to match HormuzHabit.', 'Added an update notice and a small Changelog button in Settings.', 'Added the standard funding link to the plugin manifest.'],
 
     // Exported Reader UI
     reader: {
@@ -3222,6 +3235,21 @@ class NoraPreviewView extends ItemView {
    تب تنظیمات پلاگین (Settings Tab — دوزبانه)
    ========================================================= */
 
+class NoraChangelogModal extends Modal {
+  constructor(app, language) { super(app); this.language = language === 'en' ? 'en' : 'fa'; }
+  onOpen() {
+    const fa = this.language === 'fa', t = I18N[this.language], { contentEl } = this;
+    contentEl.empty(); contentEl.addClass('nora-changelog-modal'); contentEl.setAttr('dir', fa ? 'rtl' : 'ltr');
+    contentEl.createEl('h2', { text: t.changelogTitle });
+    contentEl.createEl('p', { text: t.changelogVersion, cls: 'nora-changelog-version' });
+    const list = contentEl.createEl('ul');
+    for (const item of t.changelogItems) list.createEl('li', { text: item });
+    const close = contentEl.createEl('button', { text: fa ? 'بستن' : 'Close', cls: 'nora-changelog-close' });
+    close.addEventListener('click', () => this.close());
+  }
+  onClose() { this.contentEl.empty(); }
+}
+
 class NoraSettingTab extends PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -3368,7 +3396,30 @@ class NoraSettingTab extends PluginSettingTab {
           });
       });
 
+    this.addGuidesSection(containerEl, uiLang === 'fa');
     this.addSupportSection(containerEl, uiLang === 'fa');
+  }
+
+  addGuidesSection(container, fa) {
+    const t = I18N[fa ? 'fa' : 'en'];
+    const root = container.createDiv({ cls: 'nora-guides' });
+    root.setAttribute('dir', fa ? 'rtl' : 'ltr');
+    root.createEl('h3', { cls: 'nora-guides-heading', text: t.guideHeading });
+    root.createEl('p', { cls: 'nora-guides-desc', text: t.guideIntro });
+    const actions = root.createDiv({ cls: 'nora-guide-actions' });
+    const guides = [
+      { label: t.guideFa, url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Complete-Guide-fa.html', primary: fa },
+      { label: t.guideEn, url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Complete-Guide.html', primary: !fa }
+    ];
+    for (const guide of guides) {
+      const link = actions.createEl('a', { cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button', text: guide.label });
+      link.href = guide.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    }
+    const row = root.createDiv({ cls: 'nora-changelog-row' });
+    row.createSpan({ cls: 'nora-changelog-label', text: t.changelogTitle });
+    const button = row.createEl('button', { cls: 'nora-changelog-button', text: t.changelogButton });
+    button.type = 'button';
+    button.addEventListener('click', () => new NoraChangelogModal(this.app, this.plugin.getUiLang()).open());
   }
 
   addSupportSection(container, fa) {
@@ -3380,18 +3431,18 @@ class NoraSettingTab extends PluginSettingTab {
 
     const grid = root.createDiv({ cls: 'nora-channel-grid' });
     const channels = [
-      [fa ? 'بله' : 'Bale', 'https://ble.ir/obsidiantut'],
-      [fa ? 'تلگرام' : 'Telegram', 'https://t.me/obsidiantut'],
-      [fa ? 'یوتیوب' : 'YouTube', 'https://youtube.com/@obsidiantut']
+      ['bale', fa ? 'بله' : 'Bale', 'https://ble.ir/obsidiantut'],
+      ['telegram', fa ? 'تلگرام' : 'Telegram', 'https://t.me/obsidiantut'],
+      ['youtube', fa ? 'یوتیوب' : 'YouTube', 'https://youtube.com/@obsidiantut']
     ];
-    for (const [name, url] of channels) {
+    for (const [type, name, url] of channels) {
       const card = grid.createEl('a', { cls: 'nora-channel' });
       card.href = url;
       card.setAttribute('target', '_blank');
       card.setAttribute('rel', 'noopener noreferrer');
       card.setAttribute('aria-label', (fa ? 'عضویت در کانال ' : 'Join our ') + name);
       const logoSpan = card.createSpan({ cls: 'nora-channel-logo' });
-      noraSupportLogo(logoSpan, name === 'Bale' || name === 'بله' ? 'bale' : name === 'Telegram' || name === 'تلگرام' ? 'telegram' : 'youtube');
+      noraSupportLogo(logoSpan, type);
       card.createSpan({ cls: 'nora-channel-name', text: name });
       card.createSpan({ cls: 'nora-channel-handle', text: '@obsidiantut' });
       card.createSpan({ cls: 'nora-channel-join', text: t.supportJoin });
@@ -3404,48 +3455,37 @@ class NoraSettingTab extends PluginSettingTab {
     copy.createEl('h4', { cls: 'nora-donation-title', text: t.supportDonationTitle });
     copy.createEl('p', { cls: 'nora-donation-desc', text: t.supportDonationDesc });
     const button = donation.createEl('a', { cls: 'nora-donation-button', text: t.supportDonate });
-    button.href = 'https://reymit.ir/singhaf9270';
+    button.href = this.plugin.manifest.fundingUrl || 'https://reymit.ir/singhaf9270';
     button.setAttribute('target', '_blank');
     button.setAttribute('rel', 'noopener noreferrer');
   }
 }
 
-/* ===== SVG logos for community links (matching Puyan) ===== */
+/* ===== SVG channel logos — exact artwork from HormuzHabit ===== */
 const NORA_SVG_NS = 'http://www.w3.org/2000/svg';
-function noraMakeSvg(parent, viewBox, children) {
-  const svg = document.createElementNS(NORA_SVG_NS, 'svg');
-  svg.setAttribute('viewBox', viewBox);
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '1.8');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
-  svg.setAttribute('aria-hidden', 'true');
-  for (const [tag, attrs] of children) {
-    const node = document.createElementNS(NORA_SVG_NS, tag);
-    for (const key in attrs) node.setAttribute(key, attrs[key]);
+function noraSupportLogo(parent, type) {
+  const doc = parent.ownerDocument || document;
+  const svg = doc.createElementNS(NORA_SVG_NS, 'svg');
+  svg.setAttribute('viewBox', type === 'bale' ? '0 0 64 64' : '0 0 24 24');
+  svg.setAttribute('width', '28'); svg.setAttribute('height', '28'); svg.setAttribute('aria-hidden', 'true');
+  function shape(tag, attrs) {
+    const node = doc.createElementNS(NORA_SVG_NS, tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
     svg.appendChild(node);
+  }
+  if (type === 'bale') {
+    shape('circle', { cx: '32', cy: '32', r: '30', fill: '#22A06B' });
+    shape('path', { d: 'M20 33 L28 41 L46 23', fill: 'none', stroke: '#fff', 'stroke-width': '6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  } else if (type === 'telegram') {
+    shape('path', { fill: '#229ED9', d: 'M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z' });
+  } else if (type === 'youtube') {
+    shape('path', { fill: '#FF0000', d: 'M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z' });
+    shape('path', { fill: '#fff', d: 'M9.6 8.4v7.2l6.2-3.6z' });
+  } else if (type === 'heart') {
+    shape('path', { d: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.6', 'stroke-linejoin': 'round' });
   }
   parent.appendChild(svg);
   return svg;
-}
-function noraSupportLogo(parent, type) {
-  if (type === 'bale') return noraMakeSvg(parent, '0 0 24 24', [
-    ['path', { d: 'M4 5h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8l-4 4V7a2 2 0 0 1 2-2z' }],
-    ['path', { d: 'M8 10h8M8 14h5' }]
-  ]);
-  if (type === 'telegram') return noraMakeSvg(parent, '0 0 24 24', [
-    ['path', { d: 'M22 3 11 14' }],
-    ['path', { d: 'M22 3 15 21l-4-7-7-4 18-7z' }]
-  ]);
-  if (type === 'youtube') return noraMakeSvg(parent, '0 0 24 24', [
-    ['rect', { x: '2', y: '5', width: '20', height: '14', rx: '3.5' }],
-    ['path', { d: 'm10 9 5 3-5 3V9z', fill: 'currentColor', stroke: 'none' }]
-  ]);
-  if (type === 'heart') return noraMakeSvg(parent, '0 0 24 24', [
-    ['path', { d: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z' }]
-  ]);
-  return null;
 }
 
 /* =========================================================
@@ -3475,6 +3515,17 @@ class NoraHtmlExporterPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings();
+    const currentVersion = this.manifest.version;
+    const previousVersion = this.settings.lastSeenVersion;
+    const isUpgrade = previousVersion ? previousVersion !== currentVersion : this._hadSavedSettings;
+    if (isUpgrade) {
+      new Notice(I18N[this.getUiLang()].changelogUpdated, 7000);
+      window.setTimeout(() => new NoraChangelogModal(this.app, this.getUiLang()).open(), 500);
+    }
+    if (previousVersion !== currentVersion) {
+      this.settings.lastSeenVersion = currentVersion;
+      await this.saveSettings();
+    }
     const t = I18N[this.getUiLang()];
 
     this.registerView(
@@ -3575,7 +3626,9 @@ class NoraHtmlExporterPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const savedData = await this.loadData();
+    this._hadSavedSettings = !!savedData && Object.keys(savedData).length > 0;
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, savedData || {});
   }
 
   async saveSettings() {
