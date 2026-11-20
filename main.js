@@ -3547,7 +3547,10 @@ class NoraHtmlExporterPlugin extends Plugin {
       this.settings.lastSeenVersion = currentVersion;
       await this.saveSettings();
     }
-    if (!this.settings.guideDownloaded) void this.downloadGuideOnFirstRun();
+    const guideLang = this.getUiLang();
+    const guideFileName = guideLang === 'fa' ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
+    const guidePath = `Nora Guides/${guideFileName}`;
+    if (!(await this.app.vault.adapter.exists(guidePath))) void this.downloadGuideOnFirstRun();
     const t = I18N[this.getUiLang()];
 
     this.registerView(
@@ -3646,11 +3649,11 @@ class NoraHtmlExporterPlugin extends Plugin {
   async downloadGuideOnFirstRun() {
     const lang = this.getUiLang();
     const isFa = lang === 'fa';
-    const fileName = isFa ? 'Nora-User-Guide-fa.html' : 'Nora-User-Guide-en.html';
+    const fileName = isFa ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
     const path = `Nora Guides/${fileName}`;
     const url = isFa
-      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide-fa.html'
-      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide.html';
+      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Guide-FA.md'
+      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora_HTML_Exporter_Complete_English_Guide.md';
     try {
       await this.ensureFolderExists('Nora Guides');
       if (!(await this.app.vault.adapter.exists(path))) {
@@ -3664,7 +3667,6 @@ class NoraHtmlExporterPlugin extends Plugin {
       await this.saveSettings();
       new Notice(I18N[lang].guideDownloadedNotice, 7000);
     } catch (error) {
-      // Keep the flag false so the first-run download can be retried next launch.
       this.settings.guideDownloaded = false;
       await this.saveSettings();
       console.error('Nora: automatic guide download failed', error);
@@ -3675,11 +3677,11 @@ class NoraHtmlExporterPlugin extends Plugin {
   async openGuide(language) {
     const isFa = language === 'fa';
     const lang = isFa ? 'fa' : 'en';
-    const fileName = isFa ? 'Nora-User-Guide-fa.html' : 'Nora-User-Guide-en.html';
+    const fileName = isFa ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
     const path = `Nora Guides/${fileName}`;
     const url = isFa
-      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide-fa.html'
-      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide.html';
+      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Guide-FA.md'
+      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora_HTML_Exporter_Complete_English_Guide.md';
     try {
       await this.ensureFolderExists('Nora Guides');
       if (!(await this.app.vault.adapter.exists(path))) {
@@ -3689,7 +3691,7 @@ class NoraHtmlExporterPlugin extends Plugin {
         }
         await this.app.vault.create(path, response.text);
       }
-      openWithDefaultApp(this.app.vault.adapter.getFullPath(path));
+      await this.app.workspace.openLinkText(path, '', false);
     } catch (error) {
       console.error('Nora: opening user guide failed', error);
       new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
