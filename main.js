@@ -1971,8 +1971,12 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
 }
 
 @media(max-width:720px){
-  .readerbar{flex-wrap:wrap;gap:7px;padding:8px 10px}
-  .bar-center{order:3;flex-basis:100%;max-width:none}
+  .readerbar{flex-wrap:wrap;gap:8px;padding:9px 10px}
+  .bar-start{order:1;flex:1 1 100%;min-width:0}
+  .bar-end{order:2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;flex:1 1 100%;width:100%;min-width:0}
+  .bar-center{order:3;flex:1 1 100%;width:100%;max-width:none;min-width:0}
+  .bar-end .bar-btn{width:100%;min-width:0;min-height:42px;justify-content:center;padding:7px 4px;gap:3px}
+  .bar-end .bar-btn.icon-only{padding:7px 4px}
   .btn-label-hide{display:none}
 }
 @media(max-width:600px){
@@ -2024,7 +2028,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   <div class="bar-end">
     <button type="button" class="bar-btn" id="highlightBtn" title="${esc(r.hlBtn)}"><span class="hl-indicator" id="hlIndicator"></span><span class="btn-label-hide">${esc(r.hlBtn.replace(/^🖍\s*/, ''))}</span></button>
     <button type="button" class="bar-btn" id="commentBtn" title="${esc(r.commentBtn)}">💬<span class="btn-label-hide"> ${esc(r.commentBtn.replace(/^💬\s*/, ''))}</span></button>
-    <button type="button" class="bar-btn" id="markBtn" title="${esc(r.markBtn)}">${esc(r.markBtn)}</button>
+    <button type="button" class="bar-btn" id="markBtn" title="${esc(r.markBtn)}"><span aria-hidden="true">🔖</span><span class="btn-label-hide" id="markBtnLabel">${esc(r.markBtn.replace(/^🔖\s*/, ''))}</span></button>
     <button type="button" class="bar-btn icon-only" id="themeBtn" title="${esc(r.themeTitle)}">🌓</button>
     <button type="button" class="bar-btn settings-trigger" id="settingsBtn" title="${esc(r.settingsTitle)}">⚙️ <span class="btn-label-hide">${esc(r.settingsBtn)}</span></button>
   </div>
@@ -2365,7 +2369,11 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   function updateMarkBtn(){
     const isBookmarked=current>=0&&marks.some(m=>m.page===current);
     markBtn.classList.toggle('is-active',isBookmarked);
-    markBtn.textContent=isBookmarked?S.markRemoveBtn:S.markBtn;
+    const label=isBookmarked?S.markRemoveBtn:S.markBtn;
+    const labelEl=document.querySelector('#markBtnLabel');
+    if(labelEl) labelEl.textContent=label.replace(/^🔖\s*/, '');
+    markBtn.title=label;
+    markBtn.setAttribute('aria-label',label);
   }
   function setProgress(){
     if(current<0){progress.style.width='0%';return}
