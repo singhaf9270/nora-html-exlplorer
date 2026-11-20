@@ -1280,7 +1280,11 @@ function renderMarkdown(md, opts = {}) {
       i++;
       while (i < lines.length && !/^```\s*$/.test(lines[i].trim())) code.push(lines[i++]);
       if (i < lines.length) i++;
-      html += `<pre><code class="language-${esc(langCode)}">${esc(code.join('\n'))}</code></pre>`;
+      if (langCode.toLowerCase() === 'mermaid') {
+        html += `<div class="mermaid nora-mermaid">${esc(code.join('\n'))}</div>`;
+      } else {
+        html += `<pre><code class="language-${esc(langCode)}">${esc(code.join('\n'))}</code></pre>`;
+      }
       continue;
     }
 
@@ -1833,7 +1837,10 @@ body.night .article em{color:#ebb485}
 .article li::marker{color:var(--accent)}
 .article hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:2.3em 0}
 .article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code-bg);color:var(--code-ink);padding:.15em .45em;border-radius:6px;font-size:.88em;direction:ltr;unicode-bidi:plaintext}
-.article pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
+.article .nora-mermaid{direction:ltr;text-align:center;overflow-x:auto;margin:1.5rem auto;padding:1rem;border:1px solid var(--line);border-radius:14px;background:var(--paper);line-height:1.45}
+.nora-mermaid svg{max-width:100%;height:auto}
+.nora-mermaid .nodeLabel,.nora-mermaid .edgeLabel{font-family:var(--reader-family)!important}
+pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
 .article pre code{background:none;color:inherit;padding:0}
 .article table{border-collapse:separate;border-spacing:0;width:100%;margin:1.3em 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9em}
 .article th{background:var(--quote-bg);color:var(--accent)}
@@ -2173,6 +2180,7 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
   <span class="page-indicator" id="pageIndicator">${safeDocType}</span>
   <button id="next">${esc(r.next)}</button>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>
 (()=>{
   const S=${JSON.stringify(readerStrings)};
@@ -2633,6 +2641,22 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
     if(matchPages.length){matchCursor=(matchCursor+1)%matchPages.length;const targetPage=matchPages[matchCursor];show(targetPage,true);status.textContent=(S.searchMatchWord+' '+nf(matchCursor+1)+' '+S.ofWord+' '+nf(matchPages.length)+' '+S.searchFoundIn+' '+nf(targetPage+1)+' '+S.searchFoundEnd).trim()}
     else{status.textContent=S.searchNotFound}
   };
+
+  // Render Mermaid diagrams after the exported chapter content has been inserted.
+  if (window.mermaid) {
+    try {
+      window.mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: document.body.classList.contains('night') ? 'dark' : 'default'
+      });
+      window.mermaid.run({ querySelector: '#chapters .nora-mermaid' }).catch(error => {
+        console.warn('Nora: Mermaid rendering failed', error);
+      });
+    } catch (error) {
+      console.warn('Nora: Mermaid initialization failed', error);
+    }
+  }
 })();
 ${scriptClose}
 </body>
