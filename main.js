@@ -9,7 +9,9 @@ const {
   Notice,
   TFile,
   TFolder,
-  normalizePath
+  normalizePath,
+  requestUrl,
+  openWithDefaultApp
 } = require('obsidian');
 
 const VIEW_TYPE_NORA_PREVIEW = 'nora-html-live-preview';
@@ -28,7 +30,8 @@ const DEFAULT_SETTINGS = {
   embedAttachments: true,
   openAfterExport: true,
   chapterHeadingLevel: '1',
-  lastSeenVersion: ''
+  lastSeenVersion: '',
+  guideDownloaded: false
 };
 
 /* =========================================================
@@ -187,9 +190,11 @@ const I18N = {
     guideHeading: 'راهنمای استفاده از نورا',
     guideIntro: 'برای آشنایی با امکانات و روش کار پلاگین، راهنمای زبان دلخواهتان را باز کنید.',
     guideFa: 'راهنمای فارسی', guideEn: 'English Guide',
+    guideDownloadedNotice: 'راهنمای فارسی نورا در پوشه «Nora Guides» ذخیره شد.',
+    guideDownloadFailedNotice: 'دانلود خودکار راهنما انجام نشد. می‌توانید از بخش راهنما در تنظیمات دوباره آن را دریافت کنید.',
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
     changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.5',
-    changelogItems: ['افزودن دسترسی مستقیم به راهنماهای فارسی و انگلیسی از تنظیمات.', 'هماهنگ‌سازی آیکون‌های بله، تلگرام و یوتیوب با هرمز هبیت.', 'افزودن نمایش تغییرات نسخه پس از به‌روزرسانی و دکمه مشاهده تغییرات در تنظیمات.', 'افزودن لینک حمایت مالی استاندارد به مانیفست.'],
+    changelogItems: ['بهینه‌سازی نوار ابزار خوانشگر برای نمایش و استفاده راحت‌تر در موبایل.', 'تکمیل بومی‌سازی کنترل‌ها و تنظیمات خوانشگر برای رابط فارسی و انگلیسی.', 'افزودن راهنمای جامع فارسی و انگلیسی برای آشنایی با امکانات و روش استفاده از نورا.', 'نمایش خودکار خلاصه تغییرات پس از به‌روزرسانی و امکان مشاهده دوباره آن از تنظیمات.'],
 
     // Exported Reader UI
     reader: {
@@ -448,9 +453,11 @@ const I18N = {
     guideHeading: 'Nora User Guides',
     guideIntro: 'Open the guide in your preferred language to learn how to use Nora.',
     guideFa: 'راهنمای فارسی', guideEn: 'English Guide',
+    guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
+    guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
     changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.5',
-    changelogItems: ['Added direct access to the Persian and English user guides from Settings.', 'Updated Bale, Telegram, and YouTube logos to match HormuzHabit.', 'Added an update notice and a small Changelog button in Settings.', 'Added the standard funding link to the plugin manifest.'],
+    changelogItems: ['Improved the reader toolbar for easier use on mobile screens.', 'Completed Persian and English localization of reader controls and settings.', 'Added comprehensive Persian and English user guides covering Nora’s features and workflows.', 'Added an automatic update summary, which can also be reopened from Settings.'],
 
     // Exported Reader UI
     reader: {
@@ -3408,12 +3415,13 @@ class NoraSettingTab extends PluginSettingTab {
     root.createEl('p', { cls: 'nora-guides-desc', text: t.guideIntro });
     const actions = root.createDiv({ cls: 'nora-guide-actions' });
     const guides = [
-      { label: t.guideFa, url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Complete-Guide-fa.html', primary: fa },
-      { label: t.guideEn, url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Complete-Guide.html', primary: !fa }
+      { label: t.guideFa, language: 'fa', primary: fa },
+      { label: t.guideEn, language: 'en', primary: !fa }
     ];
     for (const guide of guides) {
-      const link = actions.createEl('a', { cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button', text: guide.label });
-      link.href = guide.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const button = actions.createEl('button', { cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button', text: guide.label });
+      button.type = 'button';
+      button.addEventListener('click', () => this.plugin.openGuide(guide.language));
     }
     const row = root.createDiv({ cls: 'nora-changelog-row' });
     row.createSpan({ cls: 'nora-changelog-label', text: t.changelogTitle });
@@ -3526,6 +3534,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       this.settings.lastSeenVersion = currentVersion;
       await this.saveSettings();
     }
+    if (!this.settings.guideDownloaded) void this.downloadGuideOnFirstRun();
     const t = I18N[this.getUiLang()];
 
     this.registerView(
@@ -3619,6 +3628,50 @@ class NoraHtmlExporterPlugin extends Plugin {
     );
 
     this.addSettingTab(new NoraSettingTab(this.app, this));
+  }
+
+  async downloadGuideOnFirstRun() {
+    const lang = this.getUiLang();
+    const isFa = lang === 'fa';
+    const fileName = isFa ? 'Nora-User-Guide-fa.html' : 'Nora-User-Guide-en.html';
+    const path = `Nora Guides/${fileName}`;
+    const url = isFa
+      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide-fa.html'
+      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide.html';
+    try {
+      await this.ensureFolderExists('Nora Guides');
+      if (!(await this.app.vault.adapter.exists(path))) {
+        const response = await requestUrl({ url });
+        await this.app.vault.create(path, response.text);
+      }
+      this.settings.guideDownloaded = true;
+      await this.saveSettings();
+      new Notice(I18N[lang].guideDownloadedNotice, 7000);
+    } catch (error) {
+      this.settings.guideDownloaded = true;
+      await this.saveSettings();
+      new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
+    }
+  }
+
+  async openGuide(language) {
+    const isFa = language === 'fa';
+    const lang = isFa ? 'fa' : 'en';
+    const fileName = isFa ? 'Nora-User-Guide-fa.html' : 'Nora-User-Guide-en.html';
+    const path = `Nora Guides/${fileName}`;
+    const url = isFa
+      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide-fa.html'
+      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Complete-Guide.html';
+    try {
+      await this.ensureFolderExists('Nora Guides');
+      if (!(await this.app.vault.adapter.exists(path))) {
+        const response = await requestUrl({ url });
+        await this.app.vault.create(path, response.text);
+      }
+      openWithDefaultApp(this.app.vault.adapter.getFullPath(path));
+    } catch (error) {
+      new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
+    }
   }
 
   onunload() {
