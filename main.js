@@ -2041,12 +2041,12 @@ body.night .fn-popover{box-shadow:0 18px 50px rgba(0,0,0,.5)}
 </aside>
 
 <div id="settingsShade" class="settings-shade"></div>
-<aside id="settingsDrawer" class="settings-drawer" aria-label="${esc(r.settingsTitle)}">
+<aside id="settingsDrawer" class="settings-drawer" lang="${lang}" dir="${dir}" aria-label="${esc(r.settingsTitle)}">
   <div class="settings-head">
     <strong>⚙️ ${esc(r.settingsTitle)}</strong>
     <button type="button" class="settings-close" id="settingsClose" aria-label="${esc(r.settingsClose)}">×</button>
   </div>
-  <div class="settings-body">
+  <div class="settings-body" lang="${lang}" dir="${dir}">
     <div class="set-group">
       <div class="set-label"><span>${esc(r.setAppearance)}</span></div>
       <div class="seg-control">
@@ -3380,24 +3380,26 @@ class NoraSettingTab extends PluginSettingTab {
 
     const grid = root.createDiv({ cls: 'nora-channel-grid' });
     const channels = [
-      ['💬', fa ? 'بله' : 'Bale', 'https://ble.ir/obsidiantut'],
-      ['✈️', fa ? 'تلگرام' : 'Telegram', 'https://t.me/obsidiantut'],
-      ['▶️', fa ? 'یوتیوب' : 'YouTube', 'https://youtube.com/@obsidiantut']
+      [fa ? 'بله' : 'Bale', 'https://ble.ir/obsidiantut'],
+      [fa ? 'تلگرام' : 'Telegram', 'https://t.me/obsidiantut'],
+      [fa ? 'یوتیوب' : 'YouTube', 'https://youtube.com/@obsidiantut']
     ];
-    for (const [symbol, name, url] of channels) {
+    for (const [name, url] of channels) {
       const card = grid.createEl('a', { cls: 'nora-channel' });
       card.href = url;
       card.setAttribute('target', '_blank');
       card.setAttribute('rel', 'noopener noreferrer');
       card.setAttribute('aria-label', (fa ? 'عضویت در کانال ' : 'Join our ') + name);
-      card.createSpan({ cls: 'nora-channel-icon', text: symbol });
+      const logoSpan = card.createSpan({ cls: 'nora-channel-logo' });
+      noraSupportLogo(logoSpan, name === 'Bale' || name === 'بله' ? 'bale' : name === 'Telegram' || name === 'تلگرام' ? 'telegram' : 'youtube');
       card.createSpan({ cls: 'nora-channel-name', text: name });
       card.createSpan({ cls: 'nora-channel-handle', text: '@obsidiantut' });
       card.createSpan({ cls: 'nora-channel-join', text: t.supportJoin });
     }
 
     const donation = root.createDiv({ cls: 'nora-donation' });
-    donation.createDiv({ cls: 'nora-donation-icon', text: '♥' });
+    const donationIcon = donation.createDiv({ cls: 'nora-donation-icon' });
+    noraSupportLogo(donationIcon, 'heart');
     const copy = donation.createDiv({ cls: 'nora-donation-copy' });
     copy.createEl('h4', { cls: 'nora-donation-title', text: t.supportDonationTitle });
     copy.createEl('p', { cls: 'nora-donation-desc', text: t.supportDonationDesc });
@@ -3406,6 +3408,44 @@ class NoraSettingTab extends PluginSettingTab {
     button.setAttribute('target', '_blank');
     button.setAttribute('rel', 'noopener noreferrer');
   }
+}
+
+/* ===== SVG logos for community links (matching Puyan) ===== */
+const NORA_SVG_NS = 'http://www.w3.org/2000/svg';
+function noraMakeSvg(parent, viewBox, children) {
+  const svg = document.createElementNS(NORA_SVG_NS, 'svg');
+  svg.setAttribute('viewBox', viewBox);
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.8');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [tag, attrs] of children) {
+    const node = document.createElementNS(NORA_SVG_NS, tag);
+    for (const key in attrs) node.setAttribute(key, attrs[key]);
+    svg.appendChild(node);
+  }
+  parent.appendChild(svg);
+  return svg;
+}
+function noraSupportLogo(parent, type) {
+  if (type === 'bale') return noraMakeSvg(parent, '0 0 24 24', [
+    ['path', { d: 'M4 5h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8l-4 4V7a2 2 0 0 1 2-2z' }],
+    ['path', { d: 'M8 10h8M8 14h5' }]
+  ]);
+  if (type === 'telegram') return noraMakeSvg(parent, '0 0 24 24', [
+    ['path', { d: 'M22 3 11 14' }],
+    ['path', { d: 'M22 3 15 21l-4-7-7-4 18-7z' }]
+  ]);
+  if (type === 'youtube') return noraMakeSvg(parent, '0 0 24 24', [
+    ['rect', { x: '2', y: '5', width: '20', height: '14', rx: '3.5' }],
+    ['path', { d: 'm10 9 5 3-5 3V9z', fill: 'currentColor', stroke: 'none' }]
+  ]);
+  if (type === 'heart') return noraMakeSvg(parent, '0 0 24 24', [
+    ['path', { d: 'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z' }]
+  ]);
+  return null;
 }
 
 /* =========================================================
