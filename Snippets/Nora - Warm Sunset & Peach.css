@@ -1,0 +1,41 @@
+/* === Nora Snippet 5: Warm Sunset & Peach === */
+body[data-palette] {
+  --bg: #fff2eb;
+  --paper: #fffdfb;
+  --ink: #331f1a;
+  --muted: #846258;
+  --line: #f4dcd0;
+  --accent: #e85d3f;
+  --accent2: #f59e0b;
+  --quote-bg: #fff1e6;
+  --code-bg: #fceae0;
+  --code-ink: #c2410c;
+  background: linear-gradient(135deg, #fff2eb 0%, #ffe6d5 50%, #fff4db 100%) !important;
+  background-attachment: fixed;
+}
+body.night[data-palette] {
+  --bg: #1b100e;
+  --paper: #271815;
+  --ink: #fceee9;
+  --muted: #c9a69b;
+  --line: #472e28;
+  --accent: #ff8566;
+  --accent2: #fbbf24;
+  --quote-bg: #33201c;
+  background: radial-gradient(circle at 80% 20%, rgba(255,133,102,.18), transparent 45%), #1b100e !important;
+}
+.cover[data-cover] {
+  background: radial-gradient(circle at 20% 20%, rgba(245,158,11,.32), transparent 45%),
+              radial-gradient(circle at 85% 80%, rgba(232,93,63,.28), transparent 48%),
+              linear-gradient(150deg, #fffdfb, #ffe9dc) !important;
+}
+body.night .cover[data-cover] {
+  background: radial-gradient(circle at 20% 20%, rgba(251,191,36,.20), transparent 45%),
+              radial-gradient(circle at 85% 80%, rgba(255,133,102,.22), transparent 48%),
+              linear-gradient(150deg, #271815, #381e19) !important;
+}
+.book { border-radius: 24px; border: 1.5px solid color-mix(in srgb, var(--accent) 24%, var(--line)); }
+.article h1 { color: var(--accent) !important; border-bottom: 3px dashed color-mix(in srgb, var(--accent2) 55%, transparent); }
+.article h2 { color: var(--accent) !important; border-inline-start: 5px solid var(--accent2); }
+.article blockquote { border-inline-start: 5px solid var(--accent2); border-radius: 16px; }
+.start-reading-btn { background: linear-gradient(135deg, #e85d3f, #f59e0b) !important; }
