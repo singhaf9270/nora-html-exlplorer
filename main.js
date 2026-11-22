@@ -33,6 +33,7 @@ const DEFAULT_SETTINGS = {
   exportFolder: 'Nora Exports',
   embedAttachments: true,
   openAfterExport: true,
+  saveMetadataToFrontmatter: true,
   chapterHeadingLevel: '1',
   customCssPath: '',
   customCss: '',
@@ -151,6 +152,7 @@ const I18N = {
 
     toggleEmbed: 'تعبیه خودکار عکس‌ها و پیوست‌های Vault داخل HTML (کاملاً آفلاین)',
     toggleOpen: 'باز کردن در مرورگر پس از ساخت',
+    toggleSaveFrontmatter: 'ذخیره مشخصات جلد در Frontmatter یادداشت',
     statWords: n => `📄 ${n} واژه`,
     statMinutes: n => `⏱ حدود ${n} دقیقه مطالعه`,
     statAttach: n => `📎 ${n} پیوست محلی شناسایی شد`,
@@ -185,10 +187,12 @@ const I18N = {
     setEmbedDesc: 'تصاویر، صوت، ویدیو و PDFهای داخل Vault به صورت خودکار داخل فایل HTML قرار می‌گیرند تا فایل کاملاً مستقل و آفلاین باشد.',
     setOpenName: 'باز کردن خودکار در مرورگر پس از ذخیره',
     setOpenDesc: 'در نسخه دسکتاپ، بلافاصله بعد از ساخت HTML آن را در مرورگر پیش‌فرض سیستم باز می‌کند.',
+    setSaveFrontmatterName: 'ذخیره خودکار مشخصات جلد در Frontmatter یادداشت',
+    setSaveFrontmatterDesc: 'هنگام خروجی گرفتن، مشخصات جلد (عنوان، نویسنده، زیرعنوان، موضوع، سال، نوع اثر و توضیحات) را در Properties یادداشت ذخیره می‌کند تا در خروجی‌های بعدی خودکار پر شوند.',
     setChapterHeadingName: 'سطح هدینگ شروع فصل در خروجی یکپارچه',
     setChapterHeadingDesc: 'عنوان هر فایل به‌عنوان شروع یک فصل درج می‌شود. سطح هدینگ را برای فصل‌ها انتخاب کنید (H1 تا H6).',
     setCustomCssFileName: 'انتخاب اسنیپت CSS از Vault (اختیاری)',
-    setCustomCssFileDesc: 'یکی از فایل‌های CSS موجود در پوشه snippets ابسیدین (یا Vault) را انتخاب کنید تا به‌صورت خودکار و آفلاین در خروجی HTML و پیش‌نمایش اعمال شود.',
+    setCustomCssFileDesc: 'فقط فایل‌های CSS موجود در پوشه snippets ابسیدین (یا Vault) که نامشان با nora شروع می‌شود نمایش داده می‌شوند (مثل nora-sepia.css).',
     setCustomCssNone: 'بدون فایل CSS (غیرفعال)',
     setCustomCssRefresh: 'به‌روزرسانی لیست اسنیپت‌ها',
     setCustomCssName: 'کد CSS سفارشی (Custom CSS)',
@@ -213,7 +217,8 @@ const I18N = {
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در حالت روز، شب و چاپ.',
       'پشتیبانی مستقیم از کدهای SVG (هم به‌صورت بلوک ```svg و هم تگ خام <svg>) همراه با زوم برداری تمام‌صفحه.',
       'افزودن منوی انتخاب اسنیپت CSS از Vault و کادر Custom CSS در تنظیمات پلاگین.',
-      'بازطراحی مدرن کدبلاک‌ها با هدر نمایش نام زبان برنامه‌نویسی، دکمه کپی سریع و هماهنگی کامل با حالت روز و شب.'
+      'بازطراحی مدرن کدبلاک‌ها با هدر نمایش نام زبان برنامه‌نویسی، دکمه کپی سریع و هماهنگی کامل با حالت روز و شب.',
+      'امکان ذخیره خودکار مشخصات جلد و اثر در Frontmatter (Properties) یادداشت هنگام خروجی گرفتن (قابل فعال/غیرفعال‌سازی در تنظیمات).'
     ],
 
     // Exported Reader UI
@@ -430,6 +435,7 @@ const I18N = {
 
     toggleEmbed: 'Embed Vault images & attachments as Base64 (fully offline)',
     toggleOpen: 'Open in browser after export',
+    toggleSaveFrontmatter: 'Save cover metadata to note frontmatter',
     statWords: n => `📄 ${n} words`,
     statMinutes: n => `⏱ ~${n} min read`,
     statAttach: n => `📎 ${n} local attachment(s) found`,
@@ -464,10 +470,12 @@ const I18N = {
     setEmbedDesc: 'Embed images, audio, video, and PDFs directly inside the HTML file so it works completely offline.',
     setOpenName: 'Open in Browser After Saving',
     setOpenDesc: 'On desktop, automatically opens the generated HTML file in your default web browser.',
+    setSaveFrontmatterName: 'Auto-save cover metadata to note frontmatter',
+    setSaveFrontmatterDesc: 'When exporting, writes entered cover metadata (title, author, subtitle, category, year, docType, description) to the note YAML frontmatter so it is pre-filled next time.',
     setChapterHeadingName: 'Chapter heading level for merged export',
     setChapterHeadingDesc: 'Each file title starts a new chapter. Choose the heading level (H1–H6).',
     setCustomCssFileName: 'Select CSS Snippet from Vault (optional)',
-    setCustomCssFileDesc: 'Pick a .css file from Obsidian snippets (or your Vault) to automatically embed offline in HTML exports and Live Preview.',
+    setCustomCssFileDesc: 'Lists only .css files in Obsidian snippets (or your Vault) whose filename starts with "nora" (e.g., nora-sepia.css).',
     setCustomCssNone: 'None (Disabled)',
     setCustomCssRefresh: 'Refresh snippets list',
     setCustomCssName: 'Custom CSS',
@@ -492,7 +500,8 @@ const I18N = {
       'Full 100% offline Mermaid diagram rendering for Light, Dark, and Print modes.',
       'Added direct SVG rendering support (both fenced ```svg blocks and raw <svg> tags) with crisp vector fullscreen zoom.',
       'Added Vault CSS snippets dropdown picker and inline Custom CSS editor in Settings.',
-      'Redesigned code blocks with a modern header showing the programming language, a quick Copy button, and Light/Dark theme support.'
+      'Redesigned code blocks with a modern header showing the programming language, a quick Copy button, and Light/Dark theme support.',
+      'Added optional auto-saving of entered cover metadata into the note YAML frontmatter upon export (configurable in Settings and Export dialog).'
     ],
 
     // Exported Reader UI
@@ -1161,6 +1170,7 @@ async function listVaultCssSnippets(app) {
   const items = [];
   const configDir = (app.vault && app.vault.configDir) || '.obsidian';
   const snippetsDir = normalizePath(`${configDir}/snippets`);
+  const isNoraCss = name => Boolean(name) && !name.startsWith('.') && /^nora/i.test(name);
   try {
     if (await app.vault.adapter.exists(snippetsDir)) {
       const listed = await app.vault.adapter.list(snippetsDir);
@@ -1168,9 +1178,10 @@ async function listVaultCssSnippets(app) {
       for (const fPath of files) {
         if (/\.css$/i.test(fPath)) {
           const norm = normalizePath(fPath);
+          const name = norm.split('/').pop() || '';
+          if (!isNoraCss(name)) continue;
           if (!seen.has(norm)) {
             seen.add(norm);
-            const name = norm.split('/').pop();
             items.push({ path: norm, label: `🎨 ${name}` });
           }
         }
@@ -1183,6 +1194,8 @@ async function listVaultCssSnippets(app) {
     const vaultCss = app.vault.getFiles().filter(f => f.extension && f.extension.toLowerCase() === 'css');
     for (const f of vaultCss) {
       const norm = normalizePath(f.path);
+      const name = norm.split('/').pop() || '';
+      if (!isNoraCss(name)) continue;
       if (!seen.has(norm)) {
         seen.add(norm);
         items.push({ path: norm, label: `📄 ${norm}` });
@@ -1194,13 +1207,18 @@ async function listVaultCssSnippets(app) {
 
 async function resolveCustomCss(app, settings) {
   const parts = [];
+  let name = '';
   const rawPath = String((settings && settings.customCssPath) || '').trim();
   if (rawPath) {
     const cleanPath = normalizePath(rawPath);
     try {
       if (await app.vault.adapter.exists(cleanPath)) {
         const fileCss = await app.vault.adapter.read(cleanPath);
-        if (fileCss && fileCss.trim()) parts.push(fileCss.trim());
+        if (fileCss && fileCss.trim()) {
+          parts.push(fileCss.trim());
+          const base = (cleanPath.split('/').pop() || '').replace(/\.css$/i, '').trim();
+          if (base) name = base;
+        }
       }
     } catch (err) {
       console.warn('[Nora] Failed to read custom CSS file:', cleanPath, err);
@@ -1208,8 +1226,11 @@ async function resolveCustomCss(app, settings) {
   }
   const inlineCss = String((settings && settings.customCss) || '').trim();
   if (inlineCss) parts.push(inlineCss);
-  if (!parts.length) return '';
-  return '\n/* ===== Custom User CSS ===== */\n' + parts.join('\n\n').replace(/<\/style/gi, '<\\/style');
+  if (!parts.length) return { css: '', name: '' };
+  return {
+    css: '\n/* ===== Custom User CSS ===== */\n' + parts.join('\n\n').replace(/<\/style/gi, '<\\/style'),
+    name
+  };
 }
 
 /* =========================================================
@@ -1807,7 +1828,11 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
   const t = I18N[lang];
   const r = t.reader;
   const dark = options.theme === 'dark';
-  const initPalette = options.palette || 'default';
+  const customCssText = options.customCss ? String(options.customCss).replace(/<\/style/gi, '<\\/style') : '';
+  const hasCustomCss = Boolean(customCssText.trim());
+  const customThemeLabel = String(options.customCssName || '').trim() || (lang === 'fa' ? 'استایل سفارشی' : 'Custom CSS');
+  const fallbackPalette = options.palette || 'default';
+  const initPalette = hasCustomCss ? 'custom' : fallbackPalette;
   const initCover = options.coverStyle || 'aurora';
   const dir = options.direction === 'auto' ? t.dir : (options.direction || t.dir);
   const size = parseInt(options.fontSize, 10) || 16;
@@ -1843,7 +1868,11 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
     mono: ['#454f5e', '#8a7248']
   };
 
-  const paletteChipsHtml = t.palettes.map(([v, label]) => {
+  const customChipHtml = hasCustomCss
+    ? `<button type="button" class="swatch-btn" data-palette-val="custom" title="${esc(customThemeLabel)}"><span class="swatch-dot" style="background:linear-gradient(135deg,#ff5c8a,#ffd166,#00b8a9)"></span><span class="swatch-label">✨ ${esc(customThemeLabel)}</span></button>`
+    : '';
+
+  const paletteChipsHtml = customChipHtml + t.palettes.map(([v, label]) => {
     const [c1, c2] = paletteSwatches[v] || ['#5849c7', '#15948f'];
     return `<button type="button" class="swatch-btn" data-palette-val="${esc(v)}" title="${esc(label)}"><span class="swatch-dot" style="background:linear-gradient(135deg,${c1},${c2})"></span><span class="swatch-label">${esc(label)}</span></button>`;
   }).join('');
@@ -2591,7 +2620,7 @@ body.night .nora-svg-wrap{background:#1c2035}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="${dark ? '#0f1220' : '#f3f5fb'}">
 <title>${safeTitle}</title>
-<style>${css}${options.customCss ? String(options.customCss).replace(/<\/style/gi, '<\\/style') : ''}</style>
+<style>${css}</style>${hasCustomCss ? `<style id="nora-custom-style">${customCssText}</style>` : ''}
 </head>
 <body class="${dark ? 'night' : ''}" data-palette="${esc(initPalette)}">
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
@@ -3085,7 +3114,7 @@ body.night .nora-svg-wrap{background:#1c2035}
   const progress=document.querySelector('.progress span');
   const markBtn=document.querySelector('#markBtn');
   const posKey='nora-pos-v2-'+bookId;
-  const prefsKey='nora-prefs-v3-'+bookId;
+  const prefsKey='nora-prefs-v3-'+bookId+${JSON.stringify(hasCustomCss ? '-' + shortHash(customCssText) : '')};
   let current=-1;
   const marksKey='nora-marks-'+bookId;
   let marks=[];
@@ -3172,9 +3201,14 @@ body.night .nora-svg-wrap{background:#1c2035}
   });
 
   /* ===== مدیریت تنظیمات مدرن خوانشگر ===== */
+  const isPreview=${options.forExport === false ? 'true' : 'false'};
   let prefs={...defaultPrefs};
-  try{const savedPrefs=JSON.parse(localStorage.getItem(prefsKey)||'null');if(savedPrefs&&typeof savedPrefs==='object') prefs={...prefs,...savedPrefs}}catch(e){}
+  if(!isPreview){
+    try{const savedPrefs=JSON.parse(localStorage.getItem(prefsKey)||'null');if(savedPrefs&&typeof savedPrefs==='object') prefs={...prefs,...savedPrefs}}catch(e){}
+  }
 
+  const customStyleEl=document.querySelector('#nora-custom-style');
+  const fallbackPalette=${JSON.stringify(fallbackPalette)};
   const fontSel=document.querySelector('#readerFont');
   const fontSizeVal=document.querySelector('#fontSizeVal');
   const fontSizeReadout=document.querySelector('#fontSizeReadout');
@@ -3183,7 +3217,10 @@ body.night .nora-svg-wrap{background:#1c2035}
 
   function applyPrefs(){
     document.body.classList.toggle('night',!!prefs.night);
-    document.body.dataset.palette=prefs.palette||'default';
+    const useCustom=Boolean(customStyleEl)&&(prefs.palette==='custom');
+    if(customStyleEl) customStyleEl.disabled=!useCustom;
+    if(!customStyleEl&&prefs.palette==='custom') prefs.palette=fallbackPalette;
+    document.body.dataset.palette=useCustom?'custom':(prefs.palette||'default');
     coverEl.dataset.cover=prefs.cover||'aurora';
     const fz=prefs.size||16;
     document.documentElement.style.setProperty('--reader-font',fz+'px');
@@ -3206,7 +3243,7 @@ body.night .nora-svg-wrap{background:#1c2035}
     document.querySelectorAll('[data-cover-val]').forEach(b=>b.classList.toggle('active',b.dataset.coverVal===(prefs.cover||'aurora')));
     document.querySelectorAll('[data-hl-val]').forEach(b=>b.classList.toggle('active',b.dataset.hlVal===(prefs.hlColor||'yellow')));
 
-    try{localStorage.setItem(prefsKey,JSON.stringify(prefs))}catch(e){}
+    if(!isPreview){try{localStorage.setItem(prefsKey,JSON.stringify(prefs))}catch(e){}}
   }
   applyPrefs();
 
@@ -3218,7 +3255,7 @@ body.night .nora-svg-wrap{background:#1c2035}
   document.querySelectorAll('[data-lh-val]').forEach(b=>b.onclick=()=>{prefs.lh=b.dataset.lhVal;applyPrefs()});
   document.querySelectorAll('[data-width-val]').forEach(b=>b.onclick=()=>{prefs.width=b.dataset.widthVal;applyPrefs()});
   document.querySelectorAll('[data-palette-val]').forEach(b=>b.onclick=()=>{prefs.palette=b.dataset.paletteVal;applyPrefs()});
-  document.querySelectorAll('[data-cover-val]').forEach(b=>b.onclick=()=>{prefs.cover=b.dataset.coverVal;applyPrefs()});
+  document.querySelectorAll('[data-cover-val]').forEach(b=>b.onclick=()=>{prefs.cover=b.dataset.coverVal;if(prefs.palette==='custom')prefs.palette=fallbackPalette;applyPrefs()});
   document.querySelectorAll('[data-hl-val]').forEach(b=>b.onclick=()=>{prefs.hlColor=b.dataset.hlVal;applyPrefs()});
   document.querySelector('#resetSettingsBtn').onclick=()=>{prefs={...defaultPrefs};applyPrefs()};
   document.querySelector('#printBtn').onclick=()=>{toggleSettings(false);setTimeout(()=>window.print(),180)};
@@ -3402,7 +3439,8 @@ class NoraExportModal extends Modal {
       width: this.overrides.width || this.plugin.settings.width,
       readerLanguage: this.overrides.readerLanguage || this.plugin.settings.readerLanguage,
       embedAttachments: this.plugin.settings.embedAttachments,
-      openAfterExport: this.plugin.settings.openAfterExport
+      openAfterExport: this.plugin.settings.openAfterExport,
+      saveMetadataToFrontmatter: this.plugin.settings.saveMetadataToFrontmatter
     };
 
     this.renderForm();
@@ -3513,6 +3551,12 @@ class NoraExportModal extends Modal {
     openCb.checked = state.openAfterExport;
     openCb.addEventListener('change', () => { state.openAfterExport = openCb.checked; });
     openLabel.appendText(t.toggleOpen);
+
+    const fmLabel = toggleRow.createEl('label');
+    const fmCb = fmLabel.createEl('input', { type: 'checkbox' });
+    fmCb.checked = state.saveMetadataToFrontmatter;
+    fmCb.addEventListener('change', () => { state.saveMetadataToFrontmatter = fmCb.checked; });
+    fmLabel.appendText(t.toggleSaveFrontmatter);
 
     // Stats bar
     const statsBar = contentEl.createDiv({ cls: 'nora-stats-bar' });
@@ -3929,14 +3973,15 @@ class NoraPreviewView extends ItemView {
 
     const mermaidMap = await renderMermaidBlocksMap(md);
     const mathMap = await renderMathBlocksMap(md);
-    const customCss = await resolveCustomCss(this.app, this.plugin.settings);
+    const customStyle = await resolveCustomCss(this.app, this.plugin.settings);
     const html = buildStandaloneHtml(md, {
       ...meta,
       ...this.viewPrefs,
       uiLang,
       fontSize: this.plugin.settings.fontSize,
       width: this.plugin.settings.width,
-      customCss,
+      customCss: customStyle.css,
+      customCssName: customStyle.name,
       forExport: false
     }, attachmentsMap, mermaidMap, mathMap);
 
@@ -4096,6 +4141,16 @@ class NoraSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.openAfterExport)
         .onChange(async val => {
           this.plugin.settings.openAfterExport = val;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName(t.setSaveFrontmatterName)
+      .setDesc(t.setSaveFrontmatterDesc)
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.saveMetadataToFrontmatter)
+        .onChange(async val => {
+          this.plugin.settings.saveMetadataToFrontmatter = val;
           await this.plugin.saveSettings();
         }));
 
@@ -4516,10 +4571,45 @@ class NoraHtmlExporterPlugin extends Plugin {
     }
   }
 
+  async saveMetadataToNoteFrontmatter(file, options) {
+    if (!file || !this.app.fileManager || typeof this.app.fileManager.processFrontMatter !== 'function') return;
+    try {
+      await this.app.fileManager.processFrontMatter(file, fm => {
+        const setOrKeep = (key, val) => {
+          const v = String(val || '').trim();
+          if (v) fm[key] = v;
+        };
+        setOrKeep('title', options.title);
+        const fName = safeFileName(options.fileName || '');
+        if (fName && fName !== safeFileName(file.basename)) {
+          fm.exportName = fName;
+        }
+        setOrKeep('docType', options.docType);
+        const authors = parseMultiList(options.author);
+        if (authors.length === 1) fm.author = authors[0];
+        else if (authors.length > 1) fm.author = authors;
+        setOrKeep('subtitle', options.subtitle);
+        const categories = parseMultiList(options.category);
+        if (categories.length === 1) fm.category = categories[0];
+        else if (categories.length > 1) fm.category = categories;
+        setOrKeep('year', options.year);
+        setOrKeep('description', options.description);
+      });
+    } catch (err) {
+      console.warn('[Nora] Failed to save metadata to frontmatter:', err);
+    }
+  }
+
   async exportNote(file, options, { mode = 'vault' } = {}) {
     const uiLang = this.getUiLang();
     const t = I18N[uiLang];
     try {
+      const shouldSaveFm = options.saveMetadataToFrontmatter !== undefined
+        ? options.saveMetadataToFrontmatter
+        : this.settings.saveMetadataToFrontmatter;
+      if (shouldSaveFm) {
+        await this.saveMetadataToNoteFrontmatter(file, options);
+      }
       const md = await this.app.vault.read(file);
       const embed = options.embedAttachments !== undefined ? options.embedAttachments : this.settings.embedAttachments;
       const attachmentsMap = await resolveAttachmentsMap(this.app, md, file, {
@@ -4529,8 +4619,8 @@ class NoraHtmlExporterPlugin extends Plugin {
 
       const mermaidMap = await renderMermaidBlocksMap(md);
       const mathMap = await renderMathBlocksMap(md);
-      const customCss = await resolveCustomCss(this.app, this.settings);
-      const html = buildStandaloneHtml(md, { ...options, uiLang, customCss, forExport: true }, attachmentsMap, mermaidMap, mathMap);
+      const customStyle = await resolveCustomCss(this.app, this.settings);
+      const html = buildStandaloneHtml(md, { ...options, uiLang, customCss: customStyle.css, customCssName: customStyle.name, forExport: true }, attachmentsMap, mermaidMap, mathMap);
       const outName = safeFileName(options.fileName || options.title || file.basename) + '.html';
 
       if (mode === 'download') {
@@ -4602,9 +4692,10 @@ class NoraHtmlExporterPlugin extends Plugin {
     const folderLabel = folderPath === '/' ? 'Vault' : folderPath.split('/').pop();
     const mermaidMap = await renderMermaidBlocksMap(combinedMarkdown);
     const mathMap = await renderMathBlocksMap(combinedMarkdown);
-    const customCss = await resolveCustomCss(this.app, this.settings);
+    const customStyle = await resolveCustomCss(this.app, this.settings);
     const html = buildStandaloneHtml(combinedMarkdown, {
-      customCss,
+      customCss: customStyle.css,
+      customCssName: customStyle.name,
       title: folderLabel || 'Nora Collection',
       fileName: safeFileName(folderLabel || 'Nora-Collection'),
       docType: uiLang === 'fa' ? 'مجموعه یادداشت‌ها' : 'Note Collection',
