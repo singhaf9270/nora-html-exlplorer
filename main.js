@@ -12,7 +12,10 @@ const {
   normalizePath,
   requestUrl,
   openWithDefaultApp,
-  loadMermaid
+  loadMermaid,
+  loadMathJax,
+  renderMath,
+  finishRenderMath
 } = require('obsidian');
 
 const VIEW_TYPE_NORA_PREVIEW = 'nora-html-live-preview';
@@ -205,12 +208,10 @@ const I18N = {
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
     changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.8',
     changelogItems: [
-      'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در خروجی HTML و پیش‌نمایش زنده.',
-      'رندر دوگانه نمودارهای Mermaid برای حالت روز و شب و نمایش بهینه در چاپ و خروجی PDF.',
-      'پشتیبانی از بلوک‌های Mermaid دارای ویژگی‌های اضافی (مانند {align: "center"}).',
-      'پشتیبانی یکپارچه از نمودارهای Mermaid در خروجی تکی و خروجی یکپارچه پوشه.',
-      'امکان زوم تمام‌صفحه و جابه‌جایی (Pan) روی نمودارهای Mermaid در فایل HTML خروجی.',
-      'افزودن قابلیت اعمال استایل دلخواه (انتخاب فایل CSS از Vault و کادر Custom CSS در تنظیمات) به خروجی HTML و پیش‌نمایش زنده.'
+      'پشتیبانی کامل و ۱۰۰٪ آفلاین از فرمول‌های ریاضی LaTeX (درون‌خطی $...$ و بلوکی $$...$$) با رندر برداری بدون افت کیفیت.',
+      'بهبود موتور زوم تمام‌صفحه برای نمودارهای Mermaid و فرمول‌های LaTeX با رندر برداری واقعی (شفاف و بدون تاری حتی در زوم ۵۰۰٪).',
+      'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در حالت روز، شب و چاپ.',
+      'افزودن منوی انتخاب اسنیپت CSS از Vault و کادر Custom CSS در تنظیمات پلاگین.'
     ],
 
     // Exported Reader UI
@@ -480,14 +481,12 @@ const I18N = {
     guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
     guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
-    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.6',
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.8',
     changelogItems: [
-      'Added full, 100% offline support for all Mermaid diagram types in HTML exports and Live Preview.',
-      'Dual-theme Mermaid rendering (Light & Dark) with clean print and PDF output.',
-      'Added support for Mermaid code blocks with extra attributes (such as {align: "center"}).',
-      'Seamless Mermaid rendering across single-note exports and merged folder exports.',
-      'Interactive fullscreen zoom and drag-to-pan viewer for Mermaid diagrams in exported HTML.',
-      'Added Custom CSS support in Settings (both loading a .css file from Vault/snippets and inline Custom CSS) for HTML exports and Live Preview.'
+      'Added full 100% offline LaTeX math support (inline $...$ and block $$...$$) with crisp vector rendering.',
+      'Upgraded fullscreen zoom viewer for both Mermaid diagrams and LaTeX formulas using true vector scaling (zero blur at up to 500% zoom).',
+      'Full 100% offline Mermaid diagram rendering for Light, Dark, and Print modes.',
+      'Added Vault CSS snippets dropdown picker and inline Custom CSS editor in Settings.'
     ],
 
     // Exported Reader UI
@@ -1010,6 +1009,145 @@ async function renderMermaidBlocksMap(md) {
   return map;
 }
 
+/* =========================================================
+   رندر برداری و کاملاً آفلاین فرمول‌های LaTeX (بدون افت کیفیت)
+   ========================================================= */
+
+const INLINE_DISPLAY_MATH_RE = /(?<!\\)\$\$([^\n$]+?)(?<!\\)\$\$/g;
+const INLINE_MATH_RE = /(?<!\\)\$(?!\s)((?:\\.|[^$\\\n])+?)(?<!\s)(?<!\\)\$(?!\d)/g;
+
+function collectMathExpressions(md) {
+  const lines = stripFrontmatter(md).replace(/\r/g, '').split('\n');
+  const seen = new Set();
+  const items = [];
+  const pushItem = (tex, display) => {
+    const clean = String(tex || '').trim();
+    if (!clean) return;
+    const key = (display ? 'D::' : 'I::') + clean;
+    if (seen.has(key)) return;
+    seen.add(key);
+    items.push({ tex: clean, display, key });
+  };
+
+  let i = 0;
+  while (i < lines.length) {
+    const t = lines[i].trim();
+    // Skip fenced code blocks
+    if (/^```/.test(t)) {
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i].trim())) i++;
+      if (i < lines.length) i++;
+      continue;
+    }
+
+    // Block display math: single-line $$...$$ or multi-line $$ ... $$
+    if (/^\$\$/.test(t)) {
+      const single = t.match(/^\$\$(.+)\$\$$/);
+      if (single) {
+        pushItem(single[1], true);
+        i++;
+        continue;
+      }
+      const buf = [];
+      const firstRest = t.slice(2).trim();
+      if (firstRest) buf.push(firstRest);
+      i++;
+      while (i < lines.length) {
+        const cur = lines[i].trim();
+        if (cur === '$$') { i++; break; }
+        if (/\$\$$/.test(cur)) {
+          const before = cur.slice(0, -2).trim();
+          if (before) buf.push(before);
+          i++;
+          break;
+        }
+        buf.push(lines[i]);
+        i++;
+      }
+      pushItem(buf.join('\n'), true);
+      continue;
+    }
+
+    // Strip inline code spans before scanning inline math
+    const noCode = lines[i].replace(/`[^`]+`/g, ' ');
+    let m;
+    INLINE_DISPLAY_MATH_RE.lastIndex = 0;
+    while ((m = INLINE_DISPLAY_MATH_RE.exec(noCode))) pushItem(m[1], true);
+
+    const noDouble = noCode.replace(INLINE_DISPLAY_MATH_RE, ' ');
+    INLINE_MATH_RE.lastIndex = 0;
+    while ((m = INLINE_MATH_RE.exec(noDouble))) pushItem(m[1], false);
+
+    i++;
+  }
+  return items;
+}
+
+async function renderMathBlocksMap(md) {
+  const map = new Map();
+  const items = collectMathExpressions(md);
+  if (!items.length) return map;
+
+  try {
+    if (typeof loadMathJax === 'function') {
+      await loadMathJax();
+    }
+  } catch (err) {
+    console.warn('[Nora] Could not load Obsidian MathJax:', err);
+  }
+
+  const mjx = window.MathJax;
+  const renderOne = async (tex, display) => {
+    // 1. Prefer pure SVG if MathJax.tex2svg is available
+    if (mjx && typeof mjx.tex2svg === 'function') {
+      try {
+        const node = mjx.tex2svg(tex, { display });
+        const svg = node && node.querySelector ? node.querySelector('svg') : null;
+        if (svg) return svg.outerHTML;
+      } catch (e) {}
+    }
+
+    // 2. Native MathML via MathJax.tex2mml (100% vector, offline, crisp at any zoom)
+    if (mjx && typeof mjx.tex2mml === 'function') {
+      try {
+        const mml = mjx.tex2mml(tex, { display });
+        if (mml && /<math[\s>]/i.test(mml)) return mml;
+      } catch (e) {}
+    }
+
+    // 3. Fallback via Obsidian's renderMath -> extract vector <svg> or <math>
+    if (typeof renderMath === 'function') {
+      try {
+        const el = renderMath(tex, display);
+        if (typeof finishRenderMath === 'function') {
+          await finishRenderMath();
+        }
+        if (el) {
+          const svg = el.querySelector('svg');
+          if (svg) return svg.outerHTML;
+          const mml = el.querySelector('mjx-assistive-mml math, math');
+          if (mml) {
+            if (display && !mml.getAttribute('display')) {
+              mml.setAttribute('display', 'block');
+            }
+            return mml.outerHTML;
+          }
+        }
+      } catch (e) {
+        console.warn('[Nora] renderMath failed:', e);
+      }
+    }
+
+    return '';
+  };
+
+  for (const item of items) {
+    const rendered = await renderOne(item.tex, item.display);
+    if (rendered) map.set(item.key, rendered);
+  }
+  return map;
+}
+
 async function listVaultCssSnippets(app) {
   const seen = new Set();
   const items = [];
@@ -1314,7 +1452,7 @@ function registerFootnote(fnState, key, rawContent, lang) {
 }
 
 function renderInline(s, opts = {}) {
-  const { forExport = false, attachmentsMap = null, lang = 'fa', fnState = null, fnDefs = null, inFootnote = false } = opts;
+  const { forExport = false, attachmentsMap = null, lang = 'fa', fnState = null, fnDefs = null, inFootnote = false, mathMap = null } = opts;
   const slots = [];
   const stash = html => {
     const key = `\u0000SLOT${slots.length}\u0000`;
@@ -1324,6 +1462,22 @@ function renderInline(s, opts = {}) {
   let out = String(s || '');
 
   out = out.replace(/`([^`]+)`/g, (_, c) => stash(`<code>${esc(c)}</code>`));
+
+  out = out.replace(INLINE_DISPLAY_MATH_RE, (_, tex) => {
+    const clean = tex.trim();
+    const rendered = mathMap ? (mathMap.get('D::' + clean) || '') : '';
+    return stash(rendered
+      ? `<span class="nora-math-inline nora-math-display-inline">${rendered}</span>`
+      : `<code class="nora-math-fallback">$$${esc(clean)}$$</code>`);
+  });
+
+  out = out.replace(INLINE_MATH_RE, (_, tex) => {
+    const clean = tex.trim();
+    const rendered = mathMap ? (mathMap.get('I::' + clean) || '') : '';
+    return stash(rendered
+      ? `<span class="nora-math-inline">${rendered}</span>`
+      : `<code class="nora-math-fallback">$${esc(clean)}$</code>`);
+  });
 
   out = out.replace(LINKED_IMG_INLINE_RE, (_, alt, i1, i2, iTitle, l1, l2) => {
     const target = (i1 || i2 || '').trim();
@@ -1414,12 +1568,12 @@ function renderInline(s, opts = {}) {
 }
 
 function renderMarkdown(md, opts = {}) {
-  const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null } = opts;
+  const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null, mathMap = null } = opts;
   const r = I18N[lang].reader;
   const bodyMd = stripFrontmatter(md);
   const { cleanLines: lines, fnDefs } = extractFootnoteDefinitions(bodyMd);
   const fnState = { list: [], byKey: new Map() };
-  const inlineOpts = { forExport, attachmentsMap, lang, fnState, fnDefs, inFootnote: false };
+  const inlineOpts = { forExport, attachmentsMap, lang, fnState, fnDefs, inFootnote: false, mathMap };
 
   let html = '', i = 0, headings = [];
   const isHr = s => /^(---+|\*\*\*+|___+)$/.test(s);
@@ -1445,6 +1599,40 @@ function renderMarkdown(md, opts = {}) {
       } else {
         html += `<pre><code class="language-${esc(langCode)}">${esc(code.join('\n'))}</code></pre>`;
       }
+      continue;
+    }
+
+    if (/^\$\$/.test(t)) {
+      let tex = '';
+      const single = t.match(/^\$\$(.+)\$\$$/);
+      if (single) {
+        tex = single[1].trim();
+        i++;
+      } else {
+        const buf = [];
+        const firstRest = t.slice(2).trim();
+        if (firstRest) buf.push(firstRest);
+        i++;
+        while (i < lines.length) {
+          const cur = lines[i].trim();
+          if (cur === '$$') { i++; break; }
+          if (/\$\$$/.test(cur)) {
+            const before = cur.slice(0, -2).trim();
+            if (before) buf.push(before);
+            i++;
+            break;
+          }
+          buf.push(lines[i]);
+          i++;
+        }
+        tex = buf.join('\n').trim();
+      }
+      const renderedMath = mathMap ? (mathMap.get('D::' + tex) || '') : '';
+      html += `<div class="nora-math-block">${
+        renderedMath
+          ? `<div class="nora-math-inner">${renderedMath}</div>`
+          : `<pre class="nora-math-fallback"><code>$$\n${esc(tex)}\n$$</code></pre>`
+      }</div>`;
       continue;
     }
 
@@ -1516,7 +1704,7 @@ function renderMarkdown(md, opts = {}) {
     while (
       i < lines.length &&
       lines[i].trim() &&
-      !/^```|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/.test(lines[i].trim()) &&
+      !/^```|^\$\$|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/.test(lines[i].trim()) &&
       !isHr(lines[i].trim()) &&
       !matchStandaloneEmbedLine(lines[i].trim()) &&
       !isTable(i)
@@ -1544,7 +1732,7 @@ function renderMarkdown(md, opts = {}) {
     firstRefId: 'fnref-' + (item.refIds[0] || (item.num + '-1')),
     html: item.rawContent
       .split(/\n{2,}/)
-      .map(block => block.split('\n').map(ln => renderInline(ln, { forExport, attachmentsMap, lang, inFootnote: true })).join('<br>'))
+      .map(block => block.split('\n').map(ln => renderInline(ln, { forExport, attachmentsMap, lang, inFootnote: true, mathMap })).join('<br>'))
       .join('<br>')
   }));
 
@@ -1558,7 +1746,7 @@ function renderMarkdown(md, opts = {}) {
    تولید سند کامل و مستقل HTML (خوانشگر نورا — دوزبانه)
    ========================================================= */
 
-function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null) {
+function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null, mathMap = null) {
   const lang = resolveReaderLang(options.readerLanguage, mdText, options.uiLang || 'fa');
   const t = I18N[lang];
   const r = t.reader;
@@ -1571,7 +1759,7 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null)
   const splitMarkedChaptersOnly = options.splitMarkedChaptersOnly === true;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
-  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang, mermaidMap });
+  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang, mermaidMap, mathMap });
   const content = rendered.html;
   const footnotes = rendered.footnotes;
   const title = cleanTitle(options.title) || (bodyMd.match(/^#\s+(.+)$/m) || [])[1] || r.defaultTitle;
@@ -2198,13 +2386,38 @@ body.night .nora-mermaid-dark{display:block}
 }
 .mmd-lb-stage.dragging{cursor:grabbing}
 .mmd-lb-canvas{
-  transform-origin:center center;will-change:transform;
-  background:var(--paper);padding:24px;border-radius:16px;
+  background:var(--paper);padding:24px 28px;border-radius:16px;
   box-shadow:0 20px 60px rgba(0,0,0,.45);
-  max-width:92vw;max-height:84vh;display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;
+  direction:ltr;color:var(--ink);
 }
 body.night .mmd-lb-canvas{background:#1c2035}
-.mmd-lb-canvas svg{max-width:86vw;max-height:76vh;width:auto;height:auto;display:block;pointer-events:none}
+.mmd-lb-canvas svg{display:block;pointer-events:none}
+.mmd-lb-canvas math{font-size:inherit;color:var(--ink);pointer-events:none}
+
+/* ===== فرمول‌های ریاضی LaTeX (برداری و آفلاین) ===== */
+.nora-math-block{
+  margin:1.4em auto;padding:18px 20px;border-radius:14px;
+  border:1px solid var(--line);background:color-mix(in srgb,var(--accent) 3%,var(--paper));
+  overflow-x:auto;text-align:center;direction:ltr;unicode-bidi:isolate;
+  break-inside:avoid;cursor:zoom-in;
+  transition:border-color .16s ease,box-shadow .16s ease;
+}
+.nora-math-block:hover{
+  border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
+  box-shadow:0 6px 20px rgba(15,20,45,.07);
+}
+body.night .nora-math-block{background:#1c2035}
+.nora-math-inner{display:inline-block;max-width:100%;font-size:1.18em;line-height:1.8;color:var(--ink)}
+.nora-math-inner svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.nora-math-inner math{font-family:'Cambria Math','STIX Two Math','Latin Modern Math','Times New Roman',serif}
+.nora-math-inner mtable{border-spacing:0.35em 0.5em}
+.nora-math-inline{
+  display:inline-block;direction:ltr;unicode-bidi:isolate;
+  vertical-align:middle;margin-inline:2px;color:var(--ink);
+}
+.nora-math-inline svg{height:1.15em;width:auto;vertical-align:-0.18em}
+.nora-math-inline math{font-family:'Cambria Math','STIX Two Math','Latin Modern Math','Times New Roman',serif;font-size:1.05em}
 @media print{
   .mmd-lightbox{display:none!important}
   .nora-mermaid-light{display:block!important}
@@ -2252,17 +2465,6 @@ body.night .mmd-lb-canvas{background:#1c2035}
 <meta name="theme-color" content="${dark ? '#0f1220' : '#f3f5fb'}">
 <title>${safeTitle}</title>
 <style>${css}${options.customCss ? String(options.customCss).replace(/<\/style/gi, '<\\/style') : ''}</style>
-<script>
-window.MathJax = {
-  tex: {
-    inlineMath: [["$", "$"], ["\\(", "\\)"]],
-    displayMath: [["\\u0024\\u0024", "\\u0024\\u0024"], ["\\[", "\\]"]],
-    processEscapes: true
-  },
-  options: { skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"] }
-};
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body class="${dark ? 'night' : ''}" data-palette="${esc(initPalette)}">
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
@@ -2620,18 +2822,35 @@ window.MathJax = {
     lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');
   });
 
-  /* ===== لایت‌باکس زوم و جابه‌جایی نمودارهای Mermaid ===== */
+  /* ===== لایت‌باکس زوم برداری واقعی برای Mermaid و فرمول‌های LaTeX ===== */
   const mmdLb=document.querySelector('#mmdLightbox');
   const mmdStage=document.querySelector('#mmdLbStage');
   const mmdCanvas=document.querySelector('#mmdLbCanvas');
   const mmdPct=document.querySelector('#mmdZoomPct');
   let mmdScale=1, mmdTx=0, mmdTy=0, mmdDrag=false, mmdMoved=false, mmdStartX=0, mmdStartY=0;
+  let mmdMode='svg', mmdBaseW=600, mmdBaseH=400, mmdBaseFont=26;
   const applyMmdTransform=()=>{
-    mmdCanvas.style.transform='translate('+mmdTx+'px,'+mmdTy+'px) scale('+mmdScale+')';
+    mmdCanvas.style.transform='translate('+Math.round(mmdTx)+'px,'+Math.round(mmdTy)+'px)';
+    if(mmdMode==='svg'){
+      const svg=mmdCanvas.querySelector('svg');
+      if(svg){
+        svg.style.width=Math.round(mmdBaseW*mmdScale)+'px';
+        svg.style.height=Math.round(mmdBaseH*mmdScale)+'px';
+        svg.style.maxWidth='none';
+        svg.style.maxHeight='none';
+      }
+    }else if(mmdMode==='math'){
+      mmdCanvas.style.fontSize=(mmdBaseFont*mmdScale).toFixed(1)+'px';
+    }
     mmdPct.textContent=Math.round(mmdScale*100)+'%';
   };
   const resetMmdView=()=>{mmdScale=1;mmdTx=0;mmdTy=0;applyMmdTransform()};
-  const closeMmdLb=()=>{mmdLb.classList.remove('open');mmdLb.setAttribute('aria-hidden','true');mmdCanvas.innerHTML=''};
+  const closeMmdLb=()=>{
+    mmdLb.classList.remove('open');
+    mmdLb.setAttribute('aria-hidden','true');
+    mmdCanvas.innerHTML='';
+    mmdCanvas.style.fontSize='';
+  };
   const setMmdScale=next=>{mmdScale=Math.max(0.4,Math.min(5,next));applyMmdTransform()};
   document.querySelector('#mmdZoomIn').onclick=()=>setMmdScale(mmdScale+0.25);
   document.querySelector('#mmdZoomOut').onclick=()=>setMmdScale(mmdScale-0.25);
@@ -2663,17 +2882,45 @@ window.MathJax = {
   mmdStage.addEventListener('click',e=>{
     if(e.target===mmdStage&&!mmdMoved) closeMmdLb();
   });
+  function openVectorLightbox(node){
+    mmdCanvas.innerHTML='';
+    mmdCanvas.style.fontSize='';
+    const clone=node.cloneNode(true);
+    if(clone.tagName&&clone.tagName.toLowerCase()==='svg'){
+      mmdMode='svg';
+      clone.removeAttribute('style');
+      mmdCanvas.append(clone);
+      mmdLb.classList.add('open');
+      mmdLb.setAttribute('aria-hidden','false');
+      const vb=(clone.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(Number);
+      let natW=vb.length===4&&vb[2]>0?vb[2]:(parseFloat(clone.getAttribute('width'))||node.getBoundingClientRect().width||600);
+      let natH=vb.length===4&&vb[3]>0?vb[3]:(parseFloat(clone.getAttribute('height'))||node.getBoundingClientRect().height||400);
+      const maxW=window.innerWidth*0.84, maxH=window.innerHeight*0.74;
+      const fit=Math.min(1, maxW/natW, maxH/natH);
+      mmdBaseW=Math.max(120, natW*fit);
+      mmdBaseH=Math.max(60, natH*fit);
+    }else{
+      mmdMode='math';
+      mmdBaseFont=28;
+      mmdCanvas.append(clone);
+      mmdLb.classList.add('open');
+      mmdLb.setAttribute('aria-hidden','false');
+    }
+    resetMmdView();
+  }
   sourceEl.addEventListener('click',e=>{
+    const mathBox=e.target.closest('.nora-math-block');
+    if(mathBox){
+      const target=mathBox.querySelector('svg')||mathBox.querySelector('math');
+      if(target) openVectorLightbox(target);
+      return;
+    }
     const wrap=e.target.closest('.nora-mermaid-wrap');
     if(!wrap) return;
     const isNight=document.body.classList.contains('night');
     const svg=wrap.querySelector(isNight?'.nora-mermaid-dark svg':'.nora-mermaid-light svg')||wrap.querySelector('svg');
     if(!svg) return;
-    mmdCanvas.innerHTML='';
-    mmdCanvas.append(svg.cloneNode(true));
-    resetMmdView();
-    mmdLb.classList.add('open');
-    mmdLb.setAttribute('aria-hidden','false');
+    openVectorLightbox(svg);
   });
 
   const all=[...sourceEl.querySelectorAll('.chapter-page')];
@@ -3524,6 +3771,7 @@ class NoraPreviewView extends ItemView {
     });
 
     const mermaidMap = await renderMermaidBlocksMap(md);
+    const mathMap = await renderMathBlocksMap(md);
     const customCss = await resolveCustomCss(this.app, this.plugin.settings);
     const html = buildStandaloneHtml(md, {
       ...meta,
@@ -3533,7 +3781,7 @@ class NoraPreviewView extends ItemView {
       width: this.plugin.settings.width,
       customCss,
       forExport: false
-    }, attachmentsMap, mermaidMap);
+    }, attachmentsMap, mermaidMap, mathMap);
 
     this.iframe.srcdoc = html;
   }
@@ -4123,8 +4371,9 @@ class NoraHtmlExporterPlugin extends Plugin {
       });
 
       const mermaidMap = await renderMermaidBlocksMap(md);
+      const mathMap = await renderMathBlocksMap(md);
       const customCss = await resolveCustomCss(this.app, this.settings);
-      const html = buildStandaloneHtml(md, { ...options, uiLang, customCss, forExport: true }, attachmentsMap, mermaidMap);
+      const html = buildStandaloneHtml(md, { ...options, uiLang, customCss, forExport: true }, attachmentsMap, mermaidMap, mathMap);
       const outName = safeFileName(options.fileName || options.title || file.basename) + '.html';
 
       if (mode === 'download') {
@@ -4195,6 +4444,7 @@ class NoraHtmlExporterPlugin extends Plugin {
     const combinedMarkdown = combinedParts.join('\n\n---\n\n');
     const folderLabel = folderPath === '/' ? 'Vault' : folderPath.split('/').pop();
     const mermaidMap = await renderMermaidBlocksMap(combinedMarkdown);
+    const mathMap = await renderMathBlocksMap(combinedMarkdown);
     const customCss = await resolveCustomCss(this.app, this.settings);
     const html = buildStandaloneHtml(combinedMarkdown, {
       customCss,
@@ -4215,7 +4465,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       splitMarkedChaptersOnly: true,
       uiLang,
       forExport: true
-    }, attachmentsMap, mermaidMap);
+    }, attachmentsMap, mermaidMap, mathMap);
 
     const baseExport = (this.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
     const folderName = folderPath === '/' ? 'Vault-Root' : safeFileName(folderLabel);
