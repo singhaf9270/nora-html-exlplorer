@@ -29,6 +29,7 @@ const DEFAULT_SETTINGS = {
   direction: 'auto',
   fontSize: 16,
   width: '850',
+  readingMode: 'paginated',
   docType: '',
   exportFolder: 'Nora Exports',
   embedAttachments: true,
@@ -108,6 +109,7 @@ const I18N = {
     fieldDirection: 'جهت متن',
     fieldFontSize: 'اندازه قلم',
     fieldWidth: 'عرض صفحه',
+    fieldReadingMode: 'حالت مطالعه',
     fieldReaderLang: 'زبان رابط خوانشگر HTML',
 
     optLight: '☀️ روز',
@@ -143,6 +145,10 @@ const I18N = {
       ['850', 'معمولی (850px)'],
       ['100%', 'تمام عرض'],
       ['680', 'باریک و متمرکز']
+    ],
+    readingModes: [
+      ['paginated', 'فصل‌به‌فصل (صفحه‌بندی)'],
+      ['scroll', 'تمام اسکرول (پیوسته)']
     ],
     readerLangs: [
       ['auto', 'تشخیص خودکار از متن'],
@@ -183,6 +189,7 @@ const I18N = {
     setPaletteName: 'پالت رنگی پیش‌فرض',
     setCoverName: 'طرح جلد پیش‌فرض',
     setDirName: 'جهت متن پیش‌فرض',
+    setReadingModeName: 'حالت مطالعه پیش‌فرض',
     setEmbedName: 'تعبیه خودکار پیوست‌ها (Base64)',
     setEmbedDesc: 'تصاویر، صوت، ویدیو و PDFهای داخل Vault به صورت خودکار داخل فایل HTML قرار می‌گیرند تا فایل کاملاً مستقل و آفلاین باشد.',
     setOpenName: 'باز کردن خودکار در مرورگر پس از ذخیره',
@@ -312,6 +319,9 @@ const I18N = {
       wNarrow: 'باریک',
       wNormal: 'معمولی',
       wWide: 'تمام عرض',
+      setReadingMode: 'حالت مطالعه',
+      rmPaginated: 'فصل‌به‌فصل',
+      rmScroll: 'تمام اسکرول',
       setFontFamily: 'قلم متن',
       setPalette: 'پالت رنگی',
       setCoverStyle: 'طرح جلد',
@@ -391,6 +401,7 @@ const I18N = {
     fieldDirection: 'Text Direction',
     fieldFontSize: 'Font Size',
     fieldWidth: 'Page Width',
+    fieldReadingMode: 'Reading Mode',
     fieldReaderLang: 'Exported HTML UI Language',
 
     optLight: '☀️ Light',
@@ -426,6 +437,10 @@ const I18N = {
       ['850', 'Normal (850px)'],
       ['100%', 'Full Width'],
       ['680', 'Narrow & Focused']
+    ],
+    readingModes: [
+      ['paginated', 'Paginated (By Section)'],
+      ['scroll', 'Full Scroll (Continuous)']
     ],
     readerLangs: [
       ['auto', 'Auto-detect from note'],
@@ -466,6 +481,7 @@ const I18N = {
     setPaletteName: 'Default Color Palette',
     setCoverName: 'Default Cover Style',
     setDirName: 'Default Text Direction',
+    setReadingModeName: 'Default Reading Mode',
     setEmbedName: 'Auto-embed Vault Attachments (Base64)',
     setEmbedDesc: 'Embed images, audio, video, and PDFs directly inside the HTML file so it works completely offline.',
     setOpenName: 'Open in Browser After Saving',
@@ -595,6 +611,9 @@ const I18N = {
       wNarrow: 'Narrow',
       wNormal: 'Normal',
       wWide: 'Full',
+      setReadingMode: 'Reading Mode',
+      rmPaginated: 'Paginated',
+      rmScroll: 'Full Scroll',
       setFontFamily: 'Font Family',
       setPalette: 'Color Palette',
       setCoverStyle: 'Cover Style',
@@ -1837,6 +1856,7 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
   const dir = options.direction === 'auto' ? t.dir : (options.direction || t.dir);
   const size = parseInt(options.fontSize, 10) || 16;
   const initWidth = options.width || '850';
+  const initReadingMode = options.readingMode === 'scroll' ? 'scroll' : 'paginated';
   const splitMarkedChaptersOnly = options.splitMarkedChaptersOnly === true;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
@@ -2252,6 +2272,11 @@ body.night .start-reading-btn{color:#121524}
 .start-reading-btn:hover{transform:translateY(-2px)}
 .chapter-page{display:none;min-height:68vh;padding:clamp(22px,5vw,60px);position:relative}
 .chapter-page.active{display:block}
+body.scroll-mode .cover{display:flex}
+body.scroll-mode .chapter-page{display:block;min-height:0;border-top:1px dashed var(--line)}
+body.scroll-mode .chapter-footer{position:static;margin-top:24px}
+body.scroll-mode .article{padding-bottom:18px}
+body.scroll-mode .navrow{display:none}
 .article{font-size:var(--reader-font);line-height:var(--reader-lh);overflow-wrap:anywhere;padding:0 0 56px}
 .article h1,.article h2,.article h3,.article h4{line-height:1.55;scroll-margin-top:90px}
 .article h1{font-size:2em;color:var(--accent);border-bottom:3px solid var(--line);padding-bottom:16px}
@@ -2622,7 +2647,7 @@ body.night .nora-svg-wrap{background:#1c2035}
 <title>${safeTitle}</title>
 <style>${css}</style>${hasCustomCss ? `<style id="nora-custom-style">${customCssText}</style>` : ''}
 </head>
-<body class="${dark ? 'night' : ''}" data-palette="${esc(initPalette)}">
+<body class="${[dark ? 'night' : '', initReadingMode === 'scroll' ? 'scroll-mode' : ''].filter(Boolean).join(' ')}" data-palette="${esc(initPalette)}">
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
 
 <nav class="readerbar">
@@ -2689,6 +2714,14 @@ body.night .nora-svg-wrap{background:#1c2035}
         <button type="button" class="seg-btn" data-width-val="680">${esc(r.wNarrow)}</button>
         <button type="button" class="seg-btn" data-width-val="850">${esc(r.wNormal)}</button>
         <button type="button" class="seg-btn" data-width-val="100%">${esc(r.wWide)}</button>
+      </div>
+    </div>
+
+    <div class="set-group">
+      <div class="set-label"><span>${esc(r.setReadingMode)}</span></div>
+      <div class="seg-control">
+        <button type="button" class="seg-btn" data-rm-val="paginated">${esc(r.rmPaginated)}</button>
+        <button type="button" class="seg-btn" data-rm-val="scroll">${esc(r.rmScroll)}</button>
       </div>
     </div>
 
@@ -2792,6 +2825,7 @@ body.night .nora-svg-wrap{background:#1c2035}
     size:${size},
     lh:'2.05',
     width:${JSON.stringify(initWidth)},
+    readingMode:${JSON.stringify(initReadingMode)},
     hlColor:'yellow'
   };
   const sourceEl=document.querySelector('#chapters');
@@ -3130,6 +3164,11 @@ body.night .nora-svg-wrap{background:#1c2035}
     markBtn.setAttribute('aria-label',label);
   }
   function setProgress(){
+    if(document.body.classList.contains('scroll-mode')){
+      const docH=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+      progress.style.width=Math.max(0,Math.min(100,(window.scrollY/docH)*100))+'%';
+      return;
+    }
     if(current<0){progress.style.width='0%';return}
     const page=all[current];
     if(!page) return;
@@ -3155,7 +3194,14 @@ body.night .nora-svg-wrap{background:#1c2035}
     }
     updateMarkBtn();
     try{localStorage.setItem(posKey,String(current))}catch(e){}
-    if(shouldScroll) window.scrollTo({top:0,behavior:'smooth'});
+    if(shouldScroll){
+      if(document.body.classList.contains('scroll-mode')){
+        const targetEl=current===-1?coverEl:all[current];
+        if(targetEl) targetEl.scrollIntoView({behavior:'smooth',block:'start'});
+      }else{
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+    }
     setProgress();
   }
   window.addEventListener('scroll',setProgress,{passive:true});
@@ -3239,6 +3285,10 @@ body.night .nora-svg-wrap{background:#1c2035}
     document.querySelectorAll('[data-theme-val]').forEach(b=>b.classList.toggle('active',(b.dataset.themeVal==='dark')===!!prefs.night));
     document.querySelectorAll('[data-lh-val]').forEach(b=>b.classList.toggle('active',b.dataset.lhVal===String(prefs.lh||'2.05')));
     document.querySelectorAll('[data-width-val]').forEach(b=>b.classList.toggle('active',b.dataset.widthVal===String(wVal)));
+    const rmVal=prefs.readingMode==='scroll'?'scroll':'paginated';
+    document.body.classList.toggle('scroll-mode',rmVal==='scroll');
+    document.querySelectorAll('[data-rm-val]').forEach(b=>b.classList.toggle('active',b.dataset.rmVal===rmVal));
+    setProgress();
     document.querySelectorAll('[data-palette-val]').forEach(b=>b.classList.toggle('active',b.dataset.paletteVal===(prefs.palette||'default')));
     document.querySelectorAll('[data-cover-val]').forEach(b=>b.classList.toggle('active',b.dataset.coverVal===(prefs.cover||'aurora')));
     document.querySelectorAll('[data-hl-val]').forEach(b=>b.classList.toggle('active',b.dataset.hlVal===(prefs.hlColor||'yellow')));
@@ -3254,6 +3304,7 @@ body.night .nora-svg-wrap{background:#1c2035}
   document.querySelectorAll('[data-theme-val]').forEach(b=>b.onclick=()=>{prefs.night=b.dataset.themeVal==='dark';applyPrefs()});
   document.querySelectorAll('[data-lh-val]').forEach(b=>b.onclick=()=>{prefs.lh=b.dataset.lhVal;applyPrefs()});
   document.querySelectorAll('[data-width-val]').forEach(b=>b.onclick=()=>{prefs.width=b.dataset.widthVal;applyPrefs()});
+  document.querySelectorAll('[data-rm-val]').forEach(b=>b.onclick=()=>{prefs.readingMode=b.dataset.rmVal;applyPrefs()});
   document.querySelectorAll('[data-palette-val]').forEach(b=>b.onclick=()=>{prefs.palette=b.dataset.paletteVal;applyPrefs()});
   document.querySelectorAll('[data-cover-val]').forEach(b=>b.onclick=()=>{prefs.cover=b.dataset.coverVal;if(prefs.palette==='custom')prefs.palette=fallbackPalette;applyPrefs()});
   document.querySelectorAll('[data-hl-val]').forEach(b=>b.onclick=()=>{prefs.hlColor=b.dataset.hlVal;applyPrefs()});
@@ -3437,6 +3488,7 @@ class NoraExportModal extends Modal {
       direction: this.overrides.direction || this.plugin.settings.direction,
       fontSize: String(this.overrides.fontSize || this.plugin.settings.fontSize),
       width: this.overrides.width || this.plugin.settings.width,
+      readingMode: this.overrides.readingMode || this.plugin.settings.readingMode || 'paginated',
       readerLanguage: this.overrides.readerLanguage || this.plugin.settings.readerLanguage,
       embedAttachments: this.plugin.settings.embedAttachments,
       openAfterExport: this.plugin.settings.openAfterExport,
@@ -3536,7 +3588,8 @@ class NoraExportModal extends Modal {
     addSelect(styleGrid, t.fieldDirection, 'direction', t.directions);
     addSelect(styleGrid, t.fieldFontSize, 'fontSize', t.fontSizes);
     addSelect(styleGrid, t.fieldWidth, 'width', t.widths);
-    addSelect(styleGrid, t.fieldReaderLang, 'readerLanguage', t.readerLangs, true);
+    addSelect(styleGrid, t.fieldReadingMode, 'readingMode', t.readingModes);
+    addSelect(styleGrid, t.fieldReaderLang, 'readerLanguage', t.readerLangs);
 
     // Toggles
     const toggleRow = contentEl.createDiv({ cls: 'nora-toggle-row' });
@@ -3624,6 +3677,7 @@ class NoraFolderExportModal extends Modal {
       direction: plugin.settings.direction,
       fontSize: String(plugin.settings.fontSize),
       width: plugin.settings.width,
+      readingMode: plugin.settings.readingMode || 'paginated',
       readerLanguage: plugin.settings.readerLanguage
     };
   }
@@ -3741,7 +3795,8 @@ class NoraFolderExportModal extends Modal {
     addSelect(styleGrid, t.fieldDirection, 'direction', t.directions);
     addSelect(styleGrid, t.fieldFontSize, 'fontSize', t.fontSizes);
     addSelect(styleGrid, t.fieldWidth, 'width', t.widths);
-    addSelect(styleGrid, t.fieldReaderLang, 'readerLanguage', t.readerLangs, true);
+    addSelect(styleGrid, t.fieldReadingMode, 'readingMode', t.readingModes);
+    addSelect(styleGrid, t.fieldReaderLang, 'readerLanguage', t.readerLangs);
 
     const extraRow = contentEl.createDiv({ cls: 'nora-toggle-row' });
     const embedLabel = extraRow.createEl('label');
@@ -3940,6 +3995,7 @@ class NoraPreviewView extends ItemView {
     if (prefs.palette) { this.viewPrefs.palette = prefs.palette; if (this.paletteSel) this.paletteSel.value = prefs.palette; }
     if (prefs.coverStyle) { this.viewPrefs.coverStyle = prefs.coverStyle; if (this.coverSel) this.coverSel.value = prefs.coverStyle; }
     if (prefs.direction) this.viewPrefs.direction = prefs.direction;
+    if (prefs.readingMode) this.viewPrefs.readingMode = prefs.readingMode;
     if (prefs.readerLanguage) this.viewPrefs.readerLanguage = prefs.readerLanguage;
     this.scheduleRefresh();
   }
@@ -3980,6 +4036,7 @@ class NoraPreviewView extends ItemView {
       uiLang,
       fontSize: this.plugin.settings.fontSize,
       width: this.plugin.settings.width,
+      readingMode: this.viewPrefs.readingMode || this.plugin.settings.readingMode || 'paginated',
       customCss: customStyle.css,
       customCssName: customStyle.name,
       forExport: false
@@ -4121,6 +4178,18 @@ class NoraSettingTab extends PluginSettingTab {
           .onChange(async val => {
             this.plugin.settings.direction = val;
             await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(containerEl)
+      .setName(t.setReadingModeName)
+      .addDropdown(dd => {
+        t.readingModes.forEach(([v, label]) => dd.addOption(v, label));
+        return dd.setValue(this.plugin.settings.readingMode || 'paginated')
+          .onChange(async val => {
+            this.plugin.settings.readingMode = val;
+            await this.plugin.saveSettings();
+            this.plugin.refreshOpenPreviews();
           });
       });
 
@@ -4708,6 +4777,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       direction: state.direction,
       fontSize: state.fontSize,
       width: state.width,
+      readingMode: state.readingMode || this.settings.readingMode || 'paginated',
       readerLanguage: state.readerLanguage,
       chapterHeadingLevel: this.settings.chapterHeadingLevel || '1',
       splitMarkedChaptersOnly: true,
