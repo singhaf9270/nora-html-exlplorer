@@ -211,7 +211,9 @@ const I18N = {
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از فرمول‌های ریاضی LaTeX (درون‌خطی $...$ و بلوکی $$...$$) با رندر برداری بدون افت کیفیت.',
       'بهبود موتور زوم تمام‌صفحه برای نمودارهای Mermaid و فرمول‌های LaTeX با رندر برداری واقعی (شفاف و بدون تاری حتی در زوم ۵۰۰٪).',
       'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در حالت روز، شب و چاپ.',
-      'افزودن منوی انتخاب اسنیپت CSS از Vault و کادر Custom CSS در تنظیمات پلاگین.'
+      'پشتیبانی مستقیم از کدهای SVG (هم به‌صورت بلوک ```svg و هم تگ خام <svg>) همراه با زوم برداری تمام‌صفحه.',
+      'افزودن منوی انتخاب اسنیپت CSS از Vault و کادر Custom CSS در تنظیمات پلاگین.',
+      'بازطراحی مدرن کدبلاک‌ها با هدر نمایش نام زبان برنامه‌نویسی، دکمه کپی سریع و هماهنگی کامل با حالت روز و شب.'
     ],
 
     // Exported Reader UI
@@ -316,7 +318,9 @@ const I18N = {
       footnoteGoTo: 'رفتن به پاورقی ↓',
       footnoteBack: 'بازگشت به متن',
       footnoteClose: 'بستن پاورقی',
-      sectionFallback: n => `بخش ${n}`
+      sectionFallback: n => `بخش ${n}`,
+      copyCode: 'کپی',
+      copiedCode: 'کپی شد ✓'
     }
   },
 
@@ -486,7 +490,9 @@ const I18N = {
       'Added full 100% offline LaTeX math support (inline $...$ and block $$...$$) with crisp vector rendering.',
       'Upgraded fullscreen zoom viewer for both Mermaid diagrams and LaTeX formulas using true vector scaling (zero blur at up to 500% zoom).',
       'Full 100% offline Mermaid diagram rendering for Light, Dark, and Print modes.',
-      'Added Vault CSS snippets dropdown picker and inline Custom CSS editor in Settings.'
+      'Added direct SVG rendering support (both fenced ```svg blocks and raw <svg> tags) with crisp vector fullscreen zoom.',
+      'Added Vault CSS snippets dropdown picker and inline Custom CSS editor in Settings.',
+      'Redesigned code blocks with a modern header showing the programming language, a quick Copy button, and Light/Dark theme support.'
     ],
 
     // Exported Reader UI
@@ -591,7 +597,9 @@ const I18N = {
       footnoteGoTo: 'Jump to footnote ↓',
       footnoteBack: 'Back to text',
       footnoteClose: 'Close footnote',
-      sectionFallback: n => `Section ${n}`
+      sectionFallback: n => `Section ${n}`,
+      copyCode: 'Copy',
+      copiedCode: 'Copied ✓'
     }
   }
 };
@@ -1567,6 +1575,35 @@ function renderInline(s, opts = {}) {
   return out;
 }
 
+const CODE_LANG_NAMES = {
+  js: 'JavaScript', javascript: 'JavaScript', mjs: 'JavaScript', cjs: 'JavaScript',
+  ts: 'TypeScript', typescript: 'TypeScript',
+  jsx: 'JSX', tsx: 'TSX',
+  py: 'Python', python: 'Python',
+  html: 'HTML', htm: 'HTML', xml: 'XML',
+  css: 'CSS', scss: 'SCSS', sass: 'Sass', less: 'Less',
+  json: 'JSON', yaml: 'YAML', yml: 'YAML', toml: 'TOML',
+  sh: 'Bash', bash: 'Bash', zsh: 'Zsh', shell: 'Shell', powershell: 'PowerShell', ps1: 'PowerShell',
+  sql: 'SQL', md: 'Markdown', markdown: 'Markdown',
+  c: 'C', cpp: 'C++', 'c++': 'C++', cs: 'C#', csharp: 'C#',
+  java: 'Java', kt: 'Kotlin', kotlin: 'Kotlin', swift: 'Swift',
+  go: 'Go', rust: 'Rust', rs: 'Rust', php: 'PHP', rb: 'Ruby', ruby: 'Ruby',
+  dart: 'Dart', r: 'R', tex: 'LaTeX', latex: 'LaTeX', diff: 'Diff', ini: 'INI', dockerfile: 'Dockerfile'
+};
+
+function formatCodeLangLabel(rawLang) {
+  const token = String(rawLang || '').trim().split(/[\s{]/)[0].toLowerCase();
+  if (!token) return 'CODE';
+  return CODE_LANG_NAMES[token] || token.toUpperCase();
+}
+
+function sanitizeInlineSvg(raw) {
+  return String(raw || '')
+    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+    .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/(href|xlink:href)\s*=\s*(?:"\s*javascript:[^"]*"|'\s*javascript:[^']*')/gi, '');
+}
+
 function renderMarkdown(md, opts = {}) {
   const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null, mathMap = null } = opts;
   const r = I18N[lang].reader;
@@ -1596,8 +1633,13 @@ function renderMarkdown(md, opts = {}) {
             ? `<div class="nora-mermaid-svg nora-mermaid-light">${svgs.light}</div><div class="nora-mermaid-svg nora-mermaid-dark">${svgs.dark}</div>`
             : `<pre class="nora-mermaid-fallback"><code class="language-mermaid">${esc(rawMmd)}</code></pre>`
         }</div>`;
+      } else if (/^svg(?:\s|$|\{)/i.test(langCode) && /<svg\b[\s\S]*<\/svg>/i.test(code.join('\n'))) {
+        const rawSvg = sanitizeInlineSvg(code.join('\n').trim());
+        html += `<div class="nora-svg-wrap">${rawSvg}</div>`;
       } else {
-        html += `<pre><code class="language-${esc(langCode)}">${esc(code.join('\n'))}</code></pre>`;
+        const langLabel = formatCodeLangLabel(langCode);
+        const langClass = langCode ? ` class="language-${esc(langCode.split(/[\s{]/)[0])}"` : '';
+        html += `<div class="nora-code-block"><div class="nora-code-head"><span class="nora-code-lang"><span class="nora-code-dots" aria-hidden="true"><i></i><i></i><i></i></span>${esc(langLabel)}</span><button type="button" class="nora-code-copy" aria-label="${esc(r.copyCode)}">${esc(r.copyCode)}</button></div><pre><code${langClass}>${esc(code.join('\n'))}</code></pre></div>`;
       }
       continue;
     }
@@ -1633,6 +1675,20 @@ function renderMarkdown(md, opts = {}) {
           ? `<div class="nora-math-inner">${renderedMath}</div>`
           : `<pre class="nora-math-fallback"><code>$$\n${esc(tex)}\n$$</code></pre>`
       }</div>`;
+      continue;
+    }
+
+    if (/^<svg\b/i.test(t)) {
+      const svgLines = [lines[i]];
+      let closed = /<\/svg>/i.test(lines[i]);
+      i++;
+      while (!closed && i < lines.length) {
+        svgLines.push(lines[i]);
+        if (/<\/svg>/i.test(lines[i])) closed = true;
+        i++;
+      }
+      const rawSvg = sanitizeInlineSvg(svgLines.join('\n').trim());
+      html += `<div class="nora-svg-wrap">${rawSvg}</div>`;
       continue;
     }
 
@@ -1704,7 +1760,7 @@ function renderMarkdown(md, opts = {}) {
     while (
       i < lines.length &&
       lines[i].trim() &&
-      !/^```|^\$\$|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/.test(lines[i].trim()) &&
+      !/^```|^\$\$|^<svg\b|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/i.test(lines[i].trim()) &&
       !isHr(lines[i].trim()) &&
       !matchStandaloneEmbedLine(lines[i].trim()) &&
       !isTable(i)
@@ -1847,7 +1903,9 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
     footnoteLabel: r.footnoteLabel,
     footnoteGoTo: r.footnoteGoTo,
     footnoteBack: r.footnoteBack,
-    footnoteClose: r.footnoteClose
+    footnoteClose: r.footnoteClose,
+    copyCode: r.copyCode,
+    copiedCode: r.copiedCode
   };
 
   const fontFamily = lang === 'fa'
@@ -2185,8 +2243,62 @@ body.night .article em{color:#ebb485}
 .article li::marker{color:var(--accent)}
 .article hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:2.3em 0}
 .article code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--code-bg);color:var(--code-ink);padding:.15em .45em;border-radius:6px;font-size:.88em;direction:ltr;unicode-bidi:plaintext}
-.article pre{direction:ltr;text-align:left;background:#141724;color:#eaecf7;padding:18px;border-radius:13px;overflow:auto;line-height:1.7;border:1px solid rgba(255,255,255,.08)}
-.article pre code{background:none;color:inherit;padding:0}
+.nora-code-block{
+  margin:1.35em 0;border-radius:14px;overflow:hidden;direction:ltr;text-align:left;
+  border:1px solid var(--line);
+  background:color-mix(in srgb,var(--bg) 55%,var(--paper));
+  box-shadow:0 4px 16px rgba(15,20,45,.05);
+  break-inside:avoid;
+}
+body.night .nora-code-block{
+  background:#151828;border-color:rgba(255,255,255,.09);
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+}
+.nora-code-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 14px;
+  background:color-mix(in srgb,var(--accent) 7%,var(--paper));
+  border-bottom:1px solid var(--line);
+}
+body.night .nora-code-head{
+  background:rgba(255,255,255,.04);border-bottom-color:rgba(255,255,255,.08);
+}
+.nora-code-lang{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--accent);
+}
+.nora-code-dots{display:inline-flex;align-items:center;gap:5px}
+.nora-code-dots i{width:8px;height:8px;border-radius:50%;display:block;opacity:.75}
+.nora-code-dots i:nth-child(1){background:#ff5f56}
+.nora-code-dots i:nth-child(2){background:#ffbd2e}
+.nora-code-dots i:nth-child(3){background:#27c93f}
+.nora-code-copy{
+  border:1px solid var(--line);background:var(--paper);color:var(--ink);
+  border-radius:8px;padding:4px 10px;font-size:11.5px;font-weight:700;
+  cursor:pointer;transition:border-color .15s,color .15s,background .15s;
+}
+.nora-code-copy:hover{border-color:var(--accent);color:var(--accent)}
+.nora-code-copy.copied{
+  background:var(--stat-bg);border-color:var(--accent2);color:var(--accent2);
+}
+body.night .nora-code-copy{
+  background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#e2e6f5;
+}
+body.night .nora-code-copy:hover{border-color:var(--accent);color:var(--accent)}
+.article pre{
+  direction:ltr;text-align:left;margin:0;padding:16px 18px;
+  background:color-mix(in srgb,var(--bg) 55%,var(--paper));
+  color:var(--ink);border-radius:13px;overflow:auto;
+  line-height:1.72;font-size:.9em;border:1px solid var(--line);
+}
+body.night .article pre{
+  background:#151828;color:#e6eaf8;border-color:rgba(255,255,255,.08);
+}
+.nora-code-block pre{
+  border:0;border-radius:0;background:transparent;
+}
+.article pre code{background:none;color:inherit;padding:0;font-size:1em}
 .article table{border-collapse:separate;border-spacing:0;width:100%;margin:1.3em 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.9em}
 .article th{background:var(--quote-bg);color:var(--accent)}
 .article td,.article th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:start}
@@ -2418,6 +2530,21 @@ body.night .nora-math-block{background:#1c2035}
 }
 .nora-math-inline svg{height:1.15em;width:auto;vertical-align:-0.18em}
 .nora-math-inline math{font-family:'Cambria Math','STIX Two Math','Latin Modern Math','Times New Roman',serif;font-size:1.05em}
+
+/* ===== نمودارها و تصاویر برداری SVG (خام و کدبلاک) ===== */
+.nora-svg-wrap{
+  margin:1.5em auto;padding:16px;border-radius:14px;
+  border:1px solid var(--line);background:var(--paper);
+  overflow-x:auto;text-align:center;direction:ltr;
+  break-inside:avoid;cursor:zoom-in;
+  transition:border-color .16s ease,box-shadow .16s ease;
+}
+.nora-svg-wrap:hover{
+  border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
+  box-shadow:0 6px 20px rgba(15,20,45,.07);
+}
+body.night .nora-svg-wrap{background:#1c2035}
+.nora-svg-wrap svg{max-width:100%;height:auto;display:block;margin:0 auto}
 @media print{
   .mmd-lightbox{display:none!important}
   .nora-mermaid-light{display:block!important}
@@ -2446,7 +2573,7 @@ body.night .nora-math-block{background:#1c2035}
 }
 @media print{
   body{padding:0;background:#fff;color:#111}
-  .readerbar,.progress,.bookmarks,.navrow,#searchStatus,.toc-drawer,.toc-shade,.settings-drawer,.settings-shade,.start-reading-btn,.lightbox,.md-pdf-details,.fn-popover,.fn-back{display:none!important}
+  .readerbar,.progress,.bookmarks,.navrow,#searchStatus,.toc-drawer,.toc-shade,.settings-drawer,.settings-shade,.start-reading-btn,.lightbox,.md-pdf-details,.fn-popover,.fn-back,.nora-code-copy{display:none!important}
   .book{box-shadow:none;border:0;max-width:none;border-radius:0}
   .cover,.cover.active{display:flex!important;min-height:94vh;break-after:page}
   .chapter-page,.chapter-page.active{display:block!important;min-height:0;break-after:page;padding:15mm}
@@ -2909,6 +3036,36 @@ body.night .nora-math-block{background:#1c2035}
     resetMmdView();
   }
   sourceEl.addEventListener('click',e=>{
+    const copyBtn=e.target.closest('.nora-code-copy');
+    if(copyBtn){
+      e.preventDefault();
+      const block=copyBtn.closest('.nora-code-block');
+      const codeEl=block&&block.querySelector('pre code');
+      const text=codeEl?codeEl.textContent:'';
+      if(!text) return;
+      const done=()=>{
+        copyBtn.textContent=S.copiedCode;
+        copyBtn.classList.add('copied');
+        clearTimeout(copyBtn._t);
+        copyBtn._t=setTimeout(()=>{copyBtn.textContent=S.copyCode;copyBtn.classList.remove('copied')},1800);
+      };
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(()=>{
+          const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+          document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(err){}ta.remove();
+        });
+      }else{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(err){}ta.remove();
+      }
+      return;
+    }
+    const svgBox=e.target.closest('.nora-svg-wrap');
+    if(svgBox){
+      const target=svgBox.querySelector('svg');
+      if(target) openVectorLightbox(target);
+      return;
+    }
     const mathBox=e.target.closest('.nora-math-block');
     if(mathBox){
       const target=mathBox.querySelector('svg')||mathBox.querySelector('math');
