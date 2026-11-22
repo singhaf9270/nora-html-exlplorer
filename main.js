@@ -2256,7 +2256,7 @@ body.night .mmd-lb-canvas{background:#1c2035}
 window.MathJax = {
   tex: {
     inlineMath: [["$", "$"], ["\\(", "\\)"]],
-    displayMath: [["$", "$"], ["\\[", "\\]"]],
+    displayMath: [["\\u0024\\u0024", "\\u0024\\u0024"], ["\\[", "\\]"]],
     processEscapes: true
   },
   options: { skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"] }
