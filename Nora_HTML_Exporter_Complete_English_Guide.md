@@ -1,135 +1,152 @@
+# Comprehensive Guide to Nora HTML Exporter
+
+## Table of Contents (click to jump to a section)
+
+- [Installation, All Commands, Export Settings, Preview, and Reader Features](#installation-all-commands-export-settings-preview-and-reader-features)
+- [1. Introducing Nora](#1-introducing-nora)
+- [2. Installation and Activation](#2-installation-and-activation)
+- [3. Ways to Access Nora's Features](#3-ways-to-access-noras-features)
+- [4. Exporting a Note with the Settings Dialog](#4-exporting-a-note-with-the-settings-dialog)
+- [5. All Fields in the Export Dialog](#5-all-fields-in-the-export-dialog)
+- [6. Note Statistics Before Export](#6-note-statistics-before-export)
+- [7. Three Ways to Get the Output](#7-three-ways-to-get-the-output)
+- [8. Quick Export](#8-quick-export)
+- [9. Combining a Folder into One Book](#9-combining-a-folder-into-one-book)
+- [10. Live Preview](#10-live-preview)
+- [11. Plugin Settings in Obsidian](#11-plugin-settings-in-obsidian)
+- [12. Cover Structure and Information](#12-cover-structure-and-information)
+- [13. Language and Text Direction](#13-language-and-text-direction)
+- [14. Book Reader Toolbar Features](#14-book-reader-toolbar-features)
+- [15. Table of Contents and Moving Between Sections](#15-table-of-contents-and-moving-between-sections)
+- [16. Reading Settings and Custom Themes](#16-reading-settings-and-custom-themes)
+- [17. Bookmarks](#17-bookmarks)
+- [18. Highlighting and Adding Notes to Text](#18-highlighting-and-adding-notes-to-text)
+- [19. Search](#19-search)
+- [20. Footnotes](#20-footnotes)
+- [21. Mermaid Diagrams, LaTeX Formulas, SVG Graphics, and Vector Zoom](#21-mermaid-diagrams-latex-formulas-svg-graphics-and-vector-zoom)
+- [22. Code Blocks](#22-code-blocks)
+- [23. CSS Snippets and Custom Styling (Custom CSS)](#23-css-snippets-and-custom-styling-custom-css)
+- [24. Images and Attachments](#24-images-and-attachments)
+- [25. Printing and Saving as PDF](#25-printing-and-saving-as-pdf)
+- [26. Automatic Metadata and Saving to Frontmatter](#26-automatic-metadata-and-saving-to-frontmatter)
+- [27. Important Notes and Limitations of the Current Version](#27-important-notes-and-limitations-of-the-current-version)
+- [28. Troubleshooting](#28-troubleshooting)
+- [29. Suggested Workflows](#29-suggested-workflows)
+- [30. Final Checklist](#30-final-checklist)
+- [Project Resources](#project-resources)
+
 ---
-title: "The Complete Guide to Nora HTML Exporter"
-exportName: "Nora-HTML-Exporter-Complete-Guide"
-docType: "Comprehensive Software Guide"
-author:
-  - "Nora Documentation Team"
-subtitle: "A Complete Guide to Using, Configuring, and Exporting Obsidian Notes as Interactive HTML Publications"
-category:
-  - "Obsidian"
-  - "Nora HTML Exporter"
-  - "HTML Export"
-  - "Software Documentation"
-  - "Digital Publishing"
-year: "2026"
-description: "A comprehensive guide to installing, configuring, and using Nora HTML Exporter. Learn how to transform Obsidian Markdown notes into standalone HTML publications with an interactive reading experience, featuring a table of contents, full-text search, bookmarks, text highlighting, annotations, image and attachment support, and print or PDF export."
----
-# Complete Guide to Nora HTML Exporter
+
 ## Installation, All Commands, Export Settings, Preview, and Reader Features
 
-**Basis of this guide:** The `main.js` and `styles.css` files uploaded for this conversation.  
-**Version stated in the source header:** `Nora HTML Exporter v1.3.0`
+**Basis of this guide:** `main.js` and `styles.css` from version **`1.1.8`**  
+**Plugin version:** `Nora HTML Exporter v1.1.8`
 
-> This guide is based on the implementation in the source code, not merely on general descriptions. Whenever an option exists in the user interface but its effect has not been implemented in the current code, or its label differs from its actual behavior, this is explicitly explained.
+> This guide is based on the implementation available in the source code of version `1.1.8`. If an option exists in the user interface but its effect has not been implemented in the current code, or if it behaves in a particular way, that is explicitly explained.
 
 ---
 
 ## 1. Introducing Nora
 
-**Nora HTML Exporter** is an Obsidian plugin that converts a Markdown note into a standalone HTML file with a book-like appearance and reading environment. It can also collect the notes in a folder into one unified HTML book.
+**Nora HTML Exporter** is a bilingual (Persian/English) plugin for Obsidian that converts Markdown notes into a standalone, 100% offline HTML file with a book-like appearance and an interactive reading environment. It can also combine Markdown notes from a folder into a single integrated HTML book.
 
-The output is not just a simple web page. It includes a book-reader interface with a cover, publication information, chapters, a table of contents, search, reading settings, bookmarks, highlights, text notes, footnotes, and printing features.
+The output is more than a simple web page. It includes a complete book-reader interface with a cover, publication details, chapters, a table of contents, search, reading settings, bookmarks, highlights, text notes, footnotes, Mermaid diagrams, LaTeX mathematical formulas, SVG graphics, modern code blocks with a copy button, and printing features.
 
-### Main features implemented in the source code
+### Main features in version 1.1.8
 
-- Plugin interface in Persian and English
-- Exporting a single note through an export settings dialog
-- Quick export using saved settings
-- Unified export of a folder and its Markdown notes
-- Option to include subfolders in folder exports
-- Live preview in an Obsidian pane
-- Five cover designs
-- Seven color palettes
-- Light and dark modes
-- Automatic text direction, RTL, and LTR
-- HTML reader interface language: Persian, English, or automatic detection
-- Font size and page-width selection
-- Embedding local images and attachments in the HTML file
-- Table of contents and section navigation
-- Full-text search
-- Section bookmarking
-- Text highlighting in five colors
-- Adding a note to a selected passage
-- Footnotes and a footnote display pop-up
-- Enlarged image viewing (Lightbox)
-- Printing and saving as PDF from the browser
-- Saving reading preferences, bookmarks, and annotations in the browser's local storage
+- Persian and English plugin interface.
+- Export a single note using an options dialog.
+- Quick export using saved settings.
+- Combine a folder and its Markdown notes into one output (including support for subfolders).
+- Live preview in an Obsidian pane, with snippets and settings applied immediately.
+- Five cover designs and seven color palettes, each available in light and dark modes.
+- Automatic text direction, RTL and LTR, and selection of the HTML interface language (Persian, English, or automatic detection).
+- Choose font size, line spacing, and page width.
+- Automatically embed local Vault images, audio, video, and PDFs in the HTML as Base64 (fully offline).
+- **Full, 100% offline support for all Mermaid diagram types**, with dual rendering for light mode, dark mode, and printing.
+- **Full, 100% offline support for LaTeX mathematical formulas** (inline and block/multiline), rendered as vector graphics.
+- **Direct support for SVG graphics**, both ` ```svg ` code blocks and raw `<svg>` tags, with security sanitization.
+- **True vector zoom lightbox (40% to 500%, without quality loss) and panning** for Mermaid diagrams, LaTeX formulas, and SVGs.
+- **Modern code blocks** with a programming-language header, a **quick Copy button**, and light/dark mode compatibility.
+- **Nora-specific CSS snippets** (with the `nora` prefix) and a Custom CSS field, available as a replaceable default theme (`✨`) in the HTML reader.
+- **Automatically save cover metadata to the note's Frontmatter** when exporting (can be enabled or disabled).
+- Table of contents, search, bookmarks, five highlight colors, text notes, interactive footnotes, image Lightbox, and print/save as PDF.
 
 ---
 
 ## 2. Installation and Activation
 
-### Installation from Community Plugins
+### Install from Community Plugins
 
 1. Open Obsidian.
 2. Go to **Settings**.
 3. Open **Community plugins**.
-4. If necessary, turn off Safe mode.
-5. Search for and install Nora HTML Exporter.
-6. Once installed, enable the plugin.
+4. If necessary, turn off Restricted/Safe mode.
+5. Search for and install `Nora HTML Exporter`.
+6. Enable the plugin after installation.
 
-If the version you need has not been published in Obsidian's plugin list, follow the installation instructions for the release available in the project's repository. The required files and manual installation procedure must match the release package for that version.
+For manual installation, place the released version's `main.js`, `manifest.json`, and `styles.css` files in `.obsidian/plugins/nora-html-exporter/`, then enable the plugin in Settings.
 
-### Verifying that the plugin is enabled
+### Check that it is enabled
 
-After activation, you should see the Nora book icon in Obsidian's ribbon, and you should be able to find Nora commands in the Command Palette.
+After activation, the Nora book icon appears in Obsidian's sidebar, and Nora commands become available in the Command Palette. On the first launch or after an update, a Changelog window is displayed and the user guide is saved in the `Nora Guides` folder.
 
 ---
 
-## 3. Ways to Access the Features
+## 3. Ways to Access Nora's Features
 
-The current source registers four main commands.
+Four main commands are registered in the current version:
 
 | Command | Function |
 |---|---|
-| Export current note to HTML (with settings dialog) | Opens the complete note export form |
+| Export HTML from the current note (with settings dialog) | Opens the full note-export form |
 | Quick HTML export with default settings | Exports the current note without opening the settings form |
 | Open Nora Reader Live Preview | Opens the preview pane |
-| Batch HTML export from a folder | Selects a folder and creates one unified HTML file |
+| Batch HTML export from a folder | Selects a folder and creates one integrated HTML file |
 
-### Method 1: Ribbon icon
+### Method 1: Sidebar ribbon icon
 
-Click the Nora book icon in the Ribbon. The plugin opens the active Markdown note in the export settings dialog. If no Markdown note is active, a message asks you to open a note.
+Click the Nora book icon in the Ribbon. The plugin opens the active Markdown note in the export settings dialog. If no active Markdown note is open, a message asks you to open a note.
 
 ### Method 2: Command Palette
 
 1. Press `Ctrl + P` on Windows/Linux or `Cmd + P` on macOS.
 2. Search for `Nora` or `Export`.
-3. Select the command you want.
+3. Select the desired command.
 
-### Method 3: File right-click menu
+### Method 3: File context menu
 
 Right-click a Markdown file in the File Explorer. Two options are added:
 
 - **Export HTML with Nora:** Opens the export settings dialog for that note.
-- **Live Preview in Nora:** Opens the live preview for that note.
+- **Live preview in Nora:** Opens a preview of that note.
 
-### Method 4: Folder right-click menu
+### Method 4: Folder context menu
 
-Right-click a folder and select the Nora batch folder export option. The folder export dialog opens with that folder preselected.
+Right-click a folder and select Nora's batch folder-export option. The folder-export window opens with that folder selected initially.
 
 ---
 
-## 4. Exporting a Single Note with the Settings Dialog
+## 4. Exporting a Note with the Settings Dialog
 
-This is the most complete way to export a note because you can specify the cover information, language, appearance, and attachments before creating the HTML file.
+This is the most complete way to export a note, because you can set the cover information, language, appearance, attachments, and Frontmatter saving before creating the HTML.
 
 ### Steps
 
 1. Open the Markdown note you want to export.
-2. Run the Nora book icon, the note export command, or the right-click menu option.
+2. Run the Nora book icon, the note-export command, or the context-menu option.
 3. The **Nora HTML Reader Export** dialog opens.
-4. Review and complete the publication information fields.
+4. Review and complete the publication-information fields.
 5. Choose the appearance and language settings.
-6. Set whether attachments should be embedded and whether the output should open automatically.
+6. Set whether attachments should be embedded, whether the output should open automatically, and whether metadata should be saved to Frontmatter.
 7. Choose one of the three buttons at the bottom of the dialog:
-   - Preview
-   - Direct Download
-   - Save to Vault
+   - **Live Preview**
+   - **Direct Download**
+   - **Save to Vault and Create HTML**
 
-### The “Entire Folder” button
+### Convert to folder export
 
-The header of the note export dialog also contains an **Entire Folder** button. Selecting it opens the folder export dialog for the parent folder of the current note.
+The note-export dialog header contains a **📁 Entire Folder** button. Selecting it opens the folder-export window for the parent folder of the current note.
 
 ---
 
@@ -139,36 +156,32 @@ The header of the note export dialog also contains an **Entire Folder** button. 
 
 | Field | Description |
 |---|---|
-| Publication Title | The main title displayed on the cover |
-| Output File Name | The HTML file name; do not include the `.html` extension |
-| Publication Type / Cover Label | A label such as Book, Article, Handout, or Guide |
-| Author(s) | Author names; separate multiple names with `؛` |
-| Subtitle or Short Description | A supplementary line displayed below the title |
-| Subject(s) | The publication's subject or categories; separate multiple items with `؛` |
-| Publication Year / Date | The year or date associated with the publication |
-| Short Cover Introduction | A multiline description of the content |
+| Publication title | Main title displayed on the cover |
+| Output filename | HTML filename; do not include the `.html` extension |
+| Work type / cover label | A label such as book, article, handout, or guide |
+| Author(s) | Author names; use `؛` as the separator for multiple authors |
+| Subtitle or short description | Supporting sentence displayed below the title |
+| Subject(s) / topics | Subject or categories; separate multiple items with `؛` |
+| Publication year / date | The year or date associated with the work |
+| Short cover introduction | A multiline description of the written content |
 
 ### “Reader Appearance, Output Language, and Cover” section
 
 | Field | Options |
 |---|---|
-| Color Mode | Light, Dark |
-| Color Palette | Lavender and Turquoise, Oceanic, Forest and Emerald, Warm Sunset, Lapis Lazuli and Gold, Plum, Paper / Neutral |
-| Cover Design | Aurora, Ocean, Botanical, Classic, Minimal |
-| Text Direction | Automatic, Right-to-left (RTL), Left-to-right (LTR) |
-| Font Size | Small 15px, Regular 16px, Large 18px, Extra Large 20px |
-| Page Width | Narrow and Focused 680px, Regular 850px, Full Width |
-| HTML Reader Interface Language | Detect automatically from text, Persian, English |
+| Color mode | Light, Dark |
+| Color palette | Lilac and turquoise, Ocean, Forest and emerald, Warm sunset, Royal blue and gold, Plum, Paper/neutral |
+| Cover design | Aurora, Ocean, Botanical, Classic, Minimal |
+| Text direction | Automatic, Right-to-left (RTL), Left-to-right (LTR) |
+| Font size | Small 15px, Normal 16px, Large 18px, Extra large 20px |
+| Page width | Narrow and focused 680px, Normal 850px, Full width |
+| HTML reader interface language | Detect from text, Persian, English |
 
 ### Additional options
 
-**Automatically embed Vault images and attachments in the HTML (fully offline)**
-
-When enabled, Nora attempts to read local files identified in the text and place their data inside the HTML as Data URLs. As a result, the exported file does not depend on the original Vault paths to display those attachments.
-
-**Open in browser after creation**
-
-When enabled, Nora opens the HTML file with the system's default browser/application after creating the export.
+- **Automatically embed images and Vault attachments in the HTML (fully offline):** Converts recognized local files referenced in the text into Data URLs (Base64) embedded in the HTML, making the file self-contained.
+- **Open in browser after creation:** On desktop, opens the generated HTML file in the system's default browser immediately after it is created.
+- **Save cover metadata to the note's Frontmatter:** Automatically saves or updates the information entered in the form in the note's YAML Frontmatter (Properties), so it can be filled in automatically during future exports.
 
 ---
 
@@ -176,96 +189,53 @@ When enabled, Nora opens the HTML file with the system's default browser/applica
 
 Three statistics are displayed at the bottom of the export form:
 
-- **Word Count:** An estimate of the number of words in the text.
-- **Reading Time:** An approximate estimate based on a speed of 220 words per minute.
-- **Local Attachments:** The number of local destinations identified in the text.
-
-These statistics are useful for quickly understanding the size of a note. Reading time is an estimate and should not be treated as an exact reading duration.
+- **Word count:** An estimate of the number of words in the text.
+- **Reading time:** An approximate estimate based on a speed of 220 words per minute.
+- **Local attachments:** The number of local destinations detected in the text.
 
 ---
 
-## 7. Three Ways to Get the Export
+## 7. Three Ways to Get the Output
 
-### 7.1. Preview
+### 7.1. Live Preview
 
-The **Preview** button opens the Live Preview pane and passes the selected appearance settings to it. At this stage, the final output file has not yet been saved.
+The **◉ Live Preview** button opens the Live Preview pane and transfers the selected appearance settings to it. The final output file is not saved at this stage.
 
 ### 7.2. Direct Download
 
-The **Direct Download** button downloads the HTML file through the browser's download mechanism. Use this option when you want the file to be placed directly in your system's Downloads location.
+The **↓ Direct Download** button downloads the HTML file through the browser's download mechanism.
 
 ### 7.3. Save to Vault
 
-The **Save to Vault** button creates the HTML file in the output folder configured inside the Vault. The default output folder in the plugin settings is `Nora Exports`.
+The **✦ Save to Vault and Create HTML** button creates the HTML file in the configured output folder inside the Vault (default: `Nora Exports`).
 
 ---
 
 ## 8. Quick Export
 
-The **Quick HTML export with default settings** command creates an HTML file from the active Markdown note without opening the full export form.
-
-This command uses metadata extracted from the note and the plugin's saved settings. Therefore, it is a good idea to review the general settings once before using quick export regularly.
-
-### When is it useful?
-
-- When your export settings have already been configured.
-- When you want to export several notes one after another quickly.
-- When you do not need to change the title, cover, or color scheme for every export.
+The **Quick HTML export with default settings** command creates HTML for the active Markdown note without opening the full export form. It uses the note's Frontmatter metadata and the plugin's saved settings.
 
 ---
 
-## 9. Unified Folder Export
+## 9. Combining a Folder into One Book
 
-This feature converts multiple Markdown notes into **one single HTML file**. It does not necessarily create a separate HTML file for every note.
+This feature places all Markdown notes in the selected folder into **one single, integrated HTML file**.
 
-### Opening the dialog
+### Open the folder-export dialog
 
-- Run the batch export command from the Command Palette; or
-- Right-click a folder and select Nora Folder Export; or
-- Click **Entire Folder** in a note's export dialog.
+- Run the batch-export command from the Command Palette; or
+- Right-click a folder and choose Nora's batch folder-export option; or
+- Click **📁 Entire Folder** in a note's export dialog.
 
-### Selecting a folder
+### Folder options
 
-In the **Select Folder from Vault** list, choose the folder you want. The Vault root is also available as an option.
+- **Choose a folder from the Vault:** Select any folder or the Vault root (`/`).
+- **Include subfolders:** Also collects Markdown notes from subfolders (Nora's own output folder is automatically ignored).
+- **Preserve subfolder structure in the output:** This option appears in the interface, but it currently has no effect on the tree structure of the integrated HTML. Files are ordered by their paths.
 
-### Include subfolders
+### Chapter order and output location
 
-When this option is enabled, Nora also searches for Markdown files inside the subfolders of the selected folder. When disabled, only Markdown files located directly inside the selected folder are collected.
-
-### Preserve subfolder tree in output
-
-This option is present in the user interface. However, in the current code, its value is recorded in the form state but is not used by the unified HTML generation logic. Therefore, in the source version reviewed, you should not expect enabling or disabling it to change the folder tree structure in the output. The actual file order is sorted by file path, and each note becomes a separate section/chapter.
-
-### Statistics and destination path
-
-The dialog displays the following information live:
-
-- How many Markdown notes have been found.
-- The base output path.
-
-If no Markdown notes are found, the build/export button is disabled.
-
-### Appearance settings for folder exports
-
-In the Folder Export dialog, you can set:
-
-- Light or dark mode
-- Color palette
-- Cover design
-- Text direction
-- Font size
-- Page width
-- Reader interface language
-- Attachment embedding
-- Whether to open the output when finished
-
-### Progress bar
-
-While the export is being generated, a progress bar is displayed, along with the name of the note currently being processed.
-
-### Chapter order
-
-Nora sorts the discovered files by their paths. To control the order, prefix file names with numbers:
+Nora sorts the discovered files by their paths. To control chapter order, number the filenames:
 
 ```text
 01-Introduction.md
@@ -274,150 +244,46 @@ Nora sorts the discovered files by their paths. To control the order, prefix fil
 04-Conclusion.md
 ```
 
-Each source note becomes an independent chapter/section in the unified HTML file. The heading level at the beginning of each chapter is taken from the **Chapter Heading Level** setting.
+Each note is inserted as the beginning of a new chapter, using the heading level selected in **Chapter start heading level**. All newer features (Mermaid, LaTeX, SVG, code blocks, and CSS snippets) are fully supported in the integrated output as well.
 
-### Folder export save location
-
-The output is saved in a subfolder named after the selected folder, inside the main output path. The final file name is generally:
-
-```text
-<FolderName>-Complete.html
-```
-
-For the Vault root, the destination folder name is set to `Vault-Root`.
+The final filename is created as `<FolderName>-Complete.html` inside the `<ExportFolder>/<FolderName>/` subfolder.
 
 ---
 
 ## 10. Live Preview
 
-Live Preview is a View-type pane inside Obsidian.
+Live Preview is a side pane inside Obsidian that updates in real time when the active note changes or when the text is edited (after a short delay).
 
-### Opening it
-
-Run the **Open Nora Reader Live Preview** command, or select the Live Preview option from a note's right-click menu.
-
-### Preview pane features
-
-The top bar of the pane contains:
-
-- Switching the pane interface language between Persian and English
-- Selecting light or dark mode
-- Selecting a color palette
-- Selecting a cover design
-- An Export button that opens the full Export form
-
-### Automatic updates
-
-The preview responds when the active note changes. It is also updated after a short delay when the note file is edited in the Vault.
-
-### Note
-
-Preview is suitable for quick inspection. However, also open the final export in a browser, especially if attachment embedding or PDF printing is important to you.
+In the pane's top toolbar, you can change the pane interface language, light/dark mode, color palette, and cover design, or open the export dialog directly. Live Preview immediately displays all features, including **Mermaid**, **LaTeX**, **SVG**, **the new code blocks**, and **the selected CSS snippet** (in preview mode, `localStorage` is not overwritten with the newly selected snippet).
 
 ---
 
 ## 11. Plugin Settings in Obsidian
 
-Open the plugin settings through **Settings → Nora HTML Exporter**.
+Open **Settings → Nora HTML Exporter** to access the settings:
 
-### 11.1. Plugin Interface Language
-
-Interface options:
-
-- Persian
-- English
-- Auto
-
-This option controls the language of the plugin's own dialogs and settings. The export dialog and preview pane also have a quick language-switch button.
-
-### 11.2. Default HTML Reader Language
-
-Options:
-
-- Automatic detection
-- Persian
-- English
-
-This option determines the language of buttons, labels, and the book-reader interface inside the HTML file. Auto detects the language based on the note text and interface settings. This option does not translate the note's content.
-
-### 11.3. Export Destination Folder
-
-Enter the name or path of the folder in which HTML files should be saved inside the Vault. The default value is:
-
-```text
-Nora Exports
-```
-
-### 11.4. Default Publication Type
-
-Sets a general label for the publication type, for example:
-
-- Book
-- Article
-- Handout
-- Guide
-- Report
-
-If the publication type is specified in the note's metadata, that value can be used for that particular note.
-
-### 11.5. Default Color Mode
-
-- Light
-- Dark
-
-### 11.6. Default Color Palette
-
-Choose one of the seven available palettes.
-
-### 11.7. Default Cover Design
-
-Choose one of the five cover designs.
-
-### 11.8. Default Text Direction
-
-- Automatic
-- Right-to-left (RTL)
-- Left-to-right (LTR)
-
-### 11.9. Embed Attachments
-
-When this option is enabled, the export form selects embedding local attachments by default. This option can also be changed in the export form.
-
-### 11.10. Open After Export
-
-When enabled, the HTML file opens after a note export has been created.
-
-### 11.11. Chapter Heading Level
-
-Options `H1` through `H6` are available. In folder exports, this value is used to determine the heading level at the beginning of each chapter/note.
-
-### 11.12. Support and Contact
-
-The bottom of the settings page contains these links in the source code:
-
-- Bale: `https://ble.ir/obsidiantut`
-- Telegram: `https://t.me/obsidiantut`
-- YouTube: `https://youtube.com/@obsidiantut`
-- Financial support: `https://reymit.ir/singhaf9270`
+1. **Plugin interface language:** Persian, English, or Auto.
+2. **Default HTML reader output language:** Detect automatically from the text, Persian, or English (the note's text is not translated).
+3. **Output folder in the Vault:** Default is `Nora Exports` (if left empty, the file is saved next to the note).
+4. **Default cover label (optional):** Such as book, article, or handout.
+5. **Default color mode:** Light or Dark.
+6. **Default color palette:** One of the seven available palettes.
+7. **Default cover design:** One of the five available designs.
+8. **Default text direction:** Automatic, RTL, or LTR.
+9. **Automatically embed attachments (Base64):** Enable or disable offline embedding of local files.
+10. **Automatically open in browser after saving:** Automatically opens the HTML file in the system browser (desktop).
+11. **Automatically save cover metadata to note Frontmatter:** Enable or disable automatic saving of cover details to the note's Properties when exporting.
+12. **Chapter start heading level for integrated export:** Choose from `H1` to `H6`.
+13. **Select a CSS snippet from the Vault (optional):** An automatically populated dropdown that lists only `.css` files beginning with `nora` from `.obsidian/snippets` or the Vault (with a `🔄` refresh-list button).
+14. **Custom CSS:** A Monospace text field for writing custom CSS.
+15. **Nora user guide and changelog:** Quick access to the Persian and English guides and the version changelog.
+16. **Stay connected and support the project:** Links to `@obsidiantut` on Bale, Telegram, YouTube, and the donation link.
 
 ---
 
-## 12. Cover Structure and Publication Information
+## 12. Cover Structure and Information
 
-The HTML cover is generated from the information entered in the form.
-
-### Displayable elements
-
-- Publication type or label
-- Main title
-- Subtitle
-- Author or authors
-- Subject or subjects
-- Year/date
-- Short description
-- Word count
-- Estimated reading time
-- Start Reading button
+The HTML cover includes the work type, main title, subtitle, author(s), subject(s), publication year, short introduction, word count, reading time, and a **Start Reading** button.
 
 ### Five cover styles
 
@@ -433,11 +299,11 @@ The HTML cover is generated from the information entered in the form.
 
 | ID | Display name |
 |---|---|
-| `default` | Lavender and Turquoise |
-| `ocean` | Oceanic |
+| `default` | Lilac and Turquoise |
+| `ocean` | Ocean |
 | `forest` | Forest and Emerald |
 | `sunset` | Warm Sunset |
-| `royal` | Lapis Lazuli and Gold |
+| `royal` | Royal Blue and Gold |
 | `plum` | Plum |
 | `mono` | Paper / Neutral |
 
@@ -445,300 +311,172 @@ The HTML cover is generated from the information entered in the form.
 
 ## 13. Language and Text Direction
 
-### Text direction
-
-- `auto`: Direction is determined by the reader/interface language.
-- `rtl`: Right-to-left.
-- `ltr`: Left-to-right.
-
-For Persian content, RTL is a suitable choice. For bilingual content, inspect the output to ensure headings, lists, code, and links are displayed correctly.
-
-### Reader interface language
-
-- Persian (FA)
-- English (EN)
-- Automatic detection from text (Auto)
-
-This selection controls the reader interface language. The original note content remains untranslated.
+- **Text direction:** `auto` (based on the reader language), `rtl` (right-to-left), and `ltr` (left-to-right).
+- **Reader interface language:** Persian (`fa`), English (`en`), or automatic detection from the text content (`auto`). This option only determines the language of the reader's buttons and interface labels.
 
 ---
 
 ## 14. Book Reader Toolbar Features
 
-After opening the HTML file, the reader toolbar is available. Its main features are:
-
 | Tool | Function |
 |---|---|
-| Contents | Opens the table of contents |
-| Search | Finds a phrase in the text |
-| Highlight | Colors the selected text |
-| Note | Adds a note to the selected text |
-| Bookmark | Adds or removes a bookmark for the current section |
-| Light/Dark | Changes the display mode |
-| Settings | Opens the reading settings panel |
-| Print/PDF | Prints the book or saves it as a PDF |
-
-At some screen sizes, the text labels on the buttons are collapsed and only their icons are displayed.
+| `☷` Contents | Opens the table-of-contents drawer |
+| Nora title/branding | Quickly returns to the cover page |
+| Search | Finds a phrase across all sections by pressing `Enter` |
+| Highlight | Highlights the selected text using the active color |
+| `💬` Note | Adds a text note to the selected passage |
+| `🔖` Bookmark | Adds or removes a bookmark for the current section |
+| `🌓` Light/Dark | Quickly switches between light and dark modes |
+| `⚙️` Settings | Opens the slide-out reading and printing settings panel |
 
 ---
 
-## 15. Table of Contents and Navigation Between Sections
+## 15. Table of Contents and Moving Between Sections
 
-### Table of contents
-
-Click the **Contents** button to open the table-of-contents sidebar. Selecting a section title takes the reader to that section.
-
-The table of contents is generated from the headings in the HTML content. In folder exports, source notes are included as separate chapters.
-
-### Cover
-
-The cover is a separate page at the beginning of the book. The **Start Reading** button takes the reader from the cover to the book content.
-
-### Previous and next sections
-
-At the bottom of the reader, **Previous** and **Next** buttons let you move between sections. A page/section indicator also shows your current position.
+- Click the **Contents (`☷`)** button to open the table-of-contents drawer. Direct links to the cover and all headings up to level 3 are available.
+- At the bottom of the page are **Previous** and **Next** buttons, along with a section-number indicator. You can also use the arrow keys (`ArrowLeft` and `ArrowRight`) to move between sections.
 
 ---
 
-## 16. Reading Settings
+## 16. Reading Settings and Custom Themes
 
-Click the gear icon to open the reading settings panel.
+In the slide-out settings panel (`⚙️`), you can change the following options live:
 
-### Display mode
+- **Display mode:** Light / Dark.
+- **Font size:** From `12px` to `28px`, using the `A−` and `A+` buttons.
+- **Line spacing:** Compact (`1.75`), Normal (`2.05`), Comfortable (`2.35`).
+- **Page width:** Narrow (`680px`), Normal (`850px`), Full width (`100%`).
+- **Text font:** Default, `Tahoma`, `System UI`, `Georgia`, `Serif`.
+- **Color palette:** Nora's 7 main palettes **plus a Custom Theme (`✨`)** when a snippet or Custom CSS is enabled.
+- **Cover design:** Live switching among all 5 cover designs.
+- **Default highlight color:** Yellow, Green, Blue, Pink, Purple.
+- **Reset to defaults** and **Print / Save PDF** buttons.
 
-- Light
-- Dark
+### How the Custom Theme (`✨`) works with palettes and covers
 
-### Font size
-
-Use the `A−` and `A+` buttons to change the font size. The size is limited in the code to a range of 12 to 28 pixels.
-
-### Line spacing
-
-Three options are available:
-
-- Compact: `1.75`
-- Normal: `2.05`
-- Comfortable: `2.35`
-
-### Page width
-
-- Narrow: `680px`
-- Normal: `850px`
-- Full width: `100%`
-
-### Text font
-
-Available options:
-
-- Default font
-- Tahoma
-- System UI
-- Georgia
-- Serif
-
-For Persian, the default font uses the font families defined in the reader's stylesheet, including Vazirmatn and IRANSans when installed/available.
-
-### Color palette
-
-You can change the palette without generating the HTML file again.
-
-### Cover design
-
-You can change the cover design from inside the reader.
-
-### Default highlight color
-
-Five highlight colors are available:
-
-- Yellow
-- Green
-- Blue
-- Pink
-- Purple
-
-### Reset to defaults
-
-The **Reset to Defaults** button restores reading preferences to the initial values for that file.
-
-### Print / Save PDF
-
-A Print/PDF button is also available at the bottom of the settings panel.
+When you use a snippet or Custom CSS, your styles are placed in a separate `<style id="nora-custom-style">` tag and appear at the beginning of the reader's palette list as the **default option**, named after the snippet (for example, `✨ nora-sepia`). If the user selects one of Nora's main palettes or another cover design in the HTML file, the custom style tag is automatically disabled (`disabled`) so the original palettes and covers work without interference. Clicking the `✨` option again immediately restores the custom style.
 
 ---
 
 ## 17. Bookmarks
 
-Bookmarks are used to save the position of a book section and return to it quickly.
-
-### Adding a bookmark
-
-1. First, navigate to one of the book's sections. A section bookmark cannot be added on the cover.
-2. Click the **Bookmark** button.
-3. The current section is added to the bookmark list using its title.
-
-### Removing a bookmark from the current section
-
-If you click the Bookmark button again while in the same section, that section's bookmark is removed.
-
-### Going to a bookmark
-
-Click its name in the bookmark list to navigate to the corresponding section.
-
-### Removing one bookmark
-
-Use the × button next to the bookmark.
-
-### Removing all bookmarks
-
-If there is more than one bookmark, a **Remove All** option is displayed and asks for confirmation before clearing them.
-
-### Bookmark persistence
-
-Bookmarks are saved in the browser's `localStorage` and keyed by the book content's identifier. Therefore:
-
-- They can be restored in the same browser and browser profile.
-- They are not necessarily available in another browser or on another device.
-- Clearing website/browser data may delete them.
-- Changing the title or the book's initial content may change the book identifier.
+- After entering a section, click the **Bookmark (`🔖`)** button to bookmark it. Click again to remove the bookmark.
+- The bookmark list is displayed at the bottom of the page. You can jump to a section, delete individual bookmarks (`×`), or delete all bookmarks.
+- Bookmarks are stored in the browser's `localStorage`.
 
 ---
 
 ## 18. Highlighting and Adding Notes to Text
 
-Nora provides two separate annotation tools.
-
-### 18.1. Highlighting
-
-1. Navigate to one of the book's sections.
-2. Select a passage in that section with the mouse.
-3. Click the **Highlight** button.
-4. The selected text is marked with the default highlight color.
-
-You can change the color in the reading settings panel. The selected color is used for subsequent highlights.
-
-### 18.2. Adding a note
-
-1. Select a passage of text.
-2. Click the **Note** button.
-3. Enter your note in the input dialog.
-4. Confirm to attach the note to the selected text.
-
-### Viewing or deleting a note
-
-Click the text associated with a note. The note's content is displayed, and you are also given the option to delete it.
-
-### Removing a highlight
-
-Click the highlighted text and confirm its removal.
-
-### Text-selection limitations
-
-- You must first enter a section.
-- The selected text must belong to the currently active section.
-- An invalid selection, or one that overlaps with an existing highlight, may be rejected.
-
-### Annotation persistence
-
-Highlights and notes are saved in the browser's `localStorage` and keyed by the book identifier. This information is not written into the original Obsidian Markdown file. To transfer it to another device, take the limitations of browser-local storage into account.
+- **Highlight:** Select a portion of text in a chapter and click **Highlight**. Click the highlighted text to remove the highlight.
+- **Note:** Select the desired text, click **Note (`💬`)**, and enter your comment. Clicking the note displays its text and also allows you to delete it.
+- Highlights and notes are stored in the browser's `localStorage`; they are not transferred to the original Markdown file in Obsidian.
 
 ---
 
 ## 19. Search
 
-The search box is used to find a word or phrase in the book.
-
-### How to use it
-
-1. Find the search box.
-2. Enter the word or phrase you want.
-3. Press `Enter`.
-4. The result and the section in which it was found are displayed.
-5. Continue searching to move between results.
-
-If no result is found, the message “No results found” is displayed.
-
-**Persian-language note:** Differences between the characters “ی/ي” and “ک/ك”, as well as the use of the zero-width non-joiner (half-space), can affect matching. If a phrase is not found, try a simpler form of it.
+Enter the desired phrase in the search field and press `Enter`. The reader moves to the section containing a result and displays the total number of results and the section number. Press `Enter` again to move through subsequent results.
 
 ---
 
 ## 20. Footnotes
 
-The Nora reader has a dedicated display pop-up for footnotes.
+Both Obsidian footnote formats are supported:
 
-When the Markdown content contains footnotes:
+- Reference-style footnote: `[^1]` and its definition `[^1]: Footnote text`
+- Inline footnote: `^[Footnote text]`
 
-- The footnote number or marker is displayed in the text.
-- Selecting it opens the footnote pop-up.
-- The **Go to Footnote** button lets you navigate to the footnote's location in the text.
-- The **Return to Text** button takes you back to the reference location in the main text.
-- The Close button closes the footnote pop-up.
-
-Final support depends on the way the footnote is written in Markdown and how it is converted by the plugin version.
+In the HTML file, clicking a footnote number opens an **interactive popover** containing the footnote text and a button to jump to the bottom of the section. At the end of each section, a list of that section's footnotes is displayed, along with a return button (`↩`) to the reference location.
 
 ---
 
-## 21. Images and Attachments
+## 21. Mermaid Diagrams, LaTeX Formulas, SVG Graphics, and Vector Zoom
 
-Nora extracts local references from the note text and prepares them for export.
+### 21.1. Mermaid diagrams (100% offline)
 
-### References recognized in the source code
+All Mermaid diagram types (Flowchart, Sequence, Class, Gantt, Pie, State, Mindmap, Graph, and others) are rendered during export and preview using Obsidian's internal engine (`loadMermaid`) and saved as SVG inside the HTML:
 
-- Images using Obsidian Wiki Embed syntax, such as `![[image.png]]`
-- Markdown images, such as `![description](image.png)`
-- Markdown links to local files, such as `[Download file](document.pdf)`
+- **Dual light/dark rendering:** Two versions, Light and Dark, are created for each diagram so it immediately matches the reader's theme when the theme changes.
+- **Optimized printing:** The Light version is always displayed when printing or exporting to PDF.
+- **Support for additional attributes:** Blocks such as ` ```mermaid {align: "center"} ` are also correctly detected and rendered.
 
-### Embedding attachments
+### 21.2. LaTeX mathematical formulas (100% offline)
 
-If attachment embedding is enabled, discovered local files are read and converted to Data URLs so they can be included in the HTML.
+Mathematical formulas are rendered as vector graphics (SVG or the browser's native MathML) using Obsidian's internal `MathJax` engine:
 
-### Benefits
+- **Block formulas (single-line and multiline):** Use `$$ ... $$`, including environments such as `\begin{aligned}`, matrices, fractions, and integrals.
+- **Inline formulas:** Use `$ ... $` within text, tables, lists, and footnotes (without interfering with code blocks or dollar amounts).
 
-- A portable HTML file with its resources embedded
-- Less dependence on Vault file paths
-- Better suited to sharing the file with others or keeping an offline archive
+### 21.3. SVG vector graphics
 
-### Notes
+SVG code is rendered directly as vector graphics in both of the following forms:
 
-- Embedding large files can significantly increase the HTML file size.
-- Only files that Nora can locate from references in the text can be processed.
-- Internet file links are not considered local files and are not embedded like Vault attachments.
-- After exporting, test important images and links in the browser.
+- Inside a ` ```svg ... ``` ` code block.
+- As a raw `<svg ...>...</svg>` tag in the text.
 
-### Image Lightbox
+Before insertion into the HTML, automatic security sanitization is performed (removing `<script>`, `on*` event handlers, and `javascript:` links).
 
-When an image is clicked, if the element supports it, the image opens in an enlarged on-page view. This view includes:
+### 21.4. True vector zoom lightbox and pan (Zoom & Pan)
 
-- An × button to close the image.
-- An **Open Original Image** link, if the original image address is available.
+Clicking any **Mermaid diagram**, **block LaTeX formula**, or **SVG graphic** in the HTML file opens a full-screen Lightbox:
+
+- **Lossless zoom (40% to 500%):** Directly changes the dimensions of vector SVG and the font size of MathML, avoiding the blur caused by pixel-based enlargement.
+- **Controls:** `+` and `−` buttons, mouse-wheel zoom, a `100%` button to reset, drag-to-pan, and close using the `×` button, the `Esc` key, or clicking the empty area around the content.
 
 ---
 
-## 22. Printing and Saving as PDF
+## 22. Code Blocks
 
-To print the book or convert it to PDF:
+Regular code blocks (with or without a language name, such as ` ```js `, ` ```python `, ` ```json `, or ` ``` `) are displayed with a modern design:
+
+- **Light/dark compatibility:** Soft light background in Light mode and dark navy in Dark mode.
+- **Language header:** Displays a readable programming-language name above the code (for example, `JavaScript`, `Python`, `CSS`; if no language is specified, it displays `CODE`).
+- **Quick Copy button:** Copies the code to the clipboard with one click and changes its label to `Copied ✓` (works with offline `file://` files and is hidden when printing/exporting to PDF).
+
+---
+
+## 23. CSS Snippets and Custom Styling (Custom CSS)
+
+Two tools are available together for fully customizing the HTML reader and Live Preview:
+
+1. **Vault CSS snippet selector:** This menu automatically reads `.css` files in `.obsidian/snippets` (with a `🎨` icon) and other Vault folders (with a `📄` icon).
+   - **Naming rule:** To avoid cluttering the list with other Obsidian snippets, only files whose names begin with **`nora`** are displayed, case-insensitively (for example, `nora-sepia.css` or `Nora-Joy.css`).
+   - Hidden and system files (such as `._*` on macOS) are automatically filtered out.
+   - Use the **`🔄`** button beside the menu to refresh the list without closing Settings.
+2. **Custom CSS code field:** For quick, direct changes in Settings.
+
+Styles are applied in this order: **Nora default styles ← selected snippet file ← CSS entered in the Custom CSS field**. Both are embedded in the HTML and work **100% offline**.
+
+---
+
+## 24. Images and Attachments
+
+Nora extracts the following local references from the text:
+
+- `![[image.png]]` (including size/caption syntax such as `![[image.png|Caption|400]]`)
+- `![Caption](image.png)`
+- `[Download file](document.pdf)`
+
+When embedding is enabled, images, audio files (with an internal player), videos, PDFs (with an expandable in-page preview), and other files are embedded as Base64 inside the HTML. Clicking images also opens a large view (Lightbox).
+
+---
+
+## 25. Printing and Saving as PDF
 
 1. Open the HTML file in a browser.
-2. Click **Print / PDF** in the toolbar or settings panel.
-3. The browser's print dialog opens.
-4. Select **Save as PDF** or the printer you want.
-5. Check the paper size and page orientation.
-6. Review the page previews and save the file.
+2. Click **Print / Save PDF** in the settings panel (`⚙️`).
+3. In the browser's print dialog, choose `Save as PDF`.
 
-### Recommendations
-
-- For Persian content, check the page direction and text layout.
-- If the background color does not appear in the PDF, enable the browser's **Background graphics** printing option.
-- Check tables and large images in the print preview.
-- If necessary, disable the browser's default headers and footers.
+In print mode, the toolbar, navigation buttons, code-block copy buttons, and Lightboxes are automatically hidden. The cover and chapters are paginated cleanly, and Mermaid diagrams are printed using their Light versions.
 
 ---
 
-## 23. Automatic Metadata from Frontmatter
+## 26. Automatic Metadata and Saving to Frontmatter
 
-Nora can extract some cover information from the YAML Frontmatter at the beginning of a note. If a field is not present in Frontmatter, the file name or plugin settings are used as a fallback value.
+When opening the export form or running Quick Export, Nora reads the cover details from the note's YAML Frontmatter.
 
-### Persian/English Frontmatter example
+### Frontmatter example
 
 ```yaml
 ---
@@ -748,7 +486,7 @@ docType: Educational Book
 author:
   - Ali Rezaei
   - Sara Ahmadi
-subtitle: From Note-Taking to Publishing
+subtitle: From Notes to Publication
 category:
   - Education
   - Research
@@ -762,167 +500,103 @@ description: A practical guide to organizing and publishing research content
 | Key | Purpose |
 |---|---|
 | `title` or `عنوان` | Publication title |
-| `exportName` | Output file name |
-| `docType`, `type`, or `نوع` | Publication type |
-| `author`, `authors`, `نویسنده`, or `نویسندگان` | Author(s) |
+| `exportName` | Output filename |
+| `docType` or `type` or `نوع` | Work type |
+| `author` or `authors` or `نویسنده` or `نویسندگان` | Authors |
 | `subtitle` or `زیرعنوان` | Subtitle |
-| `category`, `categories`, `tags`, `موضوع`, or `موضوعات` | Subjects/categories |
-| `year`, `date`, `سال`, or `تاریخ` | Year/date |
-| `description`, `summary`, `توضیحات`, or `معرفی` | Publication description |
+| `category` or `categories` or `tags` or `موضوع` or `موضوعات` | Topics |
+| `year` or `date` or `سال` or `تاریخ` | Year/date |
+| `description` or `summary` or `توضیحات` or `معرفی` | Work description |
 
-### Editing priority
+### Automatically save to Frontmatter during export
 
-Information extracted from Frontmatter can be reviewed and changed in the export form. Changing a value in the export form does not automatically edit the original note's Frontmatter.
-
-### Multiple authors or subjects
-
-For multiple authors or subjects, you can use a YAML array or separate items in the form with the `؛` delimiter.
+If **Save cover details to note Frontmatter** is enabled (controlled in the plugin settings and in the export dialog), Nora registers or updates the details entered in the form (`title`, `docType`, `author`, `subtitle`, `category`, `year`, `description`, and, if different from the filename, `exportName`) in the note's YAML Frontmatter through Obsidian's official API (`processFrontMatter`), without damaging other existing Properties. Multiple authors or topics are saved as standard YAML lists.
 
 ---
 
-## 24. Important Notes and Limitations of the Current Version
+## 27. Important Notes and Limitations of the Current Version
 
-This section is based on the uploaded source code and is important for avoiding incorrect assumptions.
-
-1. **Preserve Subfolder Tree:** This option exists in the folder export form, but it is not used by the current HTML generation logic. Therefore, no practical effect from this option is observed in the reviewed version.
-2. **Folder export is unified:** Markdown notes in a folder are merged into one HTML file with a name similar to `FolderName-Complete.html`.
-3. **Note order:** Files are sorted by their paths. Use numbered file names to control the order.
-4. **Bookmark and note persistence:** This data is saved in the browser's local storage, not in the Vault.
-5. **Output language does not translate content:** Choosing Persian or English determines the book-reader interface language; it does not translate the note text.
-6. **Preview differs from final export:** In the preview, attachments are displayed as Vault resources. In the final export, they can be embedded in the HTML.
-7. **Opening a folder export:** The form option is labeled as opening the output folder; however, in the current implementation, the path of the generated HTML file is sent to the system to be opened.
-8. **Local attachments:** Only references extracted from the text and found in the Vault can be embedded.
-9. **Browser-local storage:** Clearing browser data or using another profile/device can make saved bookmarks and annotations unavailable.
+1. **Preserve Subfolder Tree:** This option exists in the folder-export form, but it currently has no effect on the integrated HTML output. Notes are ordered by their paths.
+2. **Folder export is integrated:** All Markdown notes in the folder are merged into one HTML file named `<FolderName>-Complete.html`.
+3. **`nora` prefix for snippets:** The snippet selector in Settings only displays `.css` files whose names begin with `nora`.
+4. **Bookmark and annotation persistence:** These data are stored in the browser's `localStorage`, not in the original Markdown file.
+5. **Automatic custom-theme update on re-export:** The reader settings storage key (`prefsKey`) is tied to the snippet code's hash. Therefore, when exporting again with a new snippet, the new theme immediately appears as the default.
+6. **Opening folder output:** When the integrated export finishes, the path of the generated HTML file is sent to the system to open it in the browser.
 
 ---
 
-## 25. Troubleshooting
+## 28. Troubleshooting
 
-### I cannot see the Nora icon
+### My CSS snippet does not appear in the settings menu
 
-- Check that the plugin is enabled under Community Plugins.
-- Make sure all files for the installed version are present.
-- Restart Obsidian.
+- Make sure the `.css` filename begins with **`nora`** (for example, `nora-joy.css`).
+- Save the file in `.obsidian/snippets/` or somewhere inside the Vault, then click the **`🔄`** button beside the menu.
 
-### Commands do not appear in the Command Palette
+### Changes to the snippet do not appear in the preview or output
 
-- Search for `Nora`.
-- Check that the plugin is enabled.
-- For the note export command, open and activate a Markdown file.
+- In custom snippets, use the selectors `body[data-palette]` and `body.night[data-palette]` to override the default palette variables.
+- After replacing the plugin with a new version, turn it off and on once in Obsidian.
 
-### I see the message “Please open a Markdown note first”
+### I want to use Nora's original palettes or cover designs while a snippet is active
 
-The note export command is only available when there is an active Markdown file. Open a `.md` note and run the command again.
+- In the HTML file, open the settings panel (`⚙️`) and select one of the original palettes or cover designs. The snippet style is automatically disabled. You can restore it whenever you want by selecting `✨`.
 
-### The HTML file is not saved or I cannot find it
+### Images or attachments do not appear in the output
 
-- Check the output folder value in Settings.
-- Check the output file name in the form.
-- Make sure the operation completed without an error.
-- Check the `Nora Exports` folder or your custom path in the Vault.
+- Make sure the file exists in the Vault and that **Automatically embed attachments** is enabled.
 
-### Images do not appear in the export
+### Chapters are not in the desired order in folder export
 
-- Check the image path in the note.
-- Make sure the file exists in the Vault.
-- Enable the attachment embedding option.
-- Generate a new export and reopen the HTML file.
+- Number the beginning of the filenames (`01-`, `02-`, etc.). The order is determined by file paths.
 
-### Chapters are not in the desired order
+### The PDF prints without background colors
 
-- Number the file names.
-- Use an orderly path structure.
-- Remember that ordering is based on file paths.
-
-### Persian text has the wrong direction
-
-- Set Direction to RTL in the export form.
-- Choose Persian or Auto as the reader language.
-- Test the updated output in a browser.
-
-### Highlights or bookmarks did not remain after transferring the file
-
-This data depends on the browser's `localStorage` and is not transferred to another device with the HTML file. Check the file in the same browser and browser profile.
-
-### PDF printing looks incorrect
-
-- Check the print preview.
-- Adjust the paper size and orientation.
-- Enable background printing in the browser settings.
-- Change the reader's page width before printing.
+- Enable **Background graphics** in the browser's print dialog.
 
 ---
 
-## 26. Suggested Workflows
+## 29. Suggested Workflows
 
-### Short article
+### Technical / scientific note (with Mermaid, LaTeX, SVG, and code)
 
-1. Open the note.
-2. Open the export dialog.
-3. Review the title and author.
-4. Choose a suitable cover design and palette.
-5. Set the text direction and font size.
-6. Preview the result.
-7. Download the file or save it in the Vault.
+1. Add Mermaid diagrams, LaTeX formulas (`$...$` and `$$...$$`), SVG code, and code blocks with language names to your note.
+2. Open Live Preview to check the rendering and CSS snippet.
+3. In the export dialog, complete the cover details and keep the Frontmatter-saving option enabled.
+4. Create the HTML output and check vector zoom for diagrams and formulas, as well as the code-copy buttons.
 
-### Multi-chapter book
+### A multi-chapter book from a folder
 
-1. Create a separate Markdown file for each chapter.
-2. Place the files in one folder.
-3. Begin file names with chapter numbers.
-4. Enable Include Subfolders if needed.
-5. Set Chapter Heading Level to match the chapter structure.
-6. Run Folder Export.
-7. Check the number of notes found.
-8. Generate the unified export.
-9. Review the table of contents and chapter order.
-
-### Publishing Persian content
-
-1. Complete the Frontmatter.
-2. Set the text direction to RTL.
-3. Set the reader language to Persian.
-4. Try a font size of 16 or 18 pixels.
-5. Choose a page width of 680 or 850 pixels depending on the type of text.
-6. Embed attachments if needed.
-7. Review the output in a browser.
-8. Generate a PDF if necessary.
+1. Create a Markdown file for each chapter and add a numeric prefix to its filename.
+2. Set the chapter heading level in Settings (for example, `H1`).
+3. Run the batch folder-export command to generate the integrated `-Complete.html` file.
 
 ---
 
-## 27. Final Checklist
+## 30. Final Checklist
 
 ### Before exporting
 
-- [ ] Notes and headings are organized.
-- [ ] Frontmatter and publication information have been reviewed.
-- [ ] The output file name is appropriate.
-- [ ] The language and text direction are correct.
-- [ ] The theme, palette, and cover have been selected.
-- [ ] The attachment embedding setting has been decided.
+- [ ] Notes, headings, and chapter filenames are organized.
+- [ ] Frontmatter or cover details have been reviewed.
+- [ ] The desired CSS snippet (with the `nora` prefix) or color palette has been selected.
+- [ ] Text direction, reader language, and attachment embedding have been configured.
 
 ### After exporting
 
-- [ ] The HTML file opens.
-- [ ] The cover and publication details are correct.
-- [ ] The table of contents and chapter navigation work.
-- [ ] Images and attachments are displayed.
-- [ ] Search works.
-- [ ] Bookmarks, highlights, and notes have been tested.
-- [ ] Footnotes are displayed correctly.
-- [ ] Printing or saving as PDF has been checked.
+- [ ] The HTML file opens in a browser and works offline.
+- [ ] The cover, publication details, and table of contents are correct.
+- [ ] Mermaid diagrams, LaTeX formulas, and SVGs render correctly, and their vector zoom works without blur.
+- [ ] Code blocks have the correct language labels and working copy buttons.
+- [ ] Switching between the custom theme (`✨`) and the default palettes/covers works without conflicts.
+- [ ] Images, attachments, footnotes, search, and printing/PDF have been checked.
 
 ---
 
 ## Project Resources
 
-- GitHub repository: <https://github.com/singhaf9270/nora-html-exlplorer>
-- README: <https://github.com/singhaf9270/nora-html-exlplorer/blob/main/README.md>
-- Plugin source: <https://github.com/singhaf9270/nora-html-exlplorer/blob/main/main.js>
-- Plugin stylesheet: <https://github.com/singhaf9270/nora-html-exlplorer/blob/main/styles.css>
+- GitHub repository: https://github.com/singhaf9270/nora-html-exlplorer
+- README: https://github.com/singhaf9270/nora-html-exlplorer/blob/main/README.md
+- Plugin source: https://github.com/singhaf9270/nora-html-exlplorer/blob/main/main.js
+- Plugin styles: https://github.com/singhaf9270/nora-html-exlplorer/blob/main/styles.css
 
----
-
-**End of Guide**
-
-This guide was prepared based on the uploaded source code. If the behavior of your installed version differs from the descriptions in this document, use the plugin files and source code for that same version as the basis for review.
+**End of guide**
