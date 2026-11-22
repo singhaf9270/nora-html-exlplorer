@@ -1,39 +1,40 @@
 # Comprehensive Guide to Nora HTML Exporter
 
+<a id="nora-section-1"></a>
 ## Table of Contents (click to jump to a section)
 
-- [Installation, All Commands, Export Settings, Preview, and Reader Features](#installation-all-commands-export-settings-preview-and-reader-features)
-- [1. Introducing Nora](#1-introducing-nora)
-- [2. Installation and Activation](#2-installation-and-activation)
-- [3. Ways to Access Nora's Features](#3-ways-to-access-noras-features)
-- [4. Exporting a Note with the Settings Dialog](#4-exporting-a-note-with-the-settings-dialog)
-- [5. All Fields in the Export Dialog](#5-all-fields-in-the-export-dialog)
-- [6. Note Statistics Before Export](#6-note-statistics-before-export)
-- [7. Three Ways to Get the Output](#7-three-ways-to-get-the-output)
-- [8. Quick Export](#8-quick-export)
-- [9. Combining a Folder into One Book](#9-combining-a-folder-into-one-book)
-- [10. Live Preview](#10-live-preview)
-- [11. Plugin Settings in Obsidian](#11-plugin-settings-in-obsidian)
-- [12. Cover Structure and Information](#12-cover-structure-and-information)
-- [13. Language and Text Direction](#13-language-and-text-direction)
-- [14. Book Reader Toolbar Features](#14-book-reader-toolbar-features)
-- [15. Table of Contents and Moving Between Sections](#15-table-of-contents-and-moving-between-sections)
-- [16. Reading Settings and Custom Themes](#16-reading-settings-and-custom-themes)
-- [17. Bookmarks](#17-bookmarks)
-- [18. Highlighting and Adding Notes to Text](#18-highlighting-and-adding-notes-to-text)
-- [19. Search](#19-search)
-- [20. Footnotes](#20-footnotes)
-- [21. Mermaid Diagrams, LaTeX Formulas, SVG Graphics, and Vector Zoom](#21-mermaid-diagrams-latex-formulas-svg-graphics-and-vector-zoom)
-- [22. Code Blocks](#22-code-blocks)
-- [23. CSS Snippets and Custom Styling (Custom CSS)](#23-css-snippets-and-custom-styling-custom-css)
-- [24. Images and Attachments](#24-images-and-attachments)
-- [25. Printing and Saving as PDF](#25-printing-and-saving-as-pdf)
-- [26. Automatic Metadata and Saving to Frontmatter](#26-automatic-metadata-and-saving-to-frontmatter)
-- [27. Important Notes and Limitations of the Current Version](#27-important-notes-and-limitations-of-the-current-version)
-- [28. Troubleshooting](#28-troubleshooting)
-- [29. Suggested Workflows](#29-suggested-workflows)
-- [30. Final Checklist](#30-final-checklist)
-- [Project Resources](#project-resources)
+- [Installation, All Commands, Export Settings, Preview, and Reader Features](#nora-section-1)
+- [1. Introducing Nora](#nora-section-2)
+- [2. Installation and Activation](#nora-section-3)
+- [3. Ways to Access Nora's Features](#nora-section-4)
+- [4. Exporting a Note with the Settings Dialog](#nora-section-5)
+- [5. All Fields in the Export Dialog](#nora-section-6)
+- [6. Note Statistics Before Export](#nora-section-7)
+- [7. Three Ways to Get the Output](#nora-section-8)
+- [8. Quick Export](#nora-section-9)
+- [9. Combining a Folder into One Book](#nora-section-10)
+- [10. Live Preview](#nora-section-11)
+- [11. Plugin Settings in Obsidian](#nora-section-12)
+- [12. Cover Structure and Information](#nora-section-13)
+- [13. Language and Text Direction](#nora-section-14)
+- [14. Book Reader Toolbar Features](#nora-section-15)
+- [15. Table of Contents and Moving Between Sections](#nora-section-16)
+- [16. Reading Settings and Custom Themes](#nora-section-17)
+- [17. Bookmarks](#nora-section-18)
+- [18. Highlighting and Adding Notes to Text](#nora-section-19)
+- [19. Search](#nora-section-20)
+- [20. Footnotes](#nora-section-21)
+- [21. Mermaid Diagrams, LaTeX Formulas, SVG Graphics, and Vector Zoom](#nora-section-22)
+- [22. Code Blocks](#nora-section-23)
+- [23. CSS Snippets and Custom Styling (Custom CSS)](#nora-section-24)
+- [24. Images and Attachments](#nora-section-25)
+- [25. Printing and Saving as PDF](#nora-section-26)
+- [26. Automatic Metadata and Saving to Frontmatter](#nora-section-27)
+- [27. Important Notes and Limitations of the Current Version](#nora-section-28)
+- [28. Troubleshooting](#nora-section-29)
+- [29. Suggested Workflows](#nora-section-30)
+- [30. Final Checklist](#nora-section-31)
+- [Project Resources](#nora-section-32)
 
 ---
 
@@ -46,6 +47,7 @@
 
 ---
 
+<a id="nora-section-2"></a>
 ## 1. Introducing Nora
 
 **Nora HTML Exporter** is a bilingual (Persian/English) plugin for Obsidian that converts Markdown notes into a standalone, 100% offline HTML file with a book-like appearance and an interactive reading environment. It can also combine Markdown notes from a folder into a single integrated HTML book.
@@ -74,6 +76,7 @@ The output is more than a simple web page. It includes a complete book-reader in
 
 ---
 
+<a id="nora-section-3"></a>
 ## 2. Installation and Activation
 
 ### Install from Community Plugins
@@ -93,6 +96,7 @@ After activation, the Nora book icon appears in Obsidian's sidebar, and Nora com
 
 ---
 
+<a id="nora-section-4"></a>
 ## 3. Ways to Access Nora's Features
 
 Four main commands are registered in the current version:
@@ -127,6 +131,7 @@ Right-click a folder and select Nora's batch folder-export option. The folder-ex
 
 ---
 
+<a id="nora-section-5"></a>
 ## 4. Exporting a Note with the Settings Dialog
 
 This is the most complete way to export a note, because you can set the cover information, language, appearance, attachments, and Frontmatter saving before creating the HTML.
@@ -150,6 +155,7 @@ The note-export dialog header contains a **📁 Entire Folder** button. Selectin
 
 ---
 
+<a id="nora-section-6"></a>
 ## 5. All Fields in the Export Dialog
 
 ### “Cover Details and Publication Information” section
@@ -185,6 +191,7 @@ The note-export dialog header contains a **📁 Entire Folder** button. Selectin
 
 ---
 
+<a id="nora-section-7"></a>
 ## 6. Note Statistics Before Export
 
 Three statistics are displayed at the bottom of the export form:
@@ -195,6 +202,7 @@ Three statistics are displayed at the bottom of the export form:
 
 ---
 
+<a id="nora-section-8"></a>
 ## 7. Three Ways to Get the Output
 
 ### 7.1. Live Preview
@@ -211,12 +219,14 @@ The **✦ Save to Vault and Create HTML** button creates the HTML file in the co
 
 ---
 
+<a id="nora-section-9"></a>
 ## 8. Quick Export
 
 The **Quick HTML export with default settings** command creates HTML for the active Markdown note without opening the full export form. It uses the note's Frontmatter metadata and the plugin's saved settings.
 
 ---
 
+<a id="nora-section-10"></a>
 ## 9. Combining a Folder into One Book
 
 This feature places all Markdown notes in the selected folder into **one single, integrated HTML file**.
@@ -250,6 +260,7 @@ The final filename is created as `<FolderName>-Complete.html` inside the `<Expor
 
 ---
 
+<a id="nora-section-11"></a>
 ## 10. Live Preview
 
 Live Preview is a side pane inside Obsidian that updates in real time when the active note changes or when the text is edited (after a short delay).
@@ -258,6 +269,7 @@ In the pane's top toolbar, you can change the pane interface language, light/dar
 
 ---
 
+<a id="nora-section-12"></a>
 ## 11. Plugin Settings in Obsidian
 
 Open **Settings → Nora HTML Exporter** to access the settings:
@@ -281,6 +293,7 @@ Open **Settings → Nora HTML Exporter** to access the settings:
 
 ---
 
+<a id="nora-section-13"></a>
 ## 12. Cover Structure and Information
 
 The HTML cover includes the work type, main title, subtitle, author(s), subject(s), publication year, short introduction, word count, reading time, and a **Start Reading** button.
@@ -309,6 +322,7 @@ The HTML cover includes the work type, main title, subtitle, author(s), subject(
 
 ---
 
+<a id="nora-section-14"></a>
 ## 13. Language and Text Direction
 
 - **Text direction:** `auto` (based on the reader language), `rtl` (right-to-left), and `ltr` (left-to-right).
@@ -316,6 +330,7 @@ The HTML cover includes the work type, main title, subtitle, author(s), subject(
 
 ---
 
+<a id="nora-section-15"></a>
 ## 14. Book Reader Toolbar Features
 
 | Tool | Function |
@@ -331,6 +346,7 @@ The HTML cover includes the work type, main title, subtitle, author(s), subject(
 
 ---
 
+<a id="nora-section-16"></a>
 ## 15. Table of Contents and Moving Between Sections
 
 - Click the **Contents (`☷`)** button to open the table-of-contents drawer. Direct links to the cover and all headings up to level 3 are available.
@@ -338,6 +354,7 @@ The HTML cover includes the work type, main title, subtitle, author(s), subject(
 
 ---
 
+<a id="nora-section-17"></a>
 ## 16. Reading Settings and Custom Themes
 
 In the slide-out settings panel (`⚙️`), you can change the following options live:
@@ -358,6 +375,7 @@ When you use a snippet or Custom CSS, your styles are placed in a separate `<sty
 
 ---
 
+<a id="nora-section-18"></a>
 ## 17. Bookmarks
 
 - After entering a section, click the **Bookmark (`🔖`)** button to bookmark it. Click again to remove the bookmark.
@@ -366,6 +384,7 @@ When you use a snippet or Custom CSS, your styles are placed in a separate `<sty
 
 ---
 
+<a id="nora-section-19"></a>
 ## 18. Highlighting and Adding Notes to Text
 
 - **Highlight:** Select a portion of text in a chapter and click **Highlight**. Click the highlighted text to remove the highlight.
@@ -374,12 +393,14 @@ When you use a snippet or Custom CSS, your styles are placed in a separate `<sty
 
 ---
 
+<a id="nora-section-20"></a>
 ## 19. Search
 
 Enter the desired phrase in the search field and press `Enter`. The reader moves to the section containing a result and displays the total number of results and the section number. Press `Enter` again to move through subsequent results.
 
 ---
 
+<a id="nora-section-21"></a>
 ## 20. Footnotes
 
 Both Obsidian footnote formats are supported:
@@ -391,6 +412,7 @@ In the HTML file, clicking a footnote number opens an **interactive popover** co
 
 ---
 
+<a id="nora-section-22"></a>
 ## 21. Mermaid Diagrams, LaTeX Formulas, SVG Graphics, and Vector Zoom
 
 ### 21.1. Mermaid diagrams (100% offline)
@@ -426,6 +448,7 @@ Clicking any **Mermaid diagram**, **block LaTeX formula**, or **SVG graphic** in
 
 ---
 
+<a id="nora-section-23"></a>
 ## 22. Code Blocks
 
 Regular code blocks (with or without a language name, such as ` ```js `, ` ```python `, ` ```json `, or ` ``` `) are displayed with a modern design:
@@ -436,6 +459,7 @@ Regular code blocks (with or without a language name, such as ` ```js `, ` ```py
 
 ---
 
+<a id="nora-section-24"></a>
 ## 23. CSS Snippets and Custom Styling (Custom CSS)
 
 Two tools are available together for fully customizing the HTML reader and Live Preview:
@@ -450,6 +474,7 @@ Styles are applied in this order: **Nora default styles ← selected snippet fil
 
 ---
 
+<a id="nora-section-25"></a>
 ## 24. Images and Attachments
 
 Nora extracts the following local references from the text:
@@ -462,6 +487,7 @@ When embedding is enabled, images, audio files (with an internal player), videos
 
 ---
 
+<a id="nora-section-26"></a>
 ## 25. Printing and Saving as PDF
 
 1. Open the HTML file in a browser.
@@ -472,6 +498,7 @@ In print mode, the toolbar, navigation buttons, code-block copy buttons, and Lig
 
 ---
 
+<a id="nora-section-27"></a>
 ## 26. Automatic Metadata and Saving to Frontmatter
 
 When opening the export form or running Quick Export, Nora reads the cover details from the note's YAML Frontmatter.
@@ -514,6 +541,7 @@ If **Save cover details to note Frontmatter** is enabled (controlled in the plug
 
 ---
 
+<a id="nora-section-28"></a>
 ## 27. Important Notes and Limitations of the Current Version
 
 1. **Preserve Subfolder Tree:** This option exists in the folder-export form, but it currently has no effect on the integrated HTML output. Notes are ordered by their paths.
@@ -525,6 +553,7 @@ If **Save cover details to note Frontmatter** is enabled (controlled in the plug
 
 ---
 
+<a id="nora-section-29"></a>
 ## 28. Troubleshooting
 
 ### My CSS snippet does not appear in the settings menu
@@ -555,6 +584,7 @@ If **Save cover details to note Frontmatter** is enabled (controlled in the plug
 
 ---
 
+<a id="nora-section-30"></a>
 ## 29. Suggested Workflows
 
 ### Technical / scientific note (with Mermaid, LaTeX, SVG, and code)
@@ -572,6 +602,7 @@ If **Save cover details to note Frontmatter** is enabled (controlled in the plug
 
 ---
 
+<a id="nora-section-31"></a>
 ## 30. Final Checklist
 
 ### Before exporting
@@ -592,6 +623,7 @@ If **Save cover details to note Frontmatter** is enabled (controlled in the plug
 
 ---
 
+<a id="nora-section-32"></a>
 ## Project Resources
 
 - GitHub repository: https://github.com/singhaf9270/nora-html-exlplorer
