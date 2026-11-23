@@ -11,7 +11,6 @@ const {
   TFolder,
   normalizePath,
   requestUrl,
-  openWithDefaultApp,
   loadMermaid,
   loadMathJax,
   renderMath,
@@ -27,6 +26,7 @@ const DEFAULT_SETTINGS = {
   palette: 'default',
   coverStyle: 'aurora',
   direction: 'auto',
+  fontFamily: 'Vazirmatn',
   fontSize: 16,
   width: '850',
   readingMode: 'paginated',
@@ -107,6 +107,7 @@ const I18N = {
     fieldPalette: 'پالت رنگی',
     fieldCoverStyle: 'طرح جلد',
     fieldDirection: 'جهت متن',
+    fieldFontFamily: 'فونت متن',
     fieldFontSize: 'اندازه قلم',
     fieldWidth: 'عرض صفحه',
     fieldReadingMode: 'حالت مطالعه',
@@ -134,6 +135,13 @@ const I18N = {
       ['auto', 'خودکار'],
       ['rtl', 'راست‌چین (RTL)'],
       ['ltr', 'چپ‌چین (LTR)']
+    ],
+    fontFamilies: [
+      ['Vazirmatn', 'وزیرمتن (Vazirmatn — فارسی و انگلیسی)'],
+      ['Inter', 'Inter'],
+      ['Tahoma', 'Tahoma'],
+      ['Georgia', 'Georgia'],
+      ['system-ui', 'فونت سیستم (System UI)']
     ],
     fontSizes: [
       ['15', 'کوچک (15px)'],
@@ -189,6 +197,7 @@ const I18N = {
     setPaletteName: 'پالت رنگی پیش‌فرض',
     setCoverName: 'طرح جلد پیش‌فرض',
     setDirName: 'جهت متن پیش‌فرض',
+    setFontFamilyName: 'فونت پیش‌فرض خوانشگر',
     setReadingModeName: 'حالت مطالعه پیش‌فرض',
     setEmbedName: 'تعبیه خودکار پیوست‌ها (Base64)',
     setEmbedDesc: 'تصاویر، صوت، ویدیو و PDFهای داخل Vault به صورت خودکار داخل فایل HTML قرار می‌گیرند تا فایل کاملاً مستقل و آفلاین باشد.',
@@ -217,15 +226,14 @@ const I18N = {
     guideDownloadedNotice: 'راهنمای فارسی نورا در پوشه «Nora Guides» ذخیره شد.',
     guideDownloadFailedNotice: 'دانلود خودکار راهنما انجام نشد. می‌توانید از بخش راهنما در تنظیمات دوباره آن را دریافت کنید.',
     changelogTitle: 'تغییرات نورا', changelogButton: 'تغییرات',
-    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.1.8',
+    changelogUpdated: 'نورا به‌روزرسانی شد؛ تغییرات این نسخه را مرور کنید.', changelogVersion: 'نسخه 1.2.0',
     changelogItems: [
-      'پشتیبانی کامل و ۱۰۰٪ آفلاین از فرمول‌های ریاضی LaTeX (درون‌خطی $...$ و بلوکی $$...$$) با رندر برداری بدون افت کیفیت.',
-      'بهبود موتور زوم تمام‌صفحه برای نمودارهای Mermaid و فرمول‌های LaTeX با رندر برداری واقعی (شفاف و بدون تاری حتی در زوم ۵۰۰٪).',
-      'پشتیبانی کامل و ۱۰۰٪ آفلاین از انواع نمودارهای Mermaid در حالت روز، شب و چاپ.',
-      'پشتیبانی مستقیم از کدهای SVG (هم به‌صورت بلوک ```svg و هم تگ خام <svg>) همراه با زوم برداری تمام‌صفحه.',
-      'افزودن منوی انتخاب اسنیپت CSS از Vault و کادر Custom CSS در تنظیمات پلاگین.',
-      'بازطراحی مدرن کدبلاک‌ها با هدر نمایش نام زبان برنامه‌نویسی، دکمه کپی سریع و هماهنگی کامل با حالت روز و شب.',
-      'امکان ذخیره خودکار مشخصات جلد و اثر در Frontmatter (Properties) یادداشت هنگام خروجی گرفتن (قابل فعال/غیرفعال‌سازی در تنظیمات).'
+      'پشتیبانی کامل از کالوت‌های ابسیدین (Callouts) شامل انواع رنگی و حالت‌های باز (+) و بسته (-).',
+      'اصلاح جهت خودکار متن (Auto Direction) به‌صورت پاراگراف‌به‌پاراگراف برای متون ترکیبی فارسی و انگلیسی.',
+      'نمایش متمایز نام فایل‌ها در خروجی یکپارچه پوشه به‌صورت بنر وسط‌چین بدون برهم زدن سلسله‌مراتب H1 و گروه‌بندی فهرست مطالب.',
+      'رفع باگ نمایش و هایلایت صفحه فعلی در فهرست مطالب (حالت صفحه‌بندی).',
+      'یکسان‌سازی فونت پیش‌فرض روی Vazirmatn (همراه با بارگذاری از Google Fonts) و افزودن امکان انتخاب فونت در تنظیمات و پنجره خروجی.',
+      'رفع محدودیت ذخیره هایلایت‌ها در localStorage برای یادداشت‌های دارای تصاویر Base64 و جلوگیری از تداخل پیوست‌های همنام در خروجی پوشه.'
     ],
 
     // Exported Reader UI
@@ -399,6 +407,7 @@ const I18N = {
     fieldPalette: 'Color Palette',
     fieldCoverStyle: 'Cover Style',
     fieldDirection: 'Text Direction',
+    fieldFontFamily: 'Font Family',
     fieldFontSize: 'Font Size',
     fieldWidth: 'Page Width',
     fieldReadingMode: 'Reading Mode',
@@ -426,6 +435,13 @@ const I18N = {
       ['auto', 'Auto'],
       ['ltr', 'Left-to-Right (LTR)'],
       ['rtl', 'Right-to-Left (RTL)']
+    ],
+    fontFamilies: [
+      ['Vazirmatn', 'Vazirmatn (Persian & English)'],
+      ['Inter', 'Inter'],
+      ['Tahoma', 'Tahoma'],
+      ['Georgia', 'Georgia'],
+      ['system-ui', 'System UI']
     ],
     fontSizes: [
       ['15', 'Small (15px)'],
@@ -481,6 +497,7 @@ const I18N = {
     setPaletteName: 'Default Color Palette',
     setCoverName: 'Default Cover Style',
     setDirName: 'Default Text Direction',
+    setFontFamilyName: 'Default Reader Font',
     setReadingModeName: 'Default Reading Mode',
     setEmbedName: 'Auto-embed Vault Attachments (Base64)',
     setEmbedDesc: 'Embed images, audio, video, and PDFs directly inside the HTML file so it works completely offline.',
@@ -509,15 +526,14 @@ const I18N = {
     guideDownloadedNotice: 'The Nora user guide was saved in the “Nora Guides” folder.',
     guideDownloadFailedNotice: 'The guide could not be downloaded automatically. You can try again from Settings.',
     changelogTitle: 'Nora Changelog', changelogButton: 'Changelog',
-    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.1.8',
+    changelogUpdated: 'Nora has been updated. Review what is new in this version.', changelogVersion: 'Version 1.2.0',
     changelogItems: [
-      'Added full 100% offline LaTeX math support (inline $...$ and block $$...$$) with crisp vector rendering.',
-      'Upgraded fullscreen zoom viewer for both Mermaid diagrams and LaTeX formulas using true vector scaling (zero blur at up to 500% zoom).',
-      'Full 100% offline Mermaid diagram rendering for Light, Dark, and Print modes.',
-      'Added direct SVG rendering support (both fenced ```svg blocks and raw <svg> tags) with crisp vector fullscreen zoom.',
-      'Added Vault CSS snippets dropdown picker and inline Custom CSS editor in Settings.',
-      'Redesigned code blocks with a modern header showing the programming language, a quick Copy button, and Light/Dark theme support.',
-      'Added optional auto-saving of entered cover metadata into the note YAML frontmatter upon export (configurable in Settings and Export dialog).'
+      'Added full Obsidian Callout support including color variants and collapsible open (+) / closed (-) states.',
+      'Fixed Auto text direction to work per-paragraph for mixed Persian/English documents.',
+      'Replaced H1 file titles in merged folder exports with centered chapter banners and grouped parent/child Table of Contents.',
+      'Fixed active page highlighting in the Table of Contents in paginated mode.',
+      'Unified default reader font to Vazirmatn (with Google Fonts CDN support) and added font selection to Settings and Export modals.',
+      'Fixed localStorage quota issues when saving highlights on notes with Base64 images, and prevented duplicate attachment filename collisions in merged folder exports.'
     ],
 
     // Exported Reader UI
@@ -1644,8 +1660,39 @@ function sanitizeInlineSvg(raw) {
     .replace(/(href|xlink:href)\s*=\s*(?:"\s*javascript:[^"]*"|'\s*javascript:[^']*')/gi, '');
 }
 
+const CALLOUT_META = {
+  note:      { cls: 'note',     icon: '📝' },
+  abstract:  { cls: 'abstract', icon: '📋' },
+  summary:   { cls: 'abstract', icon: '📋' },
+  tldr:      { cls: 'abstract', icon: '📋' },
+  info:      { cls: 'info',     icon: 'ℹ️' },
+  todo:      { cls: 'todo',     icon: '☑️' },
+  tip:       { cls: 'tip',      icon: '🔥' },
+  hint:      { cls: 'tip',      icon: '🔥' },
+  important: { cls: 'tip',      icon: '🔥' },
+  success:   { cls: 'success',  icon: '✅' },
+  check:     { cls: 'success',  icon: '✅' },
+  done:      { cls: 'success',  icon: '✅' },
+  question:  { cls: 'question', icon: '❓' },
+  help:      { cls: 'question', icon: '❓' },
+  faq:       { cls: 'question', icon: '❓' },
+  warning:   { cls: 'warning',  icon: '⚠️' },
+  caution:   { cls: 'warning',  icon: '⚠️' },
+  attention: { cls: 'warning',  icon: '⚠️' },
+  failure:   { cls: 'danger',   icon: '❌' },
+  fail:      { cls: 'danger',   icon: '❌' },
+  missing:   { cls: 'danger',   icon: '❌' },
+  danger:    { cls: 'danger',   icon: '⚡' },
+  error:     { cls: 'danger',   icon: '⚡' },
+  bug:       { cls: 'danger',   icon: '🐞' },
+  example:   { cls: 'example',  icon: '🧪' },
+  quote:     { cls: 'quote',    icon: '❝' },
+  cite:      { cls: 'quote',    icon: '❝' }
+};
+
 function renderMarkdown(md, opts = {}) {
-  const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null, mathMap = null } = opts;
+  const { forExport = false, attachmentsMap = null, lang = 'fa', mermaidMap = null, mathMap = null, autoDir = false, isNested = false } = opts;
+  const dirAttr = autoDir ? ' dir="auto"' : '';
   const r = I18N[lang].reader;
   const bodyMd = stripFrontmatter(md);
   const { cleanLines: lines, fnDefs } = extractFootnoteDefinitions(bodyMd);
@@ -1732,14 +1779,24 @@ function renderMarkdown(md, opts = {}) {
       continue;
     }
 
+    const chMatch = t.match(/^:::NORA_CHAPTER_START::(.+?):::$/);
+    if (chMatch) {
+      const chTitle = chMatch[1].trim();
+      const id = 'chapter-' + headings.length;
+      headings.push({ level: 0, text: chTitle, id, isChapter: true });
+      html += `<div class="nora-chapter-banner" id="${id}" data-nora-chapter="true"${dirAttr}><span class="nora-chapter-icon" aria-hidden="true">📝</span><span class="nora-chapter-name">${esc(chTitle)}</span></div>`;
+      i++;
+      continue;
+    }
+
     if (/^#{1,6}\s/.test(t)) {
       let m = t.match(/^(#{1,6})\s+(.*)$/), level = m[1].length, text = m[2].replace(/\s+#+\s*$/, '');
       const isNoraChapter = text.startsWith('NORA_CHAPTER_START::');
       if (isNoraChapter) text = text.slice('NORA_CHAPTER_START::'.length).trim();
       let id = 'section-' + headings.length;
       text = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/__(.*?)__/g, '$1');
-      headings.push({ level, text, id });
-      html += `<h${level} id="${id}"${isNoraChapter ? ' data-nora-chapter="true"' : ''}>${renderInline(text, inlineOpts)}</h${level}>`;
+      headings.push({ level, text, id, isChapter: isNoraChapter });
+      html += `<h${level} id="${id}"${isNoraChapter ? ' data-nora-chapter="true"' : ''}${dirAttr}>${renderInline(text, inlineOpts)}</h${level}>`;
       i++;
       continue;
     }
@@ -1763,7 +1820,23 @@ function renderMarkdown(md, opts = {}) {
     if (/^>\s?/.test(t)) {
       let q = [];
       while (i < lines.length && /^\s*>/.test(lines[i])) q.push(lines[i++].replace(/^\s*>\s?/, ''));
-      html += `<blockquote>${q.map(x => `<p>${renderInline(x, inlineOpts)}</p>`).join('')}</blockquote>`;
+      const calloutMatch = q[0] && q[0].trim().match(/^\[!([a-zA-Z0-9_-]+)\]([+-])?(?:\s+(.*))?$/);
+      if (calloutMatch) {
+        const rawType = calloutMatch[1].toLowerCase();
+        const fold = calloutMatch[2] || '';
+        const customTitle = (calloutMatch[3] || '').trim();
+        const meta = CALLOUT_META[rawType] || { cls: 'note', icon: 'ℹ️' };
+        const titleText = customTitle || (rawType.charAt(0).toUpperCase() + rawType.slice(1));
+        const bodyRaw = q.slice(1).join('\n').trim();
+        const bodyHtml = bodyRaw ? renderMarkdown(bodyRaw, { ...opts, isNested: true }).html : '';
+        if (fold === '+' || fold === '-') {
+          html += `<details class="nora-callout nora-callout-${meta.cls}"${fold === '+' ? ' open' : ''}${dirAttr}><summary class="nora-callout-title"><span class="nora-callout-icon" aria-hidden="true">${meta.icon}</span><span class="nora-callout-label">${renderInline(titleText, inlineOpts)}</span><span class="nora-callout-chevron" aria-hidden="true"></span></summary>${bodyHtml ? `<div class="nora-callout-body">${bodyHtml}</div>` : ''}</details>`;
+        } else {
+          html += `<div class="nora-callout nora-callout-${meta.cls}"${dirAttr}><div class="nora-callout-title"><span class="nora-callout-icon" aria-hidden="true">${meta.icon}</span><span class="nora-callout-label">${renderInline(titleText, inlineOpts)}</span></div>${bodyHtml ? `<div class="nora-callout-body">${bodyHtml}</div>` : ''}</div>`;
+        }
+      } else {
+        html += `<blockquote${dirAttr}>${q.map(x => `<p${dirAttr}>${renderInline(x, inlineOpts)}</p>`).join('')}</blockquote>`;
+      }
       continue;
     }
 
@@ -1776,8 +1849,8 @@ function renderMarkdown(md, opts = {}) {
         i++;
       }
       if (rows.length) {
-        html += '<table><thead><tr>' + rows[0].map(x => `<th>${renderInline(x, inlineOpts)}</th>`).join('') + '</tr></thead><tbody>' +
-          rows.slice(1).map(row => '<tr>' + rows[0].map((_, j) => `<td>${renderInline(row[j] || '', inlineOpts)}</td>`).join('') + '</tr>').join('') +
+        html += '<table><thead><tr>' + rows[0].map(x => `<th${dirAttr}>${renderInline(x, inlineOpts)}</th>`).join('') + '</tr></thead><tbody>' +
+          rows.slice(1).map(row => '<tr>' + rows[0].map((_, j) => `<td${dirAttr}>${renderInline(row[j] || '', inlineOpts)}</td>`).join('') + '</tr>').join('') +
           '</tbody></table>';
       }
       continue;
@@ -1789,9 +1862,9 @@ function renderMarkdown(md, opts = {}) {
       while (i < lines.length && matchSame(lines[i])) {
         let item = lines[i++].replace(/^(\s*)([-*+]|\d+\.)\s+/, '');
         let task = item.match(/^\[([ xX])\]\s*(.*)$/);
-        items.push(`<li>${task ? `<input type="checkbox" disabled ${task[1].toLowerCase() === 'x' ? 'checked' : ''}>${renderInline(task[2], inlineOpts)}` : renderInline(item, inlineOpts)}</li>`);
+        items.push(`<li${dirAttr}>${task ? `<input type="checkbox" disabled ${task[1].toLowerCase() === 'x' ? 'checked' : ''}>${renderInline(task[2], inlineOpts)}` : renderInline(item, inlineOpts)}</li>`);
       }
-      html += `<${tag}>${items.join('')}</${tag}>`;
+      html += `<${tag}${dirAttr}>${items.join('')}</${tag}>`;
       continue;
     }
 
@@ -1800,7 +1873,7 @@ function renderMarkdown(md, opts = {}) {
     while (
       i < lines.length &&
       lines[i].trim() &&
-      !/^```|^\$\$|^<svg\b|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/i.test(lines[i].trim()) &&
+      !/^```|^\$\$|^<svg\b|^:::NORA_CHAPTER_START::|^#{1,6}\s|^>\s?|^(\s*)([-*+]|\d+\.)\s+/i.test(lines[i].trim()) &&
       !isHr(lines[i].trim()) &&
       !matchStandaloneEmbedLine(lines[i].trim()) &&
       !isTable(i)
@@ -1808,16 +1881,35 @@ function renderMarkdown(md, opts = {}) {
       para.push(lines[i].trim());
       i++;
     }
-    html += `<p>${para.map(line => renderInline(line, inlineOpts)).join('<br>')}</p>`;
+    html += `<p${dirAttr}>${para.map(line => renderInline(line, inlineOpts)).join('<br>')}</p>`;
   }
 
-  if (headings.length > 1) {
+  if (!isNested && headings.length > 0) {
+    const hasChapters = headings.some(h => h.isChapter);
     let toc = `<nav class="toc"><div class="toc-title">${esc(r.tocTitleInline)}</div>`;
-    headings.forEach((h, index) => {
-      if (h.level <= 3 && !(index === 0 && h.level === 1)) {
-        toc += `<a class="${h.level === 3 ? 'level3' : ''}" href="#${h.id}">${renderInline(h.text, { ...inlineOpts, inFootnote: true })}</a>`;
-      }
-    });
+    if (hasChapters) {
+      let groupOpen = false;
+      headings.forEach(h => {
+        if (h.isChapter) {
+          if (groupOpen) toc += '</div></div>';
+          toc += `<div class="toc-group"><a class="toc-file-link" href="#${h.id}">📝 ${esc(h.text)}</a><div class="toc-group-children">`;
+          groupOpen = true;
+        } else if (h.level <= 3) {
+          if (!groupOpen) {
+            toc += '<div class="toc-group"><div class="toc-group-children">';
+            groupOpen = true;
+          }
+          toc += `<a class="level${h.level}" href="#${h.id}">${renderInline(h.text, { ...inlineOpts, inFootnote: true })}</a>`;
+        }
+      });
+      if (groupOpen) toc += '</div></div>';
+    } else {
+      headings.forEach(h => {
+        if (h.level <= 3) {
+          toc += `<a class="level${h.level}" href="#${h.id}">${renderInline(h.text, { ...inlineOpts, inFootnote: true })}</a>`;
+        }
+      });
+    }
     toc += '</nav>';
     html = toc + html;
   }
@@ -1853,14 +1945,16 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
   const fallbackPalette = options.palette || 'default';
   const initPalette = hasCustomCss ? 'custom' : fallbackPalette;
   const initCover = options.coverStyle || 'aurora';
-  const dir = options.direction === 'auto' ? t.dir : (options.direction || t.dir);
+  const autoDir = options.direction === 'auto';
+  const dir = autoDir ? t.dir : (options.direction || t.dir);
+  const initFont = options.fontFamily || 'Vazirmatn';
   const size = parseInt(options.fontSize, 10) || 16;
   const initWidth = options.width || '850';
   const initReadingMode = options.readingMode === 'scroll' ? 'scroll' : 'paginated';
   const splitMarkedChaptersOnly = options.splitMarkedChaptersOnly === true;
   const maxW = initWidth === '100%' ? '100%' : initWidth + 'px';
   const bodyMd = stripFrontmatter(mdText);
-  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang, mermaidMap, mathMap });
+  const rendered = renderMarkdown(mdText, { forExport: options.forExport !== false, attachmentsMap, lang, mermaidMap, mathMap, autoDir });
   const content = rendered.html;
   const footnotes = rendered.footnotes;
   const title = cleanTitle(options.title) || (bodyMd.match(/^#\s+(.+)$/m) || [])[1] || r.defaultTitle;
@@ -1957,9 +2051,9 @@ function buildStandaloneHtml(mdText, options, attachmentsMap, mermaidMap = null,
     copiedCode: r.copiedCode
   };
 
-  const fontFamily = lang === 'fa'
-    ? "'Vazirmatn','IRANSans','Segoe UI',Tahoma,system-ui,-apple-system,sans-serif"
-    : "'Inter','Segoe UI',system-ui,-apple-system,'Vazirmatn',sans-serif";
+  const fontFamily = initFont === 'Vazirmatn'
+    ? "'Vazirmatn','Inter','Segoe UI',Tahoma,system-ui,-apple-system,sans-serif"
+    : `'${initFont}','Vazirmatn','Segoe UI',Tahoma,system-ui,-apple-system,sans-serif`;
 
   const drawerOffTransform = dir === 'ltr' ? '-105%' : '105%';
   const settingsOffTransform = dir === 'ltr' ? '105%' : '-105%';
@@ -2599,6 +2693,130 @@ body.night .nora-math-block{background:#1c2035}
 }
 body.night .nora-svg-wrap{background:#1c2035}
 .nora-svg-wrap svg{max-width:100%;height:auto;display:block;margin:0 auto}
+
+/* ===== جهت خودکار پاراگراف‌ها ===== */
+body.auto-dir .article p,
+body.auto-dir .article li,
+body.auto-dir .article h1,
+body.auto-dir .article h2,
+body.auto-dir .article h3,
+body.auto-dir .article h4,
+body.auto-dir .article blockquote,
+body.auto-dir .article td,
+body.auto-dir .article th{unicode-bidi:plaintext;text-align:start}
+
+/* ===== بنر شروع فصل (فایل در خروجی پوشه) ===== */
+.nora-chapter-banner{
+  display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;
+  margin:0 auto 28px;padding:16px 22px;border-radius:16px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,var(--paper)),color-mix(in srgb,var(--accent2) 10%,var(--paper)));
+  border:1.5px solid color-mix(in srgb,var(--accent) 26%,var(--line));
+  color:var(--accent);font-size:1.45em;font-weight:900;line-height:1.5;scroll-margin-top:90px;
+}
+.nora-chapter-icon{font-size:1.05em}
+
+/* ===== سلسله‌مراتب والد و فرزندی فهرست مطالب ===== */
+.toc-items a.level1{
+  font-weight:800;font-size:13.2px;color:var(--ink);
+  margin-top:6px;
+}
+.toc-items a.level2{
+  margin-inline-start:10px;padding-inline-start:14px;
+  border-inline-start:2px solid var(--line);
+  border-start-start-radius:0;border-end-start-radius:0;
+  font-size:12.5px;color:var(--muted);padding-block:6px;
+}
+.toc-items a.level3{
+  margin-inline-start:22px;padding-inline-start:14px;
+  border-inline-start:1.5px dashed var(--line);
+  border-start-start-radius:0;border-end-start-radius:0;
+  font-size:11.8px;color:var(--muted);padding-block:5px;
+}
+.toc-items a.level2:hover,.toc-items a.level2.current,
+.toc-items a.level3:hover,.toc-items a.level3.current{
+  border-inline-start-color:var(--accent);color:var(--accent);
+}
+
+/* ===== گروه‌بندی فهرست مطالب در خروجی پوشه ===== */
+.toc-group{
+  border:1px solid var(--line);border-radius:13px;padding:7px;margin:10px 0;
+  background:color-mix(in srgb,var(--bg) 48%,var(--paper));
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+.toc-group.is-active-group{
+  border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
+  box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 10%,transparent);
+}
+.toc-items a.toc-file-link{
+  display:flex;align-items:center;gap:6px;
+  font-weight:800;font-size:13.2px;color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 9%,var(--paper));
+  border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);
+  border-radius:9px;padding:8px 10px;margin:0;
+}
+.toc-items a.toc-file-link.current{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+}
+body.night .toc-items a.toc-file-link.current{color:#121524}
+.toc-group-children{
+  margin-top:6px;margin-inline-start:13px;padding-inline-start:10px;
+  border-inline-start:2px solid color-mix(in srgb,var(--accent) 24%,var(--line));
+  display:flex;flex-direction:column;gap:2px;
+}
+.toc-group-children:empty{display:none}
+.toc-group-children a{
+  position:relative;margin:0;padding:6px 10px;
+  border-inline-start:0;border-radius:8px;font-size:12.4px;color:var(--muted);
+}
+.toc-group-children a.level1{font-weight:700;color:var(--ink);font-size:12.8px;margin-top:2px}
+.toc-group-children a.level2{padding-inline-start:18px;font-size:12.2px}
+.toc-group-children a.level3{padding-inline-start:28px;font-size:11.6px;opacity:.9}
+.toc-group-children a::before{
+  content:"";position:absolute;inset-inline-start:-10px;top:50%;
+  width:8px;height:1.5px;background:color-mix(in srgb,var(--accent) 28%,var(--line));
+}
+.toc-group-children a.current::before,.toc-group-children a:hover::before{
+  background:var(--accent);
+}
+
+/* ===== کالوت‌های ابسیدین (Callouts) ===== */
+.nora-callout{
+  --co-color:var(--accent);
+  margin:1.35em 0;border-radius:13px;
+  border:1px solid color-mix(in srgb,var(--co-color) 28%,var(--line));
+  border-inline-start:4px solid var(--co-color);
+  background:color-mix(in srgb,var(--co-color) 7%,var(--paper));
+  overflow:hidden;break-inside:avoid;
+}
+.nora-callout-info,.nora-callout-todo{--co-color:#2563eb}
+.nora-callout-tip,.nora-callout-abstract{--co-color:#0d9488}
+.nora-callout-success{--co-color:#16a34a}
+.nora-callout-warning,.nora-callout-question{--co-color:#d97706}
+.nora-callout-danger{--co-color:#dc2626}
+.nora-callout-example{--co-color:#7c3aed}
+.nora-callout-quote{--co-color:#64748b}
+body.night .nora-callout-info,body.night .nora-callout-todo{--co-color:#60a5fa}
+body.night .nora-callout-tip,body.night .nora-callout-abstract{--co-color:#2dd4bf}
+body.night .nora-callout-success{--co-color:#4ade80}
+body.night .nora-callout-warning,body.night .nora-callout-question{--co-color:#fbbf24}
+body.night .nora-callout-danger{--co-color:#f87171}
+body.night .nora-callout-example{--co-color:#c084fc}
+body.night .nora-callout-quote{--co-color:#94a3b8}
+.nora-callout-title{
+  display:flex;align-items:center;gap:8px;padding:11px 15px;
+  font-weight:800;font-size:.96em;color:var(--co-color);list-style:none;
+}
+details.nora-callout>summary.nora-callout-title{cursor:pointer;user-select:none}
+details.nora-callout>summary.nora-callout-title::-webkit-details-marker{display:none}
+.nora-callout-chevron{
+  margin-inline-start:auto;width:8px;height:8px;
+  border-inline-end:2px solid currentColor;border-bottom:2px solid currentColor;
+  transform:rotate(45deg);transition:transform .18s ease;opacity:.75;
+}
+details.nora-callout[open]>summary .nora-callout-chevron{transform:rotate(225deg)}
+.nora-callout-body{padding:2px 15px 12px}
+.nora-callout-body>:first-child{margin-top:0}
+.nora-callout-body>:last-child{margin-bottom:0}
 @media print{
   .mmd-lightbox{display:none!important}
   .nora-mermaid-light{display:block!important}
@@ -2645,9 +2863,12 @@ body.night .nora-svg-wrap{background:#1c2035}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="${dark ? '#0f1220' : '#f3f5fb'}">
 <title>${safeTitle}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>${css}</style>${hasCustomCss ? `<style id="nora-custom-style">${customCssText}</style>` : ''}
 </head>
-<body class="${[dark ? 'night' : '', initReadingMode === 'scroll' ? 'scroll-mode' : ''].filter(Boolean).join(' ')}" data-palette="${esc(initPalette)}">
+<body class="${[dark ? 'night' : '', initReadingMode === 'scroll' ? 'scroll-mode' : '', autoDir ? 'auto-dir' : ''].filter(Boolean).join(' ')}" data-palette="${esc(initPalette)}">
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
 
 <nav class="readerbar">
@@ -2729,6 +2950,8 @@ body.night .nora-svg-wrap{background:#1c2035}
       <div class="set-label"><span>${esc(r.setFontFamily)}</span></div>
       <select id="readerFont" class="set-select" title="${esc(r.fontTitle)}">
         <option value="default">${esc(r.fontDefault)}</option>
+        <option value="Vazirmatn">Vazirmatn</option>
+        <option value="Inter">Inter</option>
         <option value="Tahoma">Tahoma</option>
         <option value="system-ui">System UI</option>
         <option value="Georgia">Georgia</option>
@@ -2848,12 +3071,9 @@ body.night .nora-svg-wrap{background:#1c2035}
   coverTocLink.textContent='📖 '+docLabel+' '+S.tocCoverSuffix;
   tocItems.append(coverTocLink);
   if(tocSource){
-    [...tocSource.querySelectorAll('a')].forEach(a=>{
-      const link=document.createElement('a');
-      link.href=a.getAttribute('href');
-      link.textContent=a.textContent;
-      link.className=a.className;
-      tocItems.append(link);
+    [...tocSource.children].forEach(child=>{
+      if(child.classList&&child.classList.contains('toc-title')) return;
+      tocItems.append(child.cloneNode(true));
     });
     tocSource.remove();
   }
@@ -3176,6 +3396,18 @@ body.night .nora-svg-wrap{background:#1c2035}
     const within=Math.max(0,Math.min(1,(window.scrollY+window.innerHeight-top)/(height+window.innerHeight)));
     progress.style.width=((current+within)/all.length*100)+'%';
   }
+  function syncActiveToc(){
+    const links=[...tocItems.querySelectorAll('a[href^="#"]')];
+    let targetHref='#cover';
+    if(current>=0&&all[current]){
+      const anchor=all[current].querySelector('[data-nora-chapter][id], h1[id], h2[id], h3[id]');
+      if(anchor) targetHref='#'+anchor.id;
+    }
+    links.forEach(a=>a.classList.toggle('current',a.getAttribute('href')===targetHref));
+    tocItems.querySelectorAll('.toc-group').forEach(g=>{
+      g.classList.toggle('is-active-group',Boolean(g.querySelector('a.current')));
+    });
+  }
   function show(n, shouldScroll=true){
     closeFnPop();
     current=Math.max(-1,Math.min(all.length-1,n));
@@ -3193,6 +3425,7 @@ body.night .nora-svg-wrap{background:#1c2035}
       next.textContent=isRtl?(S.nextSection+' ←'):(S.nextSection+' →');
     }
     updateMarkBtn();
+    syncActiveToc();
     try{localStorage.setItem(posKey,String(current))}catch(e){}
     if(shouldScroll){
       if(document.body.classList.contains('scroll-mode')){
@@ -3356,8 +3589,34 @@ body.night .nora-svg-wrap{background:#1c2035}
   };
 
   const annotationKey='nora-annotations-'+bookId;
-  function saveAnnotations(){try{localStorage.setItem(annotationKey,JSON.stringify(all.map(p=>p.querySelector('.article').innerHTML)))}catch(e){}}
-  try{const saved=JSON.parse(localStorage.getItem(annotationKey)||'null');if(Array.isArray(saved)) all.forEach((p,i)=>{if(typeof saved[i]==='string') p.querySelector('.article').innerHTML=saved[i]})}catch(e){}
+  const origImgSrcs=all.map(p=>[...p.querySelectorAll('img[src^="data:"]')].map(img=>img.src));
+  function saveAnnotations(){
+    try{
+      const payload=all.map(p=>{
+        const clone=p.querySelector('.article').cloneNode(true);
+        clone.querySelectorAll('img[src^="data:"]').forEach((img,idx)=>{
+          img.setAttribute('data-nora-img-idx',String(idx));
+          img.setAttribute('src','');
+        });
+        return clone.innerHTML;
+      });
+      localStorage.setItem(annotationKey,JSON.stringify(payload));
+    }catch(e){}
+  }
+  try{
+    const saved=JSON.parse(localStorage.getItem(annotationKey)||'null');
+    if(Array.isArray(saved)) all.forEach((p,i)=>{
+      if(typeof saved[i]==='string'){
+        const art=p.querySelector('.article');
+        art.innerHTML=saved[i];
+        art.querySelectorAll('img[data-nora-img-idx]').forEach(img=>{
+          const idx=+img.getAttribute('data-nora-img-idx');
+          if(origImgSrcs[i]&&origImgSrcs[i][idx]) img.src=origImgSrcs[i][idx];
+          img.removeAttribute('data-nora-img-idx');
+        });
+      }
+    });
+  }catch(e){}
   function getSelectedTextSlices(root, range){
     const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
       acceptNode(node){
@@ -3486,6 +3745,7 @@ class NoraExportModal extends Modal {
       palette: this.overrides.palette || this.plugin.settings.palette,
       coverStyle: this.overrides.coverStyle || this.plugin.settings.coverStyle,
       direction: this.overrides.direction || this.plugin.settings.direction,
+      fontFamily: this.overrides.fontFamily || this.plugin.settings.fontFamily || 'Vazirmatn',
       fontSize: String(this.overrides.fontSize || this.plugin.settings.fontSize),
       width: this.overrides.width || this.plugin.settings.width,
       readingMode: this.overrides.readingMode || this.plugin.settings.readingMode || 'paginated',
@@ -3586,6 +3846,7 @@ class NoraExportModal extends Modal {
     addSelect(styleGrid, t.fieldPalette, 'palette', t.palettes);
     addSelect(styleGrid, t.fieldCoverStyle, 'coverStyle', t.covers);
     addSelect(styleGrid, t.fieldDirection, 'direction', t.directions);
+    addSelect(styleGrid, t.fieldFontFamily, 'fontFamily', t.fontFamilies);
     addSelect(styleGrid, t.fieldFontSize, 'fontSize', t.fontSizes);
     addSelect(styleGrid, t.fieldWidth, 'width', t.widths);
     addSelect(styleGrid, t.fieldReadingMode, 'readingMode', t.readingModes);
@@ -3668,13 +3929,13 @@ class NoraFolderExportModal extends Modal {
     this.state = {
       folderPath: initialFolder ? initialFolder.path : '/',
       includeSubfolders: true,
-      preserveStructure: true,
       embedAttachments: plugin.settings.embedAttachments,
       openFolderAfter: true,
       theme: plugin.settings.theme,
       palette: plugin.settings.palette,
       coverStyle: plugin.settings.coverStyle,
       direction: plugin.settings.direction,
+      fontFamily: plugin.settings.fontFamily || 'Vazirmatn',
       fontSize: String(plugin.settings.fontSize),
       width: plugin.settings.width,
       readingMode: plugin.settings.readingMode || 'paginated',
@@ -3762,11 +4023,6 @@ class NoraFolderExportModal extends Modal {
     subCb.checked = state.includeSubfolders;
     subLabel.appendText(t.toggleSubfolders);
 
-    const treeLabel = folderOptsRow.createEl('label');
-    const treeCb = treeLabel.createEl('input', { type: 'checkbox' });
-    treeCb.checked = state.preserveStructure;
-    treeCb.addEventListener('change', () => { state.preserveStructure = treeCb.checked; });
-    treeLabel.appendText(t.togglePreserveTree);
 
     // آمار زنده فایل‌ها و مسیر خروجی
     const statsBar = contentEl.createDiv({ cls: 'nora-stats-bar' });
@@ -3793,6 +4049,7 @@ class NoraFolderExportModal extends Modal {
     addSelect(styleGrid, t.fieldPalette, 'palette', t.palettes);
     addSelect(styleGrid, t.fieldCoverStyle, 'coverStyle', t.covers);
     addSelect(styleGrid, t.fieldDirection, 'direction', t.directions);
+    addSelect(styleGrid, t.fieldFontFamily, 'fontFamily', t.fontFamilies);
     addSelect(styleGrid, t.fieldFontSize, 'fontSize', t.fontSizes);
     addSelect(styleGrid, t.fieldWidth, 'width', t.widths);
     addSelect(styleGrid, t.fieldReadingMode, 'readingMode', t.readingModes);
@@ -4034,6 +4291,7 @@ class NoraPreviewView extends ItemView {
       ...meta,
       ...this.viewPrefs,
       uiLang,
+      fontFamily: this.viewPrefs.fontFamily || this.plugin.settings.fontFamily || 'Vazirmatn',
       fontSize: this.plugin.settings.fontSize,
       width: this.plugin.settings.width,
       readingMode: this.viewPrefs.readingMode || this.plugin.settings.readingMode || 'paginated',
@@ -4178,6 +4436,18 @@ class NoraSettingTab extends PluginSettingTab {
           .onChange(async val => {
             this.plugin.settings.direction = val;
             await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(containerEl)
+      .setName(t.setFontFamilyName)
+      .addDropdown(dd => {
+        t.fontFamilies.forEach(([v, label]) => dd.addOption(v, label));
+        return dd.setValue(this.plugin.settings.fontFamily || 'Vazirmatn')
+          .onChange(async val => {
+            this.plugin.settings.fontFamily = val;
+            await this.plugin.saveSettings();
+            this.plugin.refreshOpenPreviews();
           });
       });
 
@@ -4573,30 +4843,6 @@ class NoraHtmlExporterPlugin extends Plugin {
     }
   }
 
-  async openGuide(language) {
-    const isFa = language === 'fa';
-    const lang = isFa ? 'fa' : 'en';
-    const fileName = isFa ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
-    const path = `Nora Guides/${fileName}`;
-    const url = isFa
-      ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Guide-FA.md'
-      : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora_HTML_Exporter_Complete_English_Guide.md';
-    try {
-      await this.ensureFolderExists('Nora Guides');
-      if (!(await this.app.vault.adapter.exists(path))) {
-        const response = await requestUrl({ url, method: 'GET' });
-        if (response.status < 200 || response.status >= 300 || !response.text) {
-          throw new Error(`Guide request failed (HTTP ${response.status})`);
-        }
-        await this.app.vault.create(path, response.text);
-      }
-      await this.app.workspace.openLinkText(path, '', false);
-    } catch (error) {
-      console.error('Nora: opening user guide failed', error);
-      new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
-    }
-  }
-
   onunload() {
     this.app.workspace.detachLeavesOfType(VIEW_TYPE_NORA_PREVIEW);
   }
@@ -4740,21 +4986,26 @@ class NoraHtmlExporterPlugin extends Plugin {
       if (typeof onProgress === 'function') onProgress(index + 1, files.length, file);
 
       const markdown = await this.app.vault.read(file);
-      const cleanMarkdown = stripFrontmatter(markdown);
+      let cleanMarkdown = stripFrontmatter(markdown);
       const sectionTitle = file.basename || file.name;
-
-      // Each source note starts a new chapter using the configured heading level.
-      const chapterLevel = Math.min(6, Math.max(1, parseInt(this.settings.chapterHeadingLevel, 10) || 1));
-      const chapterHeading = '#'.repeat(chapterLevel);
-      combinedParts.push(`${chapterHeading} NORA_CHAPTER_START::${sectionTitle}\n\n${cleanMarkdown}`);
 
       const noteAttachments = await resolveAttachmentsMap(this.app, markdown, file, {
         forExport: true,
         embedAttachments: state.embedAttachments
       });
       for (const [key, value] of noteAttachments.entries()) {
-        attachmentsMap.set(key, value);
+        const fullKey = normPath(value.relPath);
+        attachmentsMap.set(fullKey, value);
+        if (attachmentsMap.has(key) && attachmentsMap.get(key).relPath !== value.relPath) {
+          const escKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          cleanMarkdown = cleanMarkdown.replace(new RegExp(`(!?\\[\\[)(${escKey})([|#\\]])`, 'gi'), `$1${value.relPath}$3`);
+          cleanMarkdown = cleanMarkdown.replace(new RegExp(`(\\]\\()(${escKey})([)#\\s])`, 'gi'), `$1${value.relPath}$3`);
+        } else {
+          attachmentsMap.set(key, value);
+        }
       }
+
+      combinedParts.push(`:::NORA_CHAPTER_START::${sectionTitle}:::\n\n${cleanMarkdown}`);
     }
 
     const combinedMarkdown = combinedParts.join('\n\n---\n\n');
@@ -4775,6 +5026,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       palette: state.palette,
       coverStyle: state.coverStyle,
       direction: state.direction,
+      fontFamily: state.fontFamily || this.settings.fontFamily || 'Vazirmatn',
       fontSize: state.fontSize,
       width: state.width,
       readingMode: state.readingMode || this.settings.readingMode || 'paginated',
