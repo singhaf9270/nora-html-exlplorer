@@ -11,6 +11,7 @@ const {
   TFolder,
   normalizePath,
   requestUrl,
+  MarkdownRenderer,
   loadMermaid,
   loadMathJax,
   renderMath,
@@ -18,6 +19,7 @@ const {
 } = require('obsidian');
 
 const VIEW_TYPE_NORA_PREVIEW = 'nora-html-live-preview';
+const VIEW_TYPE_NORA_GUIDE = 'nora-user-guide-view';
 
 const DEFAULT_SETTINGS = {
   uiLanguage: 'fa',        // 'fa' | 'en' | 'auto'
@@ -90,6 +92,8 @@ const I18N = {
     phTitle: 'عنوان روی جلد',
     fieldFileName: 'نام فایل خروجی (بدون .html)',
     phFileName: 'نام فایل هنگام ذخیره',
+    fieldExportFolder: 'محل ذخیره خروجی (مسیر در Vault)',
+    phExportFolder: 'خالی = کنار همین یادداشت (مثلاً Nora Exports)',
     fieldDocType: 'نوع اثر / برچسب جلد',
     phDocType: 'پیش‌فرض: معرفی اثر (مقاله، کتاب، جزوه...)',
     fieldAuthor: 'نویسنده / نویسندگان (جداسازی با ؛)',
@@ -390,6 +394,8 @@ const I18N = {
     phTitle: 'Cover title',
     fieldFileName: 'Output filename (without .html)',
     phFileName: 'Filename when saved',
+    fieldExportFolder: 'Export Destination Folder (in Vault)',
+    phExportFolder: 'Empty = next to note (e.g. Nora Exports)',
     fieldDocType: 'Document type / Cover badge',
     phDocType: 'Default: Overview (Article, Book, Guide...)',
     fieldAuthor: 'Author(s) (separate with ; or ,)',
@@ -2367,9 +2373,11 @@ body.night .start-reading-btn{color:#121524}
 .chapter-page{display:none;min-height:68vh;padding:clamp(22px,5vw,60px);position:relative}
 .chapter-page.active{display:block}
 body.scroll-mode .cover{display:flex}
-body.scroll-mode .chapter-page{display:block;min-height:0;border-top:1px dashed var(--line)}
-body.scroll-mode .chapter-footer{position:static;margin-top:24px}
-body.scroll-mode .article{padding-bottom:18px}
+body.scroll-mode .chapter-page{display:block;min-height:0;border-top:0;padding-top:0;padding-bottom:0}
+body.scroll-mode .chapter-page:first-child{padding-top:clamp(22px,5vw,60px)}
+body.scroll-mode .chapter-page:last-child{padding-bottom:clamp(22px,5vw,60px)}
+body.scroll-mode .chapter-footer{display:none!important}
+body.scroll-mode .article{padding-bottom:0}
 body.scroll-mode .navrow{display:none}
 .article{font-size:var(--reader-font);line-height:var(--reader-lh);overflow-wrap:anywhere;padding:0 0 56px}
 .article h1,.article h2,.article h3,.article h4{line-height:1.55;scroll-margin-top:90px}
@@ -2386,7 +2394,7 @@ body.night .article em{color:#ebb485}
 .article a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed currentColor}
 .md-wikilink{color:var(--accent);font-weight:600;border-bottom:1px dotted color-mix(in srgb,var(--accent) 45%,transparent)}
 .article blockquote{margin:1.4em 0;padding:14px 18px;background:var(--quote-bg);border-inline-start:4px solid var(--accent);border-radius:12px}
-.article ul,.article ol{padding-inline-start:1.6em}
+.article ul,.article ol{padding-inline-start:2em;margin:.8em 0}
 .article li{padding:.18em 0}
 .article li::marker{color:var(--accent)}
 .article hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:2.3em 0}
@@ -2704,6 +2712,8 @@ body.auto-dir .article h4,
 body.auto-dir .article blockquote,
 body.auto-dir .article td,
 body.auto-dir .article th{unicode-bidi:plaintext;text-align:start}
+body.auto-dir .article ul,
+body.auto-dir .article ol{padding-inline:2em}
 
 /* ===== بنر شروع فصل (فایل در خروجی پوشه) ===== */
 .nora-chapter-banner{
@@ -3750,6 +3760,7 @@ class NoraExportModal extends Modal {
       width: this.overrides.width || this.plugin.settings.width,
       readingMode: this.overrides.readingMode || this.plugin.settings.readingMode || 'paginated',
       readerLanguage: this.overrides.readerLanguage || this.plugin.settings.readerLanguage,
+      exportFolder: this.overrides.exportFolder !== undefined ? this.overrides.exportFolder : (this.plugin.settings.exportFolder || ''),
       embedAttachments: this.plugin.settings.embedAttachments,
       openAfterExport: this.plugin.settings.openAfterExport,
       saveMetadataToFrontmatter: this.plugin.settings.saveMetadataToFrontmatter
@@ -3831,6 +3842,7 @@ class NoraExportModal extends Modal {
 
     addInput(metaGrid, t.fieldTitle, 'title', t.phTitle);
     addInput(metaGrid, t.fieldFileName, 'fileName', t.phFileName);
+    addInput(metaGrid, t.fieldExportFolder, 'exportFolder', t.phExportFolder, true);
     addInput(metaGrid, t.fieldDocType, 'docType', t.phDocType);
     addInput(metaGrid, t.fieldAuthor, 'author', t.phAuthor);
     addInput(metaGrid, t.fieldSubtitle, 'subtitle', t.phSubtitle);
@@ -3928,6 +3940,7 @@ class NoraFolderExportModal extends Modal {
     this.initialFolder = initialFolder;
     this.state = {
       folderPath: initialFolder ? initialFolder.path : '/',
+      exportFolder: plugin.settings.exportFolder || 'Nora Exports',
       includeSubfolders: true,
       embedAttachments: plugin.settings.embedAttachments,
       openFolderAfter: true,
@@ -4015,6 +4028,12 @@ class NoraFolderExportModal extends Modal {
       if (f.path === state.folderPath) opt.selected = true;
     });
 
+    // محل ذخیره خروجی
+    const destWrap = contentEl.createDiv({ cls: 'nora-field wide' });
+    destWrap.createEl('label', { text: t.fieldExportFolder });
+    const destInput = destWrap.createEl('input', { type: 'text', attr: { placeholder: t.phExportFolder } });
+    destInput.value = state.exportFolder || '';
+
     // گزینه‌های پوشه
     const folderOptsRow = contentEl.createDiv({ cls: 'nora-toggle-row' });
 
@@ -4081,7 +4100,7 @@ class NoraFolderExportModal extends Modal {
     const startBtn = rightGroup.createEl('button', { cls: 'nora-btn primary', text: t.btnStartBatch });
 
     const getDestBase = () => {
-      const baseExport = (this.plugin.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
+      const baseExport = (state.exportFolder || '').trim() || 'Nora Exports';
       const folderName = state.folderPath === '/' ? 'Vault-Root' : safeFileName(state.folderPath.split('/').pop());
       return normalizePath(`${baseExport}/${folderName}`);
     };
@@ -4093,6 +4112,10 @@ class NoraFolderExportModal extends Modal {
       startBtn.disabled = files.length === 0;
     };
 
+    destInput.addEventListener('input', () => {
+      state.exportFolder = destInput.value;
+      refreshCount();
+    });
     folderSel.addEventListener('change', () => {
       state.folderPath = folderSel.value;
       refreshCount();
@@ -4311,6 +4334,65 @@ class NoraPreviewView extends ItemView {
 /* =========================================================
    تب تنظیمات پلاگین (Settings Tab — دوزبانه)
    ========================================================= */
+
+class NoraGuideView extends ItemView {
+  constructor(leaf, plugin) {
+    super(leaf);
+    this.plugin = plugin;
+    this.language = 'fa';
+    this.markdown = '';
+    this.filePath = '';
+  }
+
+  getViewType() { return VIEW_TYPE_NORA_GUIDE; }
+  getDisplayText() {
+    const t = I18N[this.language === 'en' ? 'en' : 'fa'];
+    return this.language === 'en' ? t.guideEn : t.guideFa;
+  }
+  getIcon() { return 'book-open'; }
+
+  async setGuideContent(language, markdown, filePath = '') {
+    this.language = language === 'en' ? 'en' : 'fa';
+    this.markdown = markdown || '';
+    this.filePath = filePath || '';
+    if (this.leaf && typeof this.leaf.updateHeader === 'function') {
+      this.leaf.updateHeader();
+    }
+    await this.renderGuide();
+  }
+
+  async onOpen() {
+    await this.renderGuide();
+  }
+
+  async renderGuide() {
+    const container = this.containerEl.children[1];
+    if (!container) return;
+    const fa = this.language === 'fa';
+    container.empty();
+    container.addClass('markdown-preview-view', 'markdown-rendered', 'is-readable-line-width');
+    container.setAttribute('dir', fa ? 'rtl' : 'ltr');
+    container.style.padding = '24px 32px';
+    container.style.overflowY = 'auto';
+
+    const sizer = container.createDiv({ cls: 'markdown-preview-sizer markdown-preview-section' });
+    sizer.style.maxWidth = '820px';
+    sizer.style.margin = '0 auto';
+    sizer.style.lineHeight = '1.9';
+
+    if (!this.markdown) return;
+    if (MarkdownRenderer && typeof MarkdownRenderer.render === 'function') {
+      await MarkdownRenderer.render(this.app, this.markdown, sizer, this.filePath, this);
+    } else {
+      sizer.innerHTML = renderMarkdown(this.markdown, { forExport: false, lang: this.language }).html;
+    }
+  }
+
+  async onClose() {
+    const container = this.containerEl.children[1];
+    if (container) container.empty();
+  }
+}
 
 class NoraChangelogModal extends Modal {
   constructor(app, language) { super(app); this.language = language === 'en' ? 'en' : 'fa'; }
@@ -4584,26 +4666,17 @@ class NoraSettingTab extends PluginSettingTab {
     root.createEl('p', { cls: 'nora-guides-desc', text: t.guideIntro });
     const actions = root.createDiv({ cls: 'nora-guide-actions' });
     const guides = [
-      {
-        label: t.guideFa,
-        url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora-HTML-Exporter-Guide-FA.md',
-        primary: fa
-      },
-      {
-        label: t.guideEn,
-        url: 'https://github.com/singhaf9270/nora-html-exlplorer/blob/main/Nora_HTML_Exporter_Complete_English_Guide.md',
-        primary: !fa
-      }
+      { label: t.guideFa, lang: 'fa', primary: fa },
+      { label: t.guideEn, lang: 'en', primary: !fa }
     ];
     for (const guide of guides) {
-      const link = actions.createEl('a', {
+      const btn = actions.createEl('button', {
         cls: guide.primary ? 'nora-guide-button primary' : 'nora-guide-button',
-        text: guide.label,
-        href: guide.url
+        text: guide.label
       });
-      link.setAttribute('target', '_blank');
-      link.setAttribute('rel', 'noopener noreferrer');
-      link.setAttribute('aria-label', guide.label);
+      btn.type = 'button';
+      btn.setAttribute('aria-label', guide.label);
+      btn.addEventListener('click', () => { void this.plugin.openPluginGuide(guide.lang); });
     }
     const row = root.createDiv({ cls: 'nora-changelog-row' });
     row.createSpan({ cls: 'nora-changelog-label', text: t.changelogTitle });
@@ -4716,15 +4789,16 @@ class NoraHtmlExporterPlugin extends Plugin {
       this.settings.lastSeenVersion = currentVersion;
       await this.saveSettings();
     }
-    const guideLang = this.getUiLang();
-    const guideFileName = guideLang === 'fa' ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
-    const guidePath = `Nora Guides/${guideFileName}`;
-    if (!(await this.app.vault.adapter.exists(guidePath))) void this.downloadGuideOnFirstRun();
     const t = I18N[this.getUiLang()];
 
     this.registerView(
       VIEW_TYPE_NORA_PREVIEW,
       leaf => new NoraPreviewView(leaf, this)
+    );
+
+    this.registerView(
+      VIEW_TYPE_NORA_GUIDE,
+      leaf => new NoraGuideView(leaf, this)
     );
 
     this.addRibbonIcon('book-open', t.ribbonTooltip, () => {
@@ -4815,36 +4889,51 @@ class NoraHtmlExporterPlugin extends Plugin {
     this.addSettingTab(new NoraSettingTab(this.app, this));
   }
 
-  async downloadGuideOnFirstRun() {
-    const lang = this.getUiLang();
-    const isFa = lang === 'fa';
+  async openPluginGuide(language) {
+    const isFa = language === 'fa';
+    const lang = isFa ? 'fa' : 'en';
     const fileName = isFa ? 'Nora-User-Guide-fa.md' : 'Nora-User-Guide-en.md';
-    const path = `Nora Guides/${fileName}`;
+    const pluginDir = this.manifest.dir || normalizePath(`${this.app.vault.configDir}/plugins/${this.manifest.id}`);
+    const path = normalizePath(`${pluginDir}/${fileName}`);
     const url = isFa
       ? 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora-HTML-Exporter-Guide-FA.md'
       : 'https://raw.githubusercontent.com/singhaf9270/nora-html-exlplorer/main/Nora_HTML_Exporter_Complete_English_Guide.md';
     try {
-      await this.ensureFolderExists('Nora Guides');
-      if (!(await this.app.vault.adapter.exists(path))) {
+      let content = '';
+      if (await this.app.vault.adapter.exists(path)) {
+        content = await this.app.vault.adapter.read(path);
+      } else {
         const response = await requestUrl({ url, method: 'GET' });
         if (response.status < 200 || response.status >= 300 || !response.text) {
           throw new Error(`Guide request failed (HTTP ${response.status})`);
         }
-        await this.app.vault.create(path, response.text);
+        content = response.text;
+        await this.app.vault.adapter.write(path, content);
       }
-      this.settings.guideDownloaded = true;
-      await this.saveSettings();
-      new Notice(I18N[lang].guideDownloadedNotice, 7000);
+      const indexed = this.app.vault.getAbstractFileByPath(path);
+      if (indexed instanceof TFile) {
+        const leaf = this.app.workspace.getLeaf('tab');
+        await leaf.openFile(indexed);
+        return;
+      }
+      let leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_NORA_GUIDE)[0];
+      if (!leaf) {
+        leaf = this.app.workspace.getLeaf('tab');
+        await leaf.setViewState({ type: VIEW_TYPE_NORA_GUIDE, active: true });
+      }
+      this.app.workspace.revealLeaf(leaf);
+      if (leaf.view instanceof NoraGuideView) {
+        await leaf.view.setGuideContent(lang, content, path);
+      }
     } catch (error) {
-      this.settings.guideDownloaded = false;
-      await this.saveSettings();
-      console.error('Nora: automatic guide download failed', error);
+      console.error('Nora: opening user guide failed', error);
       new Notice(I18N[lang].guideDownloadFailedNotice, 8000);
     }
   }
 
   onunload() {
     this.app.workspace.detachLeavesOfType(VIEW_TYPE_NORA_PREVIEW);
+    this.app.workspace.detachLeavesOfType(VIEW_TYPE_NORA_GUIDE);
   }
 
   async loadSettings() {
@@ -4952,7 +5041,7 @@ class NoraHtmlExporterPlugin extends Plugin {
         return;
       }
 
-      const folder = (this.settings.exportFolder || '').trim();
+      const folder = (options.exportFolder !== undefined ? options.exportFolder : (this.settings.exportFolder || '')).trim();
       let targetDir = folder ? normalizePath(folder) : (file.parent ? file.parent.path : '');
       if (targetDir && targetDir !== '/') {
         await this.ensureFolderExists(targetDir);
@@ -5037,7 +5126,7 @@ class NoraHtmlExporterPlugin extends Plugin {
       forExport: true
     }, attachmentsMap, mermaidMap, mathMap);
 
-    const baseExport = (this.settings.exportFolder || 'Nora Exports').trim() || 'Nora Exports';
+    const baseExport = (state.exportFolder !== undefined ? state.exportFolder : (this.settings.exportFolder || 'Nora Exports')).trim() || 'Nora Exports';
     const folderName = folderPath === '/' ? 'Vault-Root' : safeFileName(folderLabel);
     const targetDir = normalizePath(`${baseExport}/${folderName}`);
     await this.ensureFolderExists(targetDir);
