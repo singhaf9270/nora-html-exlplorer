@@ -4386,6 +4386,59 @@ class NoraGuideView extends ItemView {
     } else {
       sizer.innerHTML = renderMarkdown(this.markdown, { forExport: false, lang: this.language }).html;
     }
+    this.setupGuideToc(sizer);
+  }
+
+  setupGuideToc(root) {
+    const slugify = value => String(value || '')
+      .normalize('NFKC')
+      .toLocaleLowerCase()
+      .replace(/[\u064B-\u065F\u0670]/g, '')
+      .replace(/[يى]/g, 'ی')
+      .replace(/ك/g, 'ک')
+      .replace(/[\u200c\u200f\u202a-\u202e]/g, '')
+      .replace(/[^\p{L}\p{N}]+/gu, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const headings = [...root.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+    const used = new Map();
+
+    headings.forEach(heading => {
+      const base = slugify(heading.textContent);
+      if (!base) return;
+      const count = used.get(base) || 0;
+      used.set(base, count + 1);
+      const slug = count ? `${base}-${count}` : base;
+      heading.dataset.noraGuideSlug = slug;
+      if (!heading.id) heading.id = slug;
+      heading.style.scrollMarginTop = '20px';
+    });
+
+    root.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', event => {
+        const raw = (link.getAttribute('href') || '').slice(1);
+        if (!raw) return;
+
+        let fragment = raw;
+        try { fragment = decodeURIComponent(raw); } catch (e) {}
+
+        const elementsWithId = [...root.querySelectorAll('[id]')];
+        let target = elementsWithId.find(el => el.id === fragment);
+
+        if (!target) {
+          const wantedSlug = slugify(fragment);
+          target = headings.find(heading => heading.dataset.noraGuideSlug === wantedSlug);
+        }
+        if (!target) return;
+
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (target.matches('h1,h2,h3,h4,h5,h6')) {
+          target.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+        }
+      });
+    });
   }
 
   async onClose() {
